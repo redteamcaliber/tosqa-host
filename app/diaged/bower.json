@@ -1,0 +1,6 @@
+{
+  "name": "diaged",
+  "dependencies": {
+    "raphael": "*"
+  }
+}
