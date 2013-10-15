@@ -19,6 +19,6 @@ npm install
 
 Some stuff is hard-coded, see `app/main/host.coffee`.
 
-(this code was originally derived from jcw/housemon v0.8, see its [README](HMR))
+(this code was originally derived from jcw/housemon v0.8, see its [README][HMR])
 
 [HMR]: https://github.com/jcw/housemon/blob/master/README-0.8.md
