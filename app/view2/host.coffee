@@ -5,3 +5,4 @@ module.exports = (app, plugin) ->
     counter = 0
     app.host.view2_next = ->
       ++counter
+      console.log "view2"

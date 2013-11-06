@@ -21,6 +21,7 @@ module.exports = (app, plugin) ->
   app.on 'running', ->
     Logger = @registry.sink.logger
     Replayer = @registry.pipe.replayer
+    Serial = @registry.interface.serial
     Parser = @registry.pipe.parser
     Dispatcher = @registry.pipe.dispatcher
     ReadingLog = @registry.sink.readinglog
@@ -44,3 +45,13 @@ module.exports = (app, plugin) ->
 
     readings
       .pipe(new StatusTable app.db)
+
+    jeelink = new Serial('usb-A900ad5m').on 'open', ->
+
+      jeelink # log raw data to file, as timestamped lines of text
+          .pipe(new Logger) # sink, can't chain this further
+
+      jeelink # log decoded readings as entries in the database
+          .pipe(new Parser)
+          .pipe(new Dispatcher)
+          .pipe(new ReadingLog app.db)

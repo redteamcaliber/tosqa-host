@@ -65,11 +65,13 @@ module.exports = (app, plugin) ->
 
   # generate "top-level" events for changes, so that we can hook in per-prefix
   emitOnPrefix = (key, value) ->
+    # 
     prefix = key.replace /~.*/, ''
     key = key.substr(prefix.length+1)
     value = JSON.parse value  if value?[0] is '{'
     app.emit "db.#{prefix}", key, value
 
+  
   app.db.on 'put', emitOnPrefix
   app.db.on 'batch', (array) ->
     emitOnPrefix x.key, x.value  for x in array
