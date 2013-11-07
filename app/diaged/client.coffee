@@ -272,9 +272,6 @@ window.createDiagramEditor = (domid) ->
               addWire pad, toPad, ->
                 context.onRemoveWire? pad, toPad
     @
-  
-  
+
   # onAddWire: (from, to) ->
   # onRemoveWire: (from, to) ->
-
-  

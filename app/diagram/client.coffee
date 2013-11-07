@@ -46,17 +46,6 @@ ng.controller 'DiagramCtrl', ->
       name: 'Player'
       pads:
         'waveform': {}
-    .addNode
-      id: 5
-      name: 'new oscilator'
-      x: 90
-      y: 110
-      pads:
-        'frequency': {}
-        'shape': {}
-        'waveform':
-          wires:
-            3: ['inmix']
     .wireItUp()
     
   diagram.onAddWire = (from, to) ->

@@ -31,36 +31,4 @@ ng.config (primus) ->
       table.push value
 
     table
-  
-  # primus.dead = (scope, prefix, adjust) ->
-    # table = []
-    # primus.write ['dead', prefix]
-#     
-    # # FIXME: scope has no place in this code, I'm mixing up stuff here...
-    # scope.$on "dead.#{prefix}", (event, type, value) ->
-      # switch type
-        # when 'put'
-          # key = value.key
-        # when 'del'
-          # key = value
-          # value = null
-        # else
-          # return
-# 
-      # adjust? value  if value?
-# 
-      # for row, index in table 
-        # if row.key is key
-          # if value?
-            # table[index] = value
-          # else
-            # table.splice index, 1
-          # return
-# 
-      # table.push value
-# 
-    # table
 
-
-
-    
