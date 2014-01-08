@@ -42,6 +42,8 @@ ng.config ($stateProvider, navbarProvider, primus) ->
       
     table
 
+    hier schrijf ik onzin
+
 
 #controller, calls primus.dead only
 ng.controller 'View5Ctrl', ($scope, primus, host) ->
