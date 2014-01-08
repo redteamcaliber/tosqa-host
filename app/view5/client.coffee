@@ -7,17 +7,17 @@ ng.config ($stateProvider, navbarProvider, primus) ->
     controller: 'View5Ctrl'
   navbarProvider.add '/view5', 'view5', 15
   
-  primus.dead = (scope, prefix, adjust) ->
+  primus.live = (scope, prefix, adjust) ->
     table = []
-    primus.write ['dead', prefix]
+    primus.write ['live', prefix]
 
     #function called at server side to update client         
-    scope.$on "dead.#{prefix}", (event, type, value) ->
+    scope.$on "live.#{prefix}", (event, type, value) ->
       switch type
         when 'put'
           key = value.key
           value = {key:key, value:value.value}
-          console.log "updated: " + key 
+          console.log "updated: " + key
          
         when 'del'
           key = value.key
@@ -25,18 +25,16 @@ ng.config ($stateProvider, navbarProvider, primus) ->
           console.log "deleted: " + key 
         else
           return
-        
 
       adjust? value  if value?
-# 
-      for row, index in table 
-        if row.key is key
-          if value?
-            table[index] = value
-          else
-            # table.splice index, 1
-          return
-# 
+# # 
+      # for row, index in table 
+      #   if row.key is key
+      #     if value?
+      #       table[index] = value
+      #     else
+      #       # table.splice index, 1
+      #     return
       
       table.push value
       
@@ -49,16 +47,14 @@ ng.controller 'View5Ctrl', ($scope, primus, host) ->
   diagram = createDiagramEditor('diagram')
   diagram_nodes = []
   
-  $scope.view5 = primus.dead $scope, 'view5', (table)->
-    console.info table.value
+  $scope.view5 = primus.live $scope, 'view5', (table)->
     
-    if table.value?[0] is '{'
-      node = JSON.parse table.value  
-   
+    node = table.value
+
     # if diagram does not contain node with this id then
     if diagram.nodes[table.key]?
       console.log "key exists"
-      if table.value isnt undefined
+      if table.value isnt null
         # console.log "new properties"
         # console.log diagram.node[table.key]
       else 
@@ -68,6 +64,7 @@ ng.controller 'View5Ctrl', ($scope, primus, host) ->
         
     else
       if node? and node.name?
+        console.info "add node:" + table.key
         addItem(diagram, table, node )
         
    
@@ -80,6 +77,7 @@ ng.controller 'View5Ctrl', ($scope, primus, host) ->
   
   diagram.onAddWire = (from, to) ->
     console.log 'added', from.node.id, from.name, '>', to.node.id, to.name
+
     
 
   diagram.onRemoveWire = (from, to) ->

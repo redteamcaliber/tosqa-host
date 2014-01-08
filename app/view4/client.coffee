@@ -9,47 +9,60 @@ ng.config ($stateProvider, navbarProvider, primus) ->
   navbarProvider.add '/view4', 'View4', 14
   
   primus.save = (scope, data) ->
-     primus.write ['save', data]
+     primus.write ['saveToStorage', data]
+     #primus.write ['live', data]
 
+#   primus.getdb = (scope, prefix, adjust) ->
+#     table = []
+#     primus.write ['getdb', prefix]
 
-  primus.getdb = (scope, prefix, adjust) ->
-    table = []
-    primus.write ['getdb', prefix]
-
-    #function called at server side to update client         
-    scope.$on "getdb.#{prefix}", (event, type, value) ->
-      switch type
-        when 'put'
-          key = value.key
-          value = {key:key, value:value.value}
-          console.log "updated: " + key 
-        else
-          return
+#     #function called at server side to update client         
+#     scope.$on "getdb.#{prefix}", (event, type, value) ->
+#       switch type
+#         when 'put'
+#           key = value.key
+#           value = {key:key, value:value.value}
+#           console.log "updated: " + key 
+#         else
+#           return
         
 
-      adjust? value  if value?
-# 
-      for row, index in table 
-        if row.key is key
-          if value?
-            table[index] = value
-          else
-            # table.splice index, 1
-          return
-# 
+#       adjust? value  if value?
+# # 
+#       for row, index in table 
+#         if row.key is key
+#           if value?
+#             table[index] = value
+#           else
+#             # table.splice index, 1
+#           return
+# # 
       
-      table.push value
+#       table.push value
       
-    table     
+#     table     
      
  
 # use buttons to set variable to values
 ng.controller 'View4Ctrl', ($scope, primus, host) ->    
+    console.log "view4"
+
+    # get existing nodes from db
+    # $scope.view4 = primus.live $scope, 'view5', (table)->
+    #   console.info table.value
+    #   node = table.value
+    #   $scope.todos.push 
+    #       text: node.name
+    #       done: false
+      
+
     $scope.addValue = (key, value) ->
       
       # make sure entries end up in view 5, by adding a prefix
       prefix = "view5"
       
+      value = null if value is ""
+
       data = {prefix:prefix, key:key, value:value}
       $scope.save = primus.save $scope, data
     
@@ -62,7 +75,7 @@ ng.controller 'View4Ctrl', ($scope, primus, host) ->
       height = number * 100 + 10
       
       value = '{"name":"'+ name + '","type":"' + type + '", "x":"300","y":"'+ height + '"}'      
-      console.info value
+      # console.info value
 
       
       data = {prefix:prefix, key:name, value:value}
@@ -86,14 +99,15 @@ ng.controller 'View4Ctrl', ($scope, primus, host) ->
       
     ]
     
-    # get existing nodes from db
-    $scope.view5 = primus.getdb $scope, 'view5', (table)->
-      console.info table.value
-      node = JSON.parse table.value
-      $scope.todos.push 
-        text: node.name
-        type: node.type
-        done: false
+
+
+    # $scope.view5 = primus.getdb $scope, 'view5', (table)->
+    #   console.info table.value
+    #   node = JSON.parse table.value
+    #   $scope.todos.push 
+    #     text: node.name
+    #     type: node.type
+    #     done: false
     
     $scope.addTodo = ->
       $scope.todos.push

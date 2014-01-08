@@ -64,6 +64,7 @@ module.exports = (app, plugin) ->
   app.db = setupDatabase './storage'
 
   # generate "top-level" events for changes, so that we can hook in per-prefix
+
   emitOnPrefix = (key, value) ->
     prefix = key.replace /~.*/, ''
     key = key.substr(prefix.length+1)
@@ -74,25 +75,54 @@ module.exports = (app, plugin) ->
   app.db.on 'batch', (array) ->
     emitOnPrefix x.key, x.value  for x in array
 
+
+
   # capture all requests to set up a live feed
   app.on 'running', (primus) ->
     primus.on 'connection', (spark) ->
+      # create save event for different keys 
+      spark.on 'saveToStorage', (data) ->
+        key = data.prefix + "~" +data.key
+        value = data.value
+        
+        if value? 
+          app.db.put key, value, (err) ->
+            # read the whole store as a stream and print each entry to stdout
+            app.db.createReadStream().on("data", console.log)
+        else  
+          app.db.del key, (err) ->
+            # read the whole store as a stream and print each entry to stdout
+            app.db.createReadStream().on("data", console.log)
+      
+      # create live event
       spark.on 'live', (prefix) ->
-        console.info 'replay', prefix
+        # console.info 'replay', prefix
         livePrefix = "live.#{prefix}"
 
-        app.db.createValueStream
-          start: prefix + "~"
-          end: prefix + "~~"
-          valueEncoding: 'json'
+        # create value stream to initialize nodes on client
+        app.db.createReadStream
+          start:  prefix
+          end:    prefix + '\xFF'
+          keys:   true
+          #valueEncoding: 'json' #why does this not work?
         .on 'data', (data) ->
+          #begin dirty workaround
+          key = data.key
+          value = data.value
+          value = JSON.parse value  if value?[0] is '{'
+          data = {key, value}
+          #end dirty workaround
           spark.write [livePrefix, 'put', data]
         .on 'end', ->
-          console.info 'live', prefix
+          console.log 'live', prefix  
 
+          # at db.#{prefix} event update the client
           app.on "db.#{prefix}", (key, value) ->
             if value?
-              if key is value.key
-                spark.write [livePrefix, 'put', value]
+              data = {key, value}
+              spark.write [livePrefix, 'put', data]
+              console.log "added " + key
             else
-              spark.write [livePrefix, 'del', key]
+              data = {key, 'null'}
+              spark.write [livePrefix, 'del', data]
+              console.log "removed " + key
