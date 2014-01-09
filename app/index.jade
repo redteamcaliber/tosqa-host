@@ -8,10 +8,8 @@ prepend styles
   script(src='/foundation/js/vendor/custom.modernizr.js')
 
 prepend scripts
-  script.
-    document.write('<script src=/foundation/js/vendor/'
-      + ('__proto__' in {} ? 'zepto' : 'jquery')
-      + '.js><\/script>');
+  //- TODO: zepto is probably not enough for foundation
+  script(src='/foundation/js/vendor/jquery.js')
   script(src='/foundation/js/foundation/foundation.js')
   script(src='/foundation/js/foundation/foundation.topbar.js')
   script.

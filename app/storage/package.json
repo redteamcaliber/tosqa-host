@@ -10,7 +10,7 @@
   "license": "MIT",
   "repository": {},
   "dependencies": {
-    "level": "~0.17.0",
+    "level": "~0.18.0",
     "level-nulldel": "~0.0.1"
   }
 }
