@@ -81,11 +81,13 @@ module.exports = (app, plugin) ->
   app.on 'running', (primus) ->
     primus.on 'connection', (spark) ->
       # create save event for different keys 
+
       spark.on 'saveToStorage', (data) ->
+        
         key = data.prefix + "~" +data.key
         value = data.value
         
-        if value? 
+        if value?
           app.db.put key, value, (err) ->
             # read the whole store as a stream and print each entry to stdout
             app.db.createReadStream().on("data", console.log)

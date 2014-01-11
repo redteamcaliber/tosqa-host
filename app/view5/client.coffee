@@ -50,13 +50,17 @@ ng.controller 'View5Ctrl', ($scope, primus, host) ->
   $scope.view5 = primus.live $scope, 'view5', (table)->
     
     node = table.value
+    console.log node
 
     # if diagram does not contain node with this id then
     if diagram.nodes[table.key]?
       console.log "key exists"
       if table.value isnt null
-        # console.log "new properties"
+        console.log "new properties"
+        console.log diagram.nodes[table.key]
+        diagram.nodes[table.key].x = 60
         # console.log diagram.node[table.key]
+
       else 
         # if key is removed then remove Node
         console.log "remove node:" + table.key
@@ -68,21 +72,23 @@ ng.controller 'View5Ctrl', ($scope, primus, host) ->
         addItem(diagram, table, node )
         
    
-        
-
-                        
-
-  
+      
   diagram.wireItUp()
   
   diagram.onAddWire = (from, to) ->
     console.log 'added', from.node.id, from.name, '>', to.node.id, to.name
+    link = from.node.id + from.name + '>' + to.node.id + to.name
+    value = {fromId:from.node.id, pad:from.name, toId:to.node.id, topad:to.name}
+    data = {prefix:"view5", key:link, value:value}
+    primus.write ['saveToStorage', data]
 
     
 
   diagram.onRemoveWire = (from, to) ->
     console.log 'removed', from.node.id, from.name, '>', to.node.id, to.name
-    
+    link = from.node.id + from.name + '>' + to.node.id + to.name
+    data = {prefix:"view5", key:link}
+    primus.write ['saveToStorage', data]
 
 
 ng.directive 'highlightOnChange', ($animate) ->
