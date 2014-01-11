@@ -2,7 +2,7 @@
   "name": "app-rpc",
   "version": "0.0.1",
   "dependencies": {
-    "q": "~0.9.7",
-    "q-connection": "~0.5.5"
+    "q": "~1.0.0",
+    "q-connection": "~1.0.0"
   }
 }
