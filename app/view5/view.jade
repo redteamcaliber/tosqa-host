@@ -13,3 +13,12 @@
       * Double-click on a line to break the connection again.
       * Adding and removing lines is now tracked in the data structure.
 
+    table.pure-table
+      tr(ng-repeat='row in nodeData')
+        td(ng-repeat='col in row')
+          input.table-input(ng-model='row[$index]')
+    //- p {{nodeData}}
+
+//- <div ng-controller="MyController"></div>
+//- p {{ person }} {{nodeData}}
+//- p <input ng-model="person.name" placeholder="Name"></input>

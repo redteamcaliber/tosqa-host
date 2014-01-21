@@ -52,6 +52,10 @@ ng.controller 'View5Ctrl', ($scope, primus, host) ->
     node = table.value
     console.log node
 
+    $scope.nodeData = [
+      ["properties", "-"]
+    ];    
+
     # if diagram does not contain node with this id then
     if diagram.nodes[table.key]?
       console.log "key exists"
@@ -70,10 +74,24 @@ ng.controller 'View5Ctrl', ($scope, primus, host) ->
       if node? and node.name?
         console.info "add node:" + table.key
         addItem(diagram, table, node )
-        
+
+      #updates infotable with new node data
+    $scope.update = (nodeId) ->
+      console.log "info updated for nodeId:" + nodeId
+      $scope.nodeData = [
+        ["properties", nodeId],
+        ["temp", 50],
+        ["STEP", 200],
+        ["value", 63]
+      ];        
    
       
   diagram.wireItUp()
+
+  
+  diagram.onClick = (nodeId)->
+    $scope.$apply ->
+      $scope.update(nodeId)
   
   diagram.onAddWire = (from, to) ->
     console.log 'added', from.node.id, from.name, '>', to.node.id, to.name

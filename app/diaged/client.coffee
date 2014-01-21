@@ -188,6 +188,21 @@ window.createDiagramEditor = (domid) ->
 
       elt.drag move, start, end
 
+    #ADDED BY TIM TO MAKE CLICKABLE
+    makeClickable = (elt) ->
+      # function empty
+      start = (x, y, e) ->
+
+      end = (e)->
+        context.onClick? node.id
+
+      elt.drag start, end
+
+
+    circle = paper.circle(x, y, 7.5).attr fill: 'white'
+    circles.push circle
+    makeClickable circle  
+
     # Create Raphael elements for all the parts of this node
     for padName, pad of pads
       pad.node = node
