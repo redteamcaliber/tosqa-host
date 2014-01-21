@@ -142,6 +142,7 @@ window.createDiagramEditor = (domid) ->
       start = ->
         cx = cy = 0
         set.toFront()
+        # context.onClick? node.id
         
       move = (dx, dy) ->
         set.translate dx - cx, dy - cy
@@ -199,6 +200,7 @@ window.createDiagramEditor = (domid) ->
       elt.drag start, end
 
 
+    # circle = paper.rect((x+10), (y+10), 7.5, 7.5).attr fill: 'white'
     circle = paper.circle(x, y, 7.5).attr fill: 'white'
     circles.push circle
     makeClickable circle  
