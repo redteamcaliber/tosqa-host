@@ -292,3 +292,46 @@ window.createDiagramEditor = (domid) ->
 
   # onAddWire: (from, to) ->
   # onRemoveWire: (from, to) ->
+
+  
+  # ///////////////
+  # nodetypes go here FOR NOW
+  # ///////////////
+  nodeTypes:->
+    tqNodeTypes:
+      ssb:
+        description: "this is a driver for ssb"
+        driver: "ssbDriver"
+        attributes:
+          temp:
+            varType: "int"
+            editable: false
+            default: 0
+          stepSize:
+            varType: "float"
+            editable: true
+        pads:
+          out:
+            axis: {}
+          in:
+            f: {}
+      host:
+        description: "this the host"
+        driver: "hostDriver"
+        attributes:
+          temp:
+            varType: "int"
+            editable: false
+            default: 0
+          stepSize:
+            varType: "float"
+            editable: true
+        pads:
+          out:
+            a: {}
+            b: {}
+            c: {}
+          in:
+            d: {}
+            e: {}
+            f: {}

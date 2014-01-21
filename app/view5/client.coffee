@@ -47,8 +47,11 @@ ng.controller 'View5Ctrl', ($scope, primus, host) ->
   diagram = createDiagramEditor('diagram')
   diagram_nodes = []
   
+  tqNodeTypes = diagram.nodeTypes
+  console.log tqNodeTypes
+  console.log tqNodeTypes.ssb
+
   $scope.view5 = primus.live $scope, 'view5', (table)->
-    
     node = table.value
     console.log node
 
