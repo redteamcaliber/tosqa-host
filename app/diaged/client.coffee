@@ -297,11 +297,11 @@ window.createDiagramEditor = (domid) ->
   # ///////////////
   # nodetypes go here FOR NOW
   # ///////////////
-  nodeTypes:->
-    tqNodeTypes:
+  nodeTypes:
       ssb:
         description: "this is a driver for ssb"
         driver: "ssbDriver"
+        diagramX: 400
         attributes:
           temp:
             varType: "int"
@@ -311,13 +311,13 @@ window.createDiagramEditor = (domid) ->
             varType: "float"
             editable: true
         pads:
-          out:
-            axis: {}
-          in:
-            f: {}
+          'frequency': {}
+          'timbre': {}
+          'modulation': {}
       host:
         description: "this the host"
         driver: "hostDriver"
+        diagramX: 200
         attributes:
           temp:
             varType: "int"
@@ -327,11 +327,32 @@ window.createDiagramEditor = (domid) ->
             varType: "float"
             editable: true
         pads:
-          out:
-            a: {}
-            b: {}
-            c: {}
-          in:
-            d: {}
-            e: {}
-            f: {}
+          'in1': {}
+          'in2': {}
+          'x':
+            wires:
+              10: ['']
+          'y':
+            wires:
+              10: ['']
+          'z':
+            wires:
+              10: ['']
+          'r':
+            wires:
+              10: ['']
+      sensor:
+        description: "this a sensor"
+        driver: "sensorDriver"
+        diagramX: 50
+        attributes:
+          value:
+            varType: "int"
+            editable: false
+            default: 0
+        pads:
+          'measure out':
+            wires:
+              10: ['']
+ 
+        

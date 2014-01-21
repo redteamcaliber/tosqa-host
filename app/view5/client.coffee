@@ -49,7 +49,6 @@ ng.controller 'View5Ctrl', ($scope, primus, host) ->
   
   tqNodeTypes = diagram.nodeTypes
   console.log tqNodeTypes
-  console.log tqNodeTypes.ssb
 
   $scope.view5 = primus.live $scope, 'view5', (table)->
     node = table.value
@@ -119,53 +118,25 @@ ng.directive 'highlightOnChange', ($animate) ->
         attrs.$removeClass 'highlight'
 
 
+# addItem = (diagram, table)->
+  
+
+
 
 addItem = (diagram, table, node) ->
-  if node.type is 'motor'
-     diagram.addNode
+  tqNode = table.value
+
+  tqNodeTypes = diagram.nodeTypes  
+  prop = tqNodeTypes[node.type]
+
+  # if properties are defined in type table then construct tqNode
+  if prop?
+    diagram.addNode
       id: table.key
-      name: node.name
-      x: 400 
+      name: node.type + node.name
+      x: prop.diagamX
       y: node.y or 50
-      pads:
-        'frequency': {}
-        'timbre': {}
-        'modulation': {}
-        # 'waveform':
-          # wires:
-            # 3: ['inmix']
-  
-  if node.type is 'host'
-     diagram.addNode
-      id: table.key
-      name: node.name + '(HOST)'
-      x: 200 
-      y: node.y or 50
-      pads:
-        'in1': {}
-        'in2': {}
-        'x':
-          wires:
-            10: ['']
-        'y':
-          wires:
-            10: ['']
-        'z':
-          wires:
-            10: ['']
-        'r':
-          wires:
-            10: ['']            
-  
-  if node.type is 'sensor'            
-     diagram.addNode
-      id: table.key
-      name: node.name
-      x: 50 
-      y: node.y or 50
-      pads:
-        'out':
-          wires:
-            10: ['']       
+      pads: prop.pads
+       
 
 
