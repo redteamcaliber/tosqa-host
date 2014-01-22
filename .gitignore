@@ -1,4 +1,6 @@
 bower_components
 node_modules
 /logger
+/logger-old
 /storage
+/storage-old
