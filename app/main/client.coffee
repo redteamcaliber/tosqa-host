@@ -3,7 +3,7 @@ ng = angular.module 'myApp'
 ng.value 'appInfo',
   name: 'Tosqa'
   version: '0.1.0'
-  home: 'https://github.com/nutbolt/tosqa-host'
+  home: 'https://github.com/tosqa/tosqa-host'
 
 ng.provider 'navbar', ->
   navs = []
