@@ -7,8 +7,9 @@ ng.config ($stateProvider, navbarProvider) ->
     controller: 'View2Ctrl'
   navbarProvider.add '/view2', 'View2', 12
 
-ng.controller 'View2Ctrl', ($scope) ->
-
 ng.filter 'interpolate', (appInfo) ->
   (text) ->
     String(text).replace '%VERSION%', appInfo.version
+
+ng.controller 'View2Ctrl', ($scope) ->
+  # nothing to do

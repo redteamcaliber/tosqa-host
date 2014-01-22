@@ -7,7 +7,5 @@ ng.config ($stateProvider, navbarProvider, primus) ->
     controller: 'View1Ctrl'
   navbarProvider.add '/', 'View1', 11
 
-  primus.client.view1_twice = (x) ->
-    2 * x
-
 ng.controller 'View1Ctrl', ->
+  # nothing to do

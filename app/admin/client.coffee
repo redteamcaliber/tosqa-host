@@ -7,3 +7,4 @@ ng.config ($stateProvider) ->
     controller: 'AdminCtrl'
 
 ng.controller 'AdminCtrl', ($scope) ->
+  # nothing to do

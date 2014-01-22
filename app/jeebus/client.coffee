@@ -22,7 +22,7 @@ ng.run ($rootScope) ->
 
     ws.onopen = ->
       # location.reload()  unless firstCall
-      console.log 'Open'
+      console.log 'WS Open'
 
     ws.onmessage = (m) ->
       $rootScope.$apply ->
@@ -30,7 +30,7 @@ ng.run ($rootScope) ->
         $rootScope.$broadcast msg[0], msg.slice(1) | 0
 
     ws.onclose = ->
-      console.log 'Closed'
+      console.log 'WS Closed'
       setTimeout reconnect, 1000
     
   reconnect true
