@@ -17,13 +17,4 @@ ng.run ($rootScope, primus) ->
     console.log 'OFFLINE'
 
   primus.on 'data', (arg) ->
-    $rootScope.$apply ->
-      switch
-        when arg.constructor is String
-          $rootScope.serverMessage = arg
-        when typeof arg is 'number'
-          $rootScope.serverTick = arg
-        when Array.isArray arg
-          $rootScope.$broadcast arg...
-        when arg instanceof Object
-          $rootScope.$broadcast 'primus', arg
+    console.log 'ng-primus', arg

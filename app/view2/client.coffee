@@ -7,9 +7,7 @@ ng.config ($stateProvider, navbarProvider) ->
     controller: 'View2Ctrl'
   navbarProvider.add '/view2', 'View2', 12
 
-ng.controller 'View2Ctrl', ($scope, host) ->
-  host('view2_next').then (x) ->
-    $scope.counter = x
+ng.controller 'View2Ctrl', ($scope) ->
 
 ng.filter 'interpolate', (appInfo) ->
   (text) ->
