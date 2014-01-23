@@ -9,7 +9,7 @@ import (
 
 func main() {
 	if len(os.Args) <= 1 {
-		log.Fatalf("usage: jb <cmd> ... (try 'jb run')")
+		log.Fatalf("usage: tosqa-host <cmd> ... (try 'tosqa-host run')")
 	}
 
 	switch os.Args[1] {
