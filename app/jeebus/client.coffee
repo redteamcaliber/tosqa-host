@@ -18,7 +18,7 @@ ng.run ($rootScope) ->
   reconnect = (firstCall) ->
     # the websocket is served from the same site as the web page
     # ws = new WebSocket "ws://#{location.host}/ws"
-    ws = new WebSocket "ws://#{location.hostname}:3334/ws"
+    ws = new WebSocket "ws://#{location.hostname}:3334/ws", ['Tosqa']
 
     ws.onopen = ->
       # location.reload()  unless firstCall
