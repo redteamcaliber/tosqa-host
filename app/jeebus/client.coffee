@@ -1,7 +1,5 @@
 ng = angular.module 'myApp'
 
-ng.constant 'jbName', 'blinker'
-
 ng.config ($stateProvider, navbarProvider) ->
   $stateProvider.state 'jeebus',
     url: '/jeebus'
@@ -9,39 +7,85 @@ ng.config ($stateProvider, navbarProvider) ->
     controller: 'JeeBusCtrl'
   navbarProvider.add '/jeebus', 'JeeBus', 25
 
-ng.run ($rootScope, jbName) ->
-  ws = null
-
-  # global function to send an object to the JeeBus server
-  $rootScope.jbSend = (payload) ->
-    ws.send JSON.stringify payload
-  
-  reconnect = (firstCall) ->
-    # the websocket is served from the same site as the web page
-    # ws = new WebSocket "ws://#{location.host}/ws"
-    ws = new WebSocket "ws://#{location.hostname}:3334/ws", [jbName]
-
-    ws.onopen = ->
-      # location.reload()  unless firstCall
-      console.log 'WS Open'
-
-    ws.onmessage = (m) ->
-      if m.data instanceof ArrayBuffer
-        console.log 'binary msg', m
-      $rootScope.$apply ->
-        for k, v of JSON.parse(m.data)
-          $rootScope[k] = v
-
-    # ws.onerror = (e) ->
-    #   console.log 'Error', e
-
-    ws.onclose = ->
-      console.log 'WS Closed'
-      setTimeout reconnect, 1000
-    
-  reconnect true
-
-ng.controller 'JeeBusCtrl', ($scope) ->
-
+ng.controller 'JeeBusCtrl', ($scope, jeebus) ->
   $scope.button = (button, value) ->
-    @jbSend {button,value}
+    jeebus.send {button,value}
+
+# The "jeebus" service below is the same for all client-side applications.
+# It lets angular connect to the JeeBus server and send/receive messages.
+ng.factory 'jeebus', ($rootScope, $q) ->
+  ws = null         # the websocket object, while open
+  seqNum = 0        # unique sequence numbers for each RPC request
+  rpcPromises = {}  # maps seqNum to a pending <timerId,promise> entry
+  
+  processRpcReply = (seq, result, err) ->
+    [tid,p] = rpcPromises[seq] or []
+    clearTimeout tid
+    if p
+      if err
+        p.reject err
+      else
+        p.resolve result
+
+  # Set up a websocket connection to the JeeBus server.
+  # The appTag is the default tag to use when sending requests to it.
+  connect: (appTag) ->
+
+    reconnect = (firstCall) ->
+      # the websocket is served from the same site as the web page
+      # ws = new WebSocket "ws://#{location.host}/ws"
+      ws = new WebSocket "ws://#{location.hostname}:3334/ws", [appTag]
+
+      ws.onopen = ->
+        # location.reload()  unless firstCall
+        console.log 'WS Open'
+
+      ws.onmessage = (m) ->
+        if m.data instanceof ArrayBuffer
+          console.log 'binary msg', m
+        $rootScope.$apply ->
+          data = JSON.parse(m.data)
+          if m.data[0] is '['
+            processRpcReply data...
+          else
+            # TODO should not write into the root scope (or merge, perhaps?)
+            for k, v of data
+              $rootScope[k] = v
+
+      # ws.onerror = (e) ->
+      #   console.log 'Error', e
+
+      ws.onclose = ->
+        console.log 'WS Closed'
+        setTimeout reconnect, 1000
+
+    reconnect true
+   
+  # Send a payload to the JeeBus server over the websocket connection.
+  # The payload should be an object (anything but array is supported for now).
+  # This becomes an MQTT message with topic "sv/<appTag>/ip-<addr:port>".
+  send: (payload) ->
+    msg = JSON.stringify payload
+    if msg[0] is '['
+      console.error "payload can't be an array (#{payload.length} elements)"
+    else
+      ws.send msg
+
+  # Store a key/value pair in the JeeBus database (key must start with "/").
+  store: (key, value) ->
+    if key[0] is '/'
+      ws.send JSON.stringify [key, value]
+    else
+      console.error 'key does not start with "/":', key
+      
+  # Perform an RPC call, i.e. register result callback and return a promise.
+  # This doesn't use MQTT to avoid additional round trips for frequent calls.
+  rpc: (args...) ->
+    d = $q.defer()
+    n = ++seqNum
+    ws.send JSON.stringify [n, args...]
+    tid = setTimeout ->
+      delete rpcPromises[n]
+      d.reject('no response from JeeBus server')
+    , 10000 # 10 seconds should be enough to complete any request
+    rpcPromises[n] = [tid, d]

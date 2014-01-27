@@ -22,7 +22,7 @@ func main() {
 		if len(os.Args) > 2 {
 			topics = os.Args[2]
 		}
-		for m := range jeebus.ListenToServer(topics) {
+		for m := range jeebus.ConnectToServer(topics) {
 			log.Println(m.T, string(m.P.([]byte)), m.R)
 		}
 
