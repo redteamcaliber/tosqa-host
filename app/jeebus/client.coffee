@@ -65,7 +65,7 @@ ng.factory 'jeebus', ($rootScope, $q) ->
   # The payload should be an object (anything but array is supported for now).
   # This becomes an MQTT message with topic "sv/<appTag>/ip-<addr:port>".
   send: (payload) ->
-    msg = JSON.stringify payload
+    msg = angular.toJson payload
     if msg[0] is '['
       console.error "payload can't be an array (#{payload.length} elements)"
     else
@@ -74,7 +74,7 @@ ng.factory 'jeebus', ($rootScope, $q) ->
   # Store a key/value pair in the JeeBus database (key must start with "/").
   store: (key, value) ->
     if key[0] is '/'
-      ws.send JSON.stringify [key, value]
+      ws.send angular.toJson [key, value]
     else
       console.error 'key does not start with "/":', key
       
@@ -83,7 +83,7 @@ ng.factory 'jeebus', ($rootScope, $q) ->
   rpc: (args...) ->
     d = $q.defer()
     n = ++seqNum
-    ws.send JSON.stringify [n, args...]
+    ws.send angular.toJson [n, args...]
     tid = setTimeout ->
       delete rpcPromises[n]
       d.reject('no response from JeeBus server')
