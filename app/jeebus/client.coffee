@@ -1,6 +1,6 @@
 ng = angular.module 'myApp'
 
-ws = null
+ng.constant 'jbName', 'blinker'
 
 ng.config ($stateProvider, navbarProvider) ->
   $stateProvider.state 'jeebus',
@@ -9,25 +9,31 @@ ng.config ($stateProvider, navbarProvider) ->
     controller: 'JeeBusCtrl'
   navbarProvider.add '/jeebus', 'JeeBus', 25
 
-ng.run ($rootScope) ->
+ng.run ($rootScope, jbName) ->
+  ws = null
 
-  setCount = (data) ->
-    $rootScope.$apply ->
-      $rootScope.count = data
-
+  # global function to send an object to the JeeBus server
+  $rootScope.jbSend = (payload) ->
+    ws.send JSON.stringify payload
+  
   reconnect = (firstCall) ->
     # the websocket is served from the same site as the web page
     # ws = new WebSocket "ws://#{location.host}/ws"
-    ws = new WebSocket "ws://#{location.hostname}:3334/ws", ['Tosqa']
+    ws = new WebSocket "ws://#{location.hostname}:3334/ws", [jbName]
 
     ws.onopen = ->
       # location.reload()  unless firstCall
       console.log 'WS Open'
 
     ws.onmessage = (m) ->
+      if m.data instanceof ArrayBuffer
+        console.log 'binary msg', m
       $rootScope.$apply ->
-        msg = JSON.parse(m.data)
-        $rootScope.$broadcast msg[0], msg.slice(1) | 0
+        for k, v of JSON.parse(m.data)
+          $rootScope[k] = v
+
+    # ws.onerror = (e) ->
+    #   console.log 'Error', e
 
     ws.onclose = ->
       console.log 'WS Closed'
@@ -36,9 +42,6 @@ ng.run ($rootScope) ->
   reconnect true
 
 ng.controller 'JeeBusCtrl', ($scope) ->
-  $scope.$on 'R', (e, v) -> $scope.redLed = v is 1
-  $scope.$on 'G', (e, v) -> $scope.greenLed = v is 1
-  $scope.$on 'C', (e, v) -> $scope.count = v
 
-  $scope.button = (b, v) ->
-    ws.send JSON.stringify [b, v]
+  $scope.button = (button, value) ->
+    @jbSend {button,value}
