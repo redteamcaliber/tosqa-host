@@ -44,7 +44,7 @@ ng.config ($stateProvider, navbarProvider, primus) ->
      
  
 # use buttons to set variable to values
-ng.controller 'View4Ctrl', ($scope, primus, host) ->    
+ng.controller 'View4Ctrl', ($scope, primus) ->    
     console.log "view4"
 
     # get existing nodes from db

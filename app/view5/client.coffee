@@ -42,7 +42,7 @@ ng.config ($stateProvider, navbarProvider, primus) ->
 
 
 #controller, calls primus.dead only
-ng.controller 'View5Ctrl', ($scope, primus, host, tqNodeTypes) ->
+ng.controller 'View5Ctrl', ($scope, primus, tqNodeTypes) ->
   
   diagram = createDiagramEditor('diagram')
   diagram_nodes = []

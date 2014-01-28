@@ -18,10 +18,6 @@ ng.controller 'View3Ctrl', ($scope, tqNodeTypes) ->
     $scope.spice = 'jalepeno'
   $scope.cSpice = (spice) ->
     $scope.spice = spice    
-    
-  # $scope.newCtrl = () ->
-  #   $scope.counter = host 'view3_next' 
-  #   console.log "newCtrl"  
 
   $scope.test = () ->
     console.log tqNodeTypes.ssb.description
@@ -30,10 +26,7 @@ ng.controller 'View3Ctrl', ($scope, tqNodeTypes) ->
 ng.filter 'interpolate', (appInfo) ->
   (text) ->
     String(text).replace '%VERSION%', appInfo.version
-   
-   
-ng.controller 'newCtrl', ($scope, host) ->
-
+  
 
 ng.factory "tqNodeTypes", ->
 
