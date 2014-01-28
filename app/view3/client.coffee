@@ -8,7 +8,7 @@ ng.config ($stateProvider, navbarProvider) ->
   navbarProvider.add '/view3', 'View3', 13
 
 # use buttons to set variable to values
-ng.controller 'View3Ctrl', ($scope, host, tqNodeTypes) ->
+ng.controller 'View3Ctrl', ($scope, tqNodeTypes) ->
   $scope.spice = "very"
   console.log "view3"
 
@@ -19,9 +19,9 @@ ng.controller 'View3Ctrl', ($scope, host, tqNodeTypes) ->
   $scope.cSpice = (spice) ->
     $scope.spice = spice    
     
-  $scope.newCtrl = () ->
-    $scope.counter = host 'view3_next' 
-    console.log "newCtrl"  
+  # $scope.newCtrl = () ->
+  #   $scope.counter = host 'view3_next' 
+  #   console.log "newCtrl"  
 
   $scope.test = () ->
     console.log tqNodeTypes.ssb.description
