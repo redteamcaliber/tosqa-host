@@ -19,13 +19,13 @@ ng.factory 'jeebus', ($rootScope, $q) ->
   rpcPromises = {}  # maps seqNum to a pending <timerId,promise> entry
   
   processRpcReply = (seq, result, err) ->
-    [tid,p] = rpcPromises[seq] or []
+    [tid,d] = rpcPromises[seq] or []
     clearTimeout tid
-    if p
+    if d
       if err
-        p.reject err
+        d.reject err
       else
-        p.resolve result
+        d.resolve result
 
   # Set up a websocket connection to the JeeBus server.
   # The appTag is the default tag to use when sending requests to it.
@@ -70,6 +70,7 @@ ng.factory 'jeebus', ($rootScope, $q) ->
       console.error "payload can't be an array (#{payload.length} elements)"
     else
       ws.send msg
+    @
 
   # Store a key/value pair in the JeeBus database (key must start with "/").
   store: (key, value) ->
@@ -77,6 +78,7 @@ ng.factory 'jeebus', ($rootScope, $q) ->
       ws.send angular.toJson [key, value]
     else
       console.error 'key does not start with "/":', key
+    @
       
   # Perform an RPC call, i.e. register result callback and return a promise.
   # This doesn't use MQTT to avoid additional round trips for frequent calls.
@@ -89,3 +91,4 @@ ng.factory 'jeebus', ($rootScope, $q) ->
       d.reject('no response from JeeBus server')
     , 10000 # 10 seconds should be enough to complete any request
     rpcPromises[n] = [tid, d]
+    d.promise

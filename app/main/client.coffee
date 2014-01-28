@@ -49,3 +49,4 @@ ng.factory 'tosqa', (jeebus) ->
   # If more than one key is given, they are joined with slashes.
   set: (key..., value) ->
     jeebus.store "/tosqa/#{key.join '/'}", value
+    @
