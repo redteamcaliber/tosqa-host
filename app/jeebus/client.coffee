@@ -8,8 +8,14 @@ ng.config ($stateProvider, navbarProvider) ->
   navbarProvider.add '/jeebus', 'JeeBus', 25
 
 ng.controller 'JeeBusCtrl', ($scope, jeebus) ->
+
   $scope.button = (button, value) ->
     jeebus.send {button,value}
+
+  $scope.test1 = ->
+    jeebus.send "TEST1 click!" # send a test message to JB server's stdout
+    jeebus.rpc('db-incr', '/tosqa/count').then (result) ->
+      console.log 'RPC TEST 1', result
 
 # The "jeebus" service below is the same for all client-side applications.
 # It lets angular connect to the JeeBus server and send/receive messages.
@@ -18,11 +24,12 @@ ng.factory 'jeebus', ($rootScope, $q) ->
   seqNum = 0        # unique sequence numbers for each RPC request
   rpcPromises = {}  # maps seqNum to a pending <timerId,promise> entry
   
-  processRpcReply = (seq, result, err) ->
-    [tid,d] = rpcPromises[seq] or []
-    clearTimeout tid
+  processRpcReply = (n, result, err) ->
+    [tid,d] = rpcPromises[n] or []
     if d
+      clearTimeout tid
       if err
+        console.error err
         d.reject err
       else
         d.resolve result
@@ -88,8 +95,10 @@ ng.factory 'jeebus', ($rootScope, $q) ->
     n = ++seqNum
     ws.send angular.toJson [n, args...]
     tid = setTimeout ->
+      console.error "RPC #{n}: no reponse", args
       delete rpcPromises[n]
-      d.reject('no response from JeeBus server')
+      $rootScope.$apply ->
+        d.reject()
     , 10000 # 10 seconds should be enough to complete any request
     rpcPromises[n] = [tid, d]
     d.promise
