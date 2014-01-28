@@ -17,7 +17,7 @@ ng.controller 'View3Ctrl', ($scope, tqNodeTypes) ->
   $scope.jalapenoSpicy = () ->
     $scope.spice = 'jalepeno'
   $scope.cSpice = (spice) ->
-    $scope.spice = spice    
+    $scope.spice = spice
 
   $scope.test = () ->
     console.log tqNodeTypes.ssb.description
@@ -26,66 +26,3 @@ ng.controller 'View3Ctrl', ($scope, tqNodeTypes) ->
 ng.filter 'interpolate', (appInfo) ->
   (text) ->
     String(text).replace '%VERSION%', appInfo.version
-  
-
-ng.factory "tqNodeTypes", ->
-
-  #factory function body that constructs shinyNewServiceInstance
-  ssb:
-    description: "this is a driver for ssb"
-    driver: "ssbDriver"
-    diagramX: 400
-    attributes:
-      temp:
-        varType: "int"
-        editable: false
-        default: 0
-      stepSize:
-        varType: "float"
-        editable: true
-    pads:
-      'frequency': {}
-      'timbre': {}
-      'modulation': {}
-  
-  host:
-    description: "this the host"
-    driver: "hostDriver"
-    diagramX: 200
-    attributes:
-      temp:
-        varType: "int"
-        editable: false
-        default: 0
-      stepSize:
-        varType: "float"
-        editable: true
-    pads:
-      'in1': {}
-      'in2': {}
-      'x':
-        wires:
-          10: ['']
-      'y':
-        wires:
-          10: ['']
-      'z':
-        wires:
-          10: ['']
-      'r':
-        wires:
-          10: ['']
-  
-  sensor:
-    description: "this a sensor"
-    driver: "sensorDriver"
-    diagramX: 50
-    attributes:
-      value:
-        varType: "int"
-        editable: false
-        default: 0
-    pads:
-      'measure out':
-        wires:
-          10: ['']

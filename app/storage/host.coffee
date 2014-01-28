@@ -80,10 +80,12 @@ module.exports = (app, plugin) ->
   # capture all requests to set up a live feed
   app.on 'running', (primus) ->
     primus.on 'connection', (spark) ->
+      console.log "primus connection"
       # create save event for different keys 
 
       spark.on 'saveToStorage', (data) ->
-        
+        console.log "test"
+
         key = data.prefix + "~" +data.key
         value = data.value
         
@@ -98,7 +100,7 @@ module.exports = (app, plugin) ->
       
       # create live event
       spark.on 'live', (prefix) ->
-        # console.info 'replay', prefix
+        console.info 'replay', prefix
         livePrefix = "live.#{prefix}"
 
         # create value stream to initialize nodes on client

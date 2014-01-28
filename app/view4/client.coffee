@@ -9,43 +9,15 @@ ng.config ($stateProvider, navbarProvider, primus) ->
   navbarProvider.add '/view4', 'View4', 14
   
   primus.save = (scope, data) ->
-     primus.write ['saveToStorage', data]
+    console.log "saveToStorage"
+    primus.write ['saveToStorage', data]
      #primus.write ['live', data]
-
-#   primus.getdb = (scope, prefix, adjust) ->
-#     table = []
-#     primus.write ['getdb', prefix]
-
-#     #function called at server side to update client         
-#     scope.$on "getdb.#{prefix}", (event, type, value) ->
-#       switch type
-#         when 'put'
-#           key = value.key
-#           value = {key:key, value:value.value}
-#           console.log "updated: " + key 
-#         else
-#           return
-        
-
-#       adjust? value  if value?
-# # 
-#       for row, index in table 
-#         if row.key is key
-#           if value?
-#             table[index] = value
-#           else
-#             # table.splice index, 1
-#           return
-# # 
-      
-#       table.push value
-      
-#     table     
      
  
 # use buttons to set variable to values
-ng.controller 'View4Ctrl', ($scope, primus) ->    
+ng.controller 'View4Ctrl', ($scope, primus, jeebus) ->    
     console.log "view4"
+    jeebus.connect
 
     # get existing nodes from db
     # $scope.view4 = primus.live $scope, 'view5', (table)->
@@ -57,14 +29,17 @@ ng.controller 'View4Ctrl', ($scope, primus) ->
       
 
     $scope.addValue = (key, value) ->
+      # console.log jeebus.logFunc
+      jeebus.saveToStorage {key, value}
       
-      # make sure entries end up in view 5, by adding a prefix
-      prefix = "view5"
-      
-      value = null if value is ""
+      # # make sure entries end up in view 5, by adding a prefix
 
-      data = {prefix:prefix, key:key, value:value}
-      $scope.save = primus.save $scope, data
+      # prefix = "view5"
+      
+      # value = null if value is ""
+
+      # data = {prefix:prefix, key:key, value:value}
+      # $scope.save = primus.save $scope, data
     
     counter = []      
     
