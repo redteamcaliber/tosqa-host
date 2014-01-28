@@ -6,6 +6,5 @@ ng.config ($stateProvider) ->
     templateUrl: 'admin/view.html'
     controller: 'AdminCtrl'
 
-ng.controller 'AdminCtrl', ($scope, host) ->
-  host('admin_dbinfo').then (x) ->
-    $scope.hello = x
+ng.controller 'AdminCtrl', ($scope) ->
+  # nothing to do
