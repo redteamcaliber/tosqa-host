@@ -42,12 +42,12 @@ ng.config ($stateProvider, navbarProvider, primus) ->
 
 
 #controller, calls primus.dead only
-ng.controller 'View5Ctrl', ($scope, primus, host) ->
+ng.controller 'View5Ctrl', ($scope, primus, host, tqNodeTypes) ->
   
   diagram = createDiagramEditor('diagram')
   diagram_nodes = []
   
-  tqNodeTypes = diagram.nodeTypes
+  # tqNodeTypes = diagram.nodeTypes
   console.log tqNodeTypes
 
   $scope.view5 = primus.live $scope, 'view5', (table)->
@@ -101,8 +101,6 @@ ng.controller 'View5Ctrl', ($scope, primus, host) ->
     value = {fromId:from.node.id, pad:from.name, toId:to.node.id, topad:to.name}
     data = {prefix:"view5", key:link, value:value}
     primus.write ['saveToStorage', data]
-
-    
 
   diagram.onRemoveWire = (from, to) ->
     console.log 'removed', from.node.id, from.name, '>', to.node.id, to.name
