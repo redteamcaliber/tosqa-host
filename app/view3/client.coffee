@@ -1,6 +1,5 @@
 ng = angular.module 'myApp'
 
-
 ng.config ($stateProvider, navbarProvider) ->
   $stateProvider.state 'view3',
     url: '/view3'
