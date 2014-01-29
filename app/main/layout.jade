@@ -48,7 +48,9 @@ html(lang='en')
         console.log('MYAPP');
         angular.module('myApp', ['ui.router', 'ngAnimate']);
       script(src='/primus/primus.js')
-    block lastScripts
+      script.
+        console.log('JEEBUS');
+      script(src='/jeebus/jeebus.js')
       script.
         console.log('BOOT');
         angular.module('myApp').constant('primus', new Primus);

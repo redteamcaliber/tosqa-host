@@ -17,7 +17,6 @@ ng.config ($stateProvider, navbarProvider, primus) ->
 # use buttons to set variable to values
 ng.controller 'View4Ctrl', ($scope, primus) ->    
     console.log "view4"
-    jeebus.connect
 
     # get existing nodes from db
     # $scope.view4 = primus.live $scope, 'view5', (table)->

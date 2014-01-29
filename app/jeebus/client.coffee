@@ -8,97 +8,42 @@ ng.config ($stateProvider, navbarProvider) ->
   navbarProvider.add '/jeebus', 'JeeBus', 25
 
 ng.controller 'JeeBusCtrl', ($scope, jeebus) ->
+  # TODO rewrite these example to use the "tosqa" service i.s.o. "jeebus"
 
-  $scope.button = (button, value) ->
-    jeebus.send {button,value}
+  $scope.echoTest = ->
+    jeebus.send "echoTest!" # send a test message to JB server's stdout
+    jeebus.rpc('echo', 'Echo', 'me!').then (r) ->
+      $scope.message = r
 
-  $scope.test1 = ->
-    jeebus.send "TEST1 click!" # send a test message to JB server's stdout
-    jeebus.rpc('db-incr', '/tosqa/count').then (result) ->
-      console.log 'RPC TEST 1', result
+  $scope.dbGetTest = ->
+    jeebus.rpc('db-get', '/admin/started').then (r) ->
+      $scope.message = r
 
-# The "jeebus" service below is the same for all client-side applications.
-# It lets angular connect to the JeeBus server and send/receive messages.
-ng.factory 'jeebus', ($rootScope, $q) ->
-  ws = null         # the websocket object, while open
-  seqNum = 0        # unique sequence numbers for each RPC request
-  rpcPromises = {}  # maps seqNum to a pending <timerId,promise> entry
+  $scope.dbKeysTest = ->
+    jeebus.rpc('db-keys', '/').then (r) ->
+      $scope.message = r
+
+# Tosqa-specific setup to connect on startup and define a new "tosqa" service.
+
+ng.run (jeebus) ->
+  jeebus.connect 'tosqa', 3334
+
+ng.factory 'tosqa', (jeebus) ->
+  # For the calls below:
+  #  - if more than one key is specified, they are joined with slashes
+  #  - do not include a slash at the start or end of any key argument
   
-  processRpcReply = (n, result, err) ->
-    [tid,d] = rpcPromises[n] or []
-    if d
-      clearTimeout tid
-      if err
-        console.error err
-        d.reject err
-      else
-        d.resolve result
+  # Get the sub-keys under a certain path in the host database as a promise.
+  # This only goes one level deep, i.e. a flat list of immediate sub-keys.
+  keys: (key...) ->
+    jeebus.rpc 'db-keys', "/#{['tosqa'].concat(key).join '/'}/"
+  
+  # Get a key's value from the host database, returned as a promise.
+  get: (key...) ->
+    jeebus.rpc 'db-get', "/#{['tosqa'].concat(key).join '/'}"
 
-  # Set up a websocket connection to the JeeBus server.
-  # The appTag is the default tag to use when sending requests to it.
-  connect: (appTag) ->
-
-    reconnect = (firstCall) ->
-      # the websocket is served from the same site as the web page
-      # ws = new WebSocket "ws://#{location.host}/ws"
-      ws = new WebSocket "ws://#{location.hostname}:3334/ws", [appTag]
-
-      ws.onopen = ->
-        # location.reload()  unless firstCall
-        console.log 'WS Open'
-
-      ws.onmessage = (m) ->
-        if m.data instanceof ArrayBuffer
-          console.log 'binary msg', m
-        $rootScope.$apply ->
-          data = JSON.parse(m.data)
-          if m.data[0] is '['
-            processRpcReply data...
-          else
-            # TODO should not write into the root scope (or merge, perhaps?)
-            for k, v of data
-              $rootScope[k] = v
-
-      # ws.onerror = (e) ->
-      #   console.log 'Error', e
-
-      ws.onclose = ->
-        console.log 'WS Closed'
-        setTimeout reconnect, 1000
-
-    reconnect true
-   
-  # Send a payload to the JeeBus server over the websocket connection.
-  # The payload should be an object (anything but array is supported for now).
-  # This becomes an MQTT message with topic "sv/<appTag>/ip-<addr:port>".
-  send: (payload) ->
-    msg = angular.toJson payload
-    if msg[0] is '['
-      console.error "payload can't be an array (#{payload.length} elements)"
-    else
-      ws.send msg
+  # Set a key/value pair in the host database, properly tagged with a prefix.
+  # If value is the empty string or null, the key will be deleted.
+  set: (key..., value) ->
+    jeebus.store "/#{['tosqa'].concat(key).join '/'}", value
     @
-
-  # Store a key/value pair in the JeeBus database (key must start with "/").
-  store: (key, value) ->
-    msg = angular.toJson [key, value]
-    if msg.slice(0, 3) is '["/'
-      ws.send angular.toJson msg
-    else
-      console.error 'key does not start with "/":', key
-    @
-      
-  # Perform an RPC call, i.e. register result callback and return a promise.
-  # This doesn't use MQTT to avoid additional round trips for frequent calls.
-  rpc: (args...) ->
-    d = $q.defer()
-    n = ++seqNum
-    ws.send angular.toJson [n, args...]
-    tid = setTimeout ->
-      console.error "RPC #{n}: no reponse", args
-      delete rpcPromises[n]
-      $rootScope.$apply ->
-        d.reject()
-    , 10000 # 10 seconds should be enough to complete any request
-    rpcPromises[n] = [tid, d]
-    d.promise
