@@ -15,7 +15,7 @@ ng.config ($stateProvider, navbarProvider, primus) ->
      
  
 # use buttons to set variable to values
-ng.controller 'View4Ctrl', ($scope, primus, jeebus) ->    
+ng.controller 'View4Ctrl', ($scope, primus) ->    
     console.log "view4"
     jeebus.connect
 
@@ -30,7 +30,7 @@ ng.controller 'View4Ctrl', ($scope, primus, jeebus) ->
 
     $scope.addValue = (key, value) ->
       # console.log jeebus.logFunc
-      jeebus.saveToStorage {key, value}
+
       
       # # make sure entries end up in view 5, by adding a prefix
 
