@@ -28,37 +28,6 @@ ng.controller 'JeeBusCtrl', ($scope, jeebus) ->
 ng.run (jeebus) ->
   jeebus.connect 'tosqa', 3334
 
-<<<<<<< HEAD
-    reconnect true
-   
-  # Send a payload to the JeeBus server over the websocket connection.
-  # The payload should be an object (anything but array is supported for now).
-  # This becomes an MQTT message with topic "sv/<appTag>/ip-<addr:port>".
-  send: (payload) ->
-    msg = angular.toJson payload
-    if msg[0] is '['
-      console.error "payload can't be an array (#{payload.length} elements)"
-    else
-      ws.send msg
-    @
-
-  saveToStorage: (table) ->
-    console.log "jeebus saveToStorage ", table.key, table.value
-    ws.send angular.toJson table
-    # if msg.slice(0, 3) is '["/'
-    #   ws.send angular.toJson msg
-    # else
-    #   console.error 'key does not start with "/":', key
-    # @
-
-  # Store a key/value pair in the JeeBus database (key must start with "/").
-  store: (key, value) ->
-    msg = angular.toJson [key, value]
-    if msg.slice(0, 3) is '["/'
-      ws.send angular.toJson msg
-    else
-      console.error 'key does not start with "/":', key
-=======
 ng.factory 'tosqa', (jeebus) ->
   # For the calls below:
   #  - if more than one key is specified, they are joined with slashes
@@ -76,6 +45,6 @@ ng.factory 'tosqa', (jeebus) ->
   # Set a key/value pair in the host database, properly tagged with a prefix.
   # If value is the empty string or null, the key will be deleted.
   set: (key..., value) ->
-    jeebus.store "/#{['tosqa'].concat(key).join '/'}", value
->>>>>>> master
+    console.log "tosqa set"
+	jeebus.store "/#{['tosqa'].concat(key).join '/'}", value
     @
