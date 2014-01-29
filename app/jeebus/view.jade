@@ -1,15 +1,26 @@
 .row
   .large-12.columns
-    h1 JeeBus
+    h1 Blink
 
-    table(cellpadding=10)
+    table(cellspacing=0)
       tr
         td
-          button(ng-click='echoTest()') RPC Echo
+          label(for='gl')
+            input(type='checkbox',ng-model='green',id='gl',disabled)
+            |  Green LED
         td
-          button(ng-click='dbGetTest()') RPC DB Get
-        td
-          button(ng-click='dbKeysTest()') RPC DB Keys
+          label(for='rl')
+            input(type='checkbox',ng-model='red',id='rl',disabled)
+            |  Red LED
       tr
-        td(colspan=3)
-          | {{ message }} &nbsp;
+        td
+          button(ng-mouseDown='button(1,1)',ng-mouseup='button(1,0)')
+            | Button 1
+        td
+          button(ng-mouseDown='button(2,1)',ng-mouseup='button(2,0)')
+            | Button 2
+        td
+          button(ng-click='test1()')
+            | RPC Test 1
+
+    p Count = {{ count }}

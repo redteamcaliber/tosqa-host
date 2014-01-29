@@ -91,9 +91,9 @@ ng.controller 'View5Ctrl', ($scope, primus, tqNodeTypes) ->
   diagram.wireItUp()
 
   
-  diagram.onClick = (nodeId)->
-    $scope.$apply ->
-      $scope.update(nodeId)
+  # diagram.onClick = (nodeId)->
+  #   $scope.$apply ->
+  #     $scope.update(nodeId)
   
   diagram.onAddWire = (from, to) ->
     console.log 'added', from.node.id, from.name, '>', to.node.id, to.name

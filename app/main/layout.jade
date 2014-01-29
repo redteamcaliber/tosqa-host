@@ -50,9 +50,6 @@ html(lang='en')
       script(src='/primus/primus.js')
     block lastScripts
       script.
-        console.log('JEEBUS');
-      script(src='/jeebus/jeebus.js')
-      script.
         console.log('BOOT');
         angular.module('myApp').constant('primus', new Primus);
         angular.bootstrap(document, ['myApp']);
