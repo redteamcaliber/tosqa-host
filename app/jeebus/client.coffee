@@ -32,7 +32,7 @@ ng.factory 'tosqa', (jeebus) ->
   # For the calls below:
   #  - if more than one key is specified, they are joined with slashes
   #  - do not include a slash at the start or end of any key argument
-  
+    
   # Get the sub-keys under a certain path in the host database as a promise.
   # This only goes one level deep, i.e. a flat list of immediate sub-keys.
   keys: (key...) ->

@@ -15,7 +15,7 @@ ng.config ($stateProvider, navbarProvider, primus) ->
      
  
 # use buttons to set variable to values
-ng.controller 'View4Ctrl', ($scope, primus) ->    
+ng.controller 'View4Ctrl', ($scope, primus, tosqa) ->    
     console.log "view4"
 
     # get existing nodes from db
@@ -25,12 +25,10 @@ ng.controller 'View4Ctrl', ($scope, primus) ->
     #   $scope.todos.push 
     #       text: node.name
     #       done: false
-      
 
     $scope.addValue = (key, value) ->
       # console.log jeebus.logFunc
-
-      
+      tosqa.set key, value
       # # make sure entries end up in view 5, by adding a prefix
 
       # prefix = "view5"
