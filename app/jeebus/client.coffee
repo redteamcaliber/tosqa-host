@@ -8,7 +8,7 @@ ng.config ($stateProvider, navbarProvider) ->
   navbarProvider.add '/jeebus', 'JeeBus', 25
 
 ng.controller 'JeeBusCtrl', ($scope, jeebus) ->
-  # TODO rewrite these example to use the "tosqa" service i.s.o. "jeebus"
+  # TODO rewrite these example to use the "tq" service i.s.o. "jeebus"
 
   $scope.echoTest = ->
     jeebus.send "echoTest!" # send a test message to JB server's stdout
@@ -23,12 +23,12 @@ ng.controller 'JeeBusCtrl', ($scope, jeebus) ->
     jeebus.rpc('db-keys', '/').then (r) ->
       $scope.message = r
 
-# Tosqa-specific setup to connect on startup and define a new "tosqa" service.
+# Tosqa-specific setup to connect on startup and define a new "TQ" service.
 
 ng.run (jeebus) ->
   jeebus.connect 'tosqa', 3334
 
-ng.factory 'tosqa', (jeebus) ->
+ng.factory 'TQ', (jeebus) ->
   # For the calls below:
   #  - if more than one key is specified, they are joined with slashes
   #  - do not include a slash at the start or end of any key argument
@@ -36,14 +36,14 @@ ng.factory 'tosqa', (jeebus) ->
   # Get the sub-keys under a certain path in the host database as a promise.
   # This only goes one level deep, i.e. a flat list of immediate sub-keys.
   keys: (key...) ->
-    jeebus.rpc 'db-keys', "/#{['tosqa'].concat(key).join '/'}/"
+    jeebus.rpc 'db-keys', "/#{['tq'].concat(key).join '/'}/"
   
   # Get a key's value from the host database, returned as a promise.
   get: (key...) ->
-    jeebus.rpc 'db-get', "/#{['tosqa'].concat(key).join '/'}"
+    jeebus.rpc 'db-get', "/#{['tq'].concat(key).join '/'}"
 
   # Set a key/value pair in the host database, properly tagged with a prefix.
   # If value is the empty string or null, the key will be deleted.
   set: (key..., value) ->
-    jeebus.store "/#{['tosqa'].concat(key).join '/'}", value
+    jeebus.store "/#{['tq'].concat(key).join '/'}", value
     @
