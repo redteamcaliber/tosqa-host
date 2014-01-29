@@ -79,15 +79,6 @@ ng.factory 'jeebus', ($rootScope, $q) ->
       ws.send msg
     @
 
-  saveToStorage: (table) ->
-    console.log "jeebus saveToStorage ", table.key, table.value
-    ws.send angular.toJson table
-    # if msg.slice(0, 3) is '["/'
-    #   ws.send angular.toJson msg
-    # else
-    #   console.error 'key does not start with "/":', key
-    # @
-
   # Store a key/value pair in the JeeBus database (key must start with "/").
   store: (key, value) ->
     msg = angular.toJson [key, value]
