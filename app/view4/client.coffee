@@ -10,13 +10,39 @@ ng.config ($stateProvider, navbarProvider, primus) ->
 
  
 # use buttons to set variable to values
-ng.controller 'View4Ctrl', ($scope, primus, tosqa, tqNodeTypes) ->    
+ng.controller 'View4Ctrl', ($scope, primus, TQ, tqNodeTypes, tqNodes) ->    
     console.log "view4"
     tqnt = tqNodeTypes
+    
 
+    console.log tqNodes
+ 
     $scope.addValue = (key, value) ->
-      # console.log jeebus.logFunc
-      tosqa.set key, value
+      # console.log jeebus.logFun
+      id = "id" + new Date().getTime() 
+
+    #   tqNode['id'] ->
+    # type: 'myType'
+    # title: 'SBB X-Axis"
+    # diagramX: 12
+    # diagramY: 828
+    # attrValues:
+    #     temp: 12
+    #     stepSize: 3.12
+    # outWires:
+    #     abc: [ ids... ]
+    # (inwires: ...)
+
+      tqNodes[id] = node:
+                      type:value
+                      title: key
+                      diagramX:100
+                      diagramY:50
+
+
+      console.log tqNodes.length
+
+      TQ.set key, value
     
     counter = []      
     
@@ -78,6 +104,23 @@ ng.controller 'View4Ctrl', ($scope, primus, tosqa, tqNodeTypes) ->
           $scope.todos.push todo
         else
           $scope.removeMotor(todo.text, todo.type)
-            
-          
+
+
+
+
+ng.factory "tqNodes", ->
+    id2233:
+      node:
+       type:"ssb"
+       title:"X-Axis"
+       diagramX:400
+       diagramY:50
+    
+    id4466: 
+      node:
+        type:"host"
+        title:"Tosqa_host"
+        diagramX:200
+        diagramY:100                    
+    
       

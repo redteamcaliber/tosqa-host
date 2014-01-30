@@ -6,86 +6,34 @@ ng.config ($stateProvider, navbarProvider, primus) ->
     templateUrl: 'view5/view.html'
     controller: 'View5Ctrl'
   navbarProvider.add '/view5', 'view5', 15
-  
-  primus.live = (scope, prefix, adjust) ->
-    table = []
-    primus.write ['live', prefix]
-
-    #function called at server side to update client         
-    scope.$on "live.#{prefix}", (event, type, value) ->
-      switch type
-        when 'put'
-          key = value.key
-          value = {key:key, value:value.value}
-          console.log "updated: " + key
-         
-        when 'del'
-          key = value.key
-          value = {key:key, value:null}
-          console.log "deleted: " + key 
-        else
-          return
-
-      adjust? value  if value?
-# # 
-      # for row, index in table 
-      #   if row.key is key
-      #     if value?
-      #       table[index] = value
-      #     else
-      #       # table.splice index, 1
-      #     return
-      
-      table.push value
-      
-    table
 
 
 #controller, calls primus.dead only
-ng.controller 'View5Ctrl', ($scope, primus, tqNodeTypes) ->
+ng.controller 'View5Ctrl', ($scope, primus, tqNodeTypes, tqNodes) ->
   
   diagram = createDiagramEditor('diagram')
   diagram_nodes = []
   
-  # tqNodeTypes = diagram.nodeTypes
-  console.log tqNodeTypes
+  $scope.nodeData = [
+    ["properties", "-"]
+  ];    
 
-  $scope.view5 = primus.live $scope, 'view5', (table)->
-    node = table.value
-    console.log node
+  for id in Object.keys(tqNodes)
+    node = tqNodes[id].node
 
-    $scope.nodeData = [
-      ["properties", "-"]
-    ];    
+    addItem(id, node, diagram, tqNodeTypes)
 
-    # if diagram does not contain node with this id then
-    if diagram.nodes[table.key]?
-      console.log "key exists"
-      if table.value isnt null
-        console.log "new properties"
-        console.log diagram.nodes[table.key]
-        diagram.nodes[table.key].x = 60
-        # console.log diagram.node[table.key]
 
-      else 
-        # if key is removed then remove Node
-        console.log "remove node:" + table.key
-        diagram.removeNode table.key
-        
-    else
-      if node? and node.name?
-        console.info "add node:" + table.key
-        addItem(diagram, table, node )
 
-      #updates infotable with new node data
-    $scope.update = (nodeId) ->
-      console.log "info updated for nodeId:" + nodeId
-      $scope.nodeData = [
-        ["properties", nodeId],
-        ["temp", 50],
-        ["STEP", 200],
-        ["value", 63]
-      ];        
+    #   #updates infotable with new node data
+    # $scope.update = (nodeId) ->
+    #   console.log "info updated for nodeId:" + nodeId
+    #   $scope.nodeData = [
+    #     ["properties", nodeId],
+    #     ["temp", 50],
+    #     ["STEP", 200],
+    #     ["value", 63]
+    #   ];        
    
       
   diagram.wireItUp()
@@ -121,19 +69,18 @@ ng.directive 'highlightOnChange', ($animate) ->
 
 
 
-addItem = (diagram, table, node) ->
-  tqNode = table.value
-
-  tqNodeTypes = diagram.nodeTypes  
+addItem = (id, node, diagram, tqNodeTypes) ->
+  console.log "addNode", node.title
+  console.log node.type
   prop = tqNodeTypes[node.type]
 
-  # if properties are defined in type table then construct tqNode
-  if prop?
-    diagram.addNode
-      id: table.key
-      name: node.type + node.name
-      x: prop.diagamX
-      y: node.y or 50
+  console.log prop
+
+  diagram.addNode
+      id: id
+      name: node.title
+      x: node.diagramX or prop.diagramX
+      y: node.diagramY or prop.diagramY
       pads: prop.pads
        
 
