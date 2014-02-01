@@ -64,5 +64,5 @@ ng.factory "tqNodeTypes", ->
         default: 0
     pads:
       'measure out':
-        wires:
-          10: ['']
+        wires: {}
+          # 10: ['']

@@ -26,8 +26,6 @@ ng.controller 'View4Ctrl', ($scope, primus, TQ, tqNodeTypes, tqNodes) ->
       tqNodes[id] = node:
                       type:value
                       title: key
-                      diagramX:100
-                      diagramY:50
 
       # TQ.set key, value
     
@@ -58,10 +56,8 @@ ng.controller 'View4Ctrl', ($scope, primus, TQ, tqNodeTypes, tqNodes) ->
     ## modified todolist starts here
     #########
     
-    $scope.todos = [
-      
-    ]
-    
+    $scope.todos = []
+
     $scope.addTodo = ->
       $scope.todos.push
         text: $scope.todoText
@@ -96,18 +92,18 @@ ng.controller 'View4Ctrl', ($scope, primus, TQ, tqNodeTypes, tqNodes) ->
 
 ng.factory "tqNodes", ->
   
-  id2233:
-    node:
-      type:"ssb"
-      title:"X-Axis"
-      diagramX:400
-      diagramY:50
+    id2233:
+      node:
+       type:"ssb"
+       title:"X-Axis"
+       diagramX:400
+       diagramY:50
     
-  id4466: 
-    node:
-      type:"host"
-      title:"Tosqa host"
-      diagramX:200
-      diagramY:100                    
+    id4466: 
+      node:
+        type:"host"
+        title:"Tosqa host"
+        diagramX:200
+        diagramY:100                    
     
       

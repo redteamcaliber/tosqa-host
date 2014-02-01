@@ -44,9 +44,9 @@ ng.controller 'View5Ctrl', ($scope, primus, tqNodeTypes, tqNodes) ->
 
   diagram.onMove = (nodeId, x, y, set)->
     # console.log nodeId, x, y
-    tqNodes[id].node.diagramX = x
-    tqNodes[id].node.diagramY = y
-    console.log nodeId, tqNodes[id].node.title, tqNodes[id].node.diagramX, tqNodes[id].node.diagramY
+    tqNodes[nodeId].node.diagramX = x
+    tqNodes[nodeId].node.diagramY = y
+    console.log nodeId, tqNodes[nodeId].node, tqNodes[nodeId].node.diagramX, tqNodes[nodeId].node.diagramY
 
   
   diagram.onClick = (nodeId)->
