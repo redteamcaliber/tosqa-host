@@ -23,9 +23,9 @@ ng.controller 'View4Ctrl', ($scope, primus, TQ, tqNodeTypes, tqNodes) ->
       # console.log jeebus.logFun
       id = "id" + new Date().getTime() 
 
-      tqNodes[id] = node:
-                      type:value
-                      title: key
+      tqNodes[id]=
+              type:value
+              title: key
 
       # TQ.set key, value
     
@@ -93,12 +93,10 @@ ng.controller 'View4Ctrl', ($scope, primus, TQ, tqNodeTypes, tqNodes) ->
 ng.factory "tqNodes", ->
   
     id2233:
-      node:
        type:"ssb"
        title:"X-Axis"
     
     id4466: 
-      node:
         type:"host"
         title:"Tosqa host"                 
     

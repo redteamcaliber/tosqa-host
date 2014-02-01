@@ -20,7 +20,8 @@ ng.controller 'View5Ctrl', ($scope, primus, tqNodeTypes, tqNodes) ->
 
   $scope.update = (nodeId) ->
     console.log "info updated for nodeId:" + nodeId
-    node = tqNodes[nodeId].node
+    node = tqNodes[nodeId]
+
     $scope.nodeData = [
       ["properties", nodeId],
       ["title", node.title]
@@ -28,28 +29,23 @@ ng.controller 'View5Ctrl', ($scope, primus, tqNodeTypes, tqNodes) ->
       ["diagramY", node.diagramY]
     ];    
 
-
+  # add all nodes in view
   for id in Object.keys(tqNodes)
-    node = tqNodes[id].node
+    node = tqNodes[id]
 
     addItem(id, node, diagram, tqNodeTypes)
 
-
-
-    #   #updates infotable with new node data
-    
-   
-      
   diagram.wireItUp()
 
   diagram.onMove = (nodeId, x, y, set)->
-    # console.log nodeId, x, y
-    tqNodes[nodeId].node.diagramX = x
-    tqNodes[nodeId].node.diagramY = y
-    console.log nodeId, tqNodes[nodeId].node, tqNodes[nodeId].node.diagramX, tqNodes[nodeId].node.diagramY
+    # update tqNode with new position 
+    tqNodes[nodeId].diagramX = x
+    tqNodes[nodeId].diagramY = y
+    console.log nodeId, tqNodes[nodeId].title, tqNodes[nodeId].diagramX, tqNodes[nodeId].diagramY
 
   
   diagram.onClick = (nodeId)->
+    #update infotable with new node data
     $scope.$apply ->
       $scope.update(nodeId)
   
@@ -80,11 +76,10 @@ addItem = (id, node, diagram, tqNodeTypes) ->
   console.log node.type
   prop = tqNodeTypes[node.type]
 
-  console.log node.diagramX, node.diagramY
-
   diagram.addNode
       id: id
       name: node.title
+      # place at default position if not set before
       x: node.diagramX or prop.diagramX
       y: node.diagramY or prop.diagramY
       pads: prop.pads
