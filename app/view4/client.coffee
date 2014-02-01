@@ -96,14 +96,10 @@ ng.factory "tqNodes", ->
       node:
        type:"ssb"
        title:"X-Axis"
-       diagramX:400
-       diagramY:50
     
     id4466: 
       node:
         type:"host"
-        title:"Tosqa host"
-        diagramX:200
-        diagramY:100                    
+        title:"Tosqa host"                 
     
       
