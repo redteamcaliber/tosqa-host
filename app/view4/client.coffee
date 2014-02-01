@@ -17,21 +17,11 @@ ng.controller 'View4Ctrl', ($scope, primus, TQ, tqNodeTypes, tqNodes) ->
 
     console.log tqNodes
  
+
+
     $scope.addValue = (key, value) ->
       # console.log jeebus.logFun
       id = "id" + new Date().getTime() 
-
-    #   tqNode['id'] ->
-    # type: 'myType'
-    # title: 'SBB X-Axis"
-    # diagramX: 12
-    # diagramY: 828
-    # attrValues:
-    #     temp: 12
-    #     stepSize: 3.12
-    # outWires:
-    #     abc: [ ids... ]
-    # (inwires: ...)
 
       tqNodes[id] = node:
                       type:value
@@ -39,10 +29,7 @@ ng.controller 'View4Ctrl', ($scope, primus, TQ, tqNodeTypes, tqNodes) ->
                       diagramX:100
                       diagramY:50
 
-
-      console.log tqNodes.length
-
-      TQ.set key, value
+      # TQ.set key, value
     
     counter = []      
     
@@ -64,7 +51,7 @@ ng.controller 'View4Ctrl', ($scope, primus, TQ, tqNodeTypes, tqNodes) ->
                      
       data = {prefix:prefix, key:name, value:null}
       counter[type] -= 1
-    
+
 
     
     #########
@@ -107,20 +94,20 @@ ng.controller 'View4Ctrl', ($scope, primus, TQ, tqNodeTypes, tqNodes) ->
 
 
 
-
 ng.factory "tqNodes", ->
-    id2233:
-      node:
-       type:"ssb"
-       title:"X-Axis"
-       diagramX:400
-       diagramY:50
+  
+  id2233:
+    node:
+      type:"ssb"
+      title:"X-Axis"
+      diagramX:400
+      diagramY:50
     
-    id4466: 
-      node:
-        type:"host"
-        title:"Tosqa_host"
-        diagramX:200
-        diagramY:100                    
+  id4466: 
+    node:
+      type:"host"
+      title:"Tosqa host"
+      diagramX:200
+      diagramY:100                    
     
       

@@ -148,6 +148,7 @@ window.createDiagramEditor = (domid) ->
         set.translate dx - cx, dy - cy
         cx = dx
         cy = dy
+        context.onMove? node.id, node.x+cx, node.y+cy 
         redrawWires()
 
       redrawWires = ->
