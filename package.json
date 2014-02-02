@@ -24,7 +24,7 @@
     "chai": "~1.8.1",
     "mocha": "~1.13.0",
     "sinon": "~1.7.3",
-    "coffee-script": "~1.6.3"
+    "coffee-script": "~1.7.1"
   },
   "scripts": {
     "test": "mocha"
