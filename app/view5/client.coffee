@@ -9,11 +9,13 @@ ng.config ($stateProvider, navbarProvider, primus) ->
 
 
 #controller, calls primus.dead only
-ng.controller 'View5Ctrl', ($scope, primus, tqNodeTypes, tqNodes) ->
+ng.controller 'View5Ctrl', ($scope, primus, TQ, tqNodeTypes, tqNodes) ->
   
   diagram = createDiagramEditor('diagram')
   diagram_nodes = []
   
+  # a = TQ.get "item"
+
   $scope.nodeData = [
     ["properties", "-"]
   ];    
