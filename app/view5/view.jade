@@ -20,5 +20,11 @@
     //- p {{nodeData}}
 
 //- <div ng-controller="MyController"></div>
-//- p {{ person }} {{nodeData}}
+p {{ admin.tick }}
+p {{nodes}}    
+    table.pure-table
+      td(ng-repeat='node in nodes')
+        //- td(ng-repeat='col in row')
+        input.table-input(ng-model='node')
+
 //- p <input ng-model="person.name" placeholder="Name"></input>

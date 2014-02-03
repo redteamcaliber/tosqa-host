@@ -9,12 +9,23 @@ ng.config ($stateProvider, navbarProvider, primus) ->
 
 
 #controller, calls primus.dead only
-ng.controller 'View5Ctrl', ($scope, primus, TQ, tqNodeTypes, tqNodes) ->
+ng.controller 'View5Ctrl', ($scope, primus, TQ, tqNodes, tqNodeTypes, $timeout, jeebus) ->
+
   
   diagram = createDiagramEditor('diagram')
   diagram_nodes = []
   
-  # a = TQ.get "item"
+  $timeout ->
+    $scope.admin = jeebus.attach '/admin/'
+    $scope.$on '$destroy', -> jeebus.detach '/admin/'
+  , 100
+
+
+  # attach /tq/ to 
+  $timeout ->
+    $scope.nodes = jeebus.attach '/tq/'
+  , 100
+
 
   $scope.nodeData = [
     ["properties", "-"]
@@ -36,6 +47,15 @@ ng.controller 'View5Ctrl', ($scope, primus, TQ, tqNodeTypes, tqNodes) ->
     node = tqNodes[id]
 
     addItem(id, node, diagram, tqNodeTypes)
+  
+  angular.forEach $scope.nodes, () ->
+    console.log "this"
+
+  # angular.forEach $scope.nodes, (node) ->
+  #     console.log $scope.nodes
+
+
+
 
   diagram.wireItUp()
 

@@ -27,11 +27,9 @@ ng.controller 'View4Ctrl', ($scope, primus, TQ, tqNodeTypes, tqNodes) ->
               type:value
               title: key
 
-      TQ.set key, value
+      TQ.set id, tqNodes[id]
 
-      TQ.get "item"
-
-    counter = []      
+    counter = []
     
     $scope.addNode = (name, type)-> 
       prefix = "view5"
