@@ -7,8 +7,14 @@ ng.config ($stateProvider, navbarProvider) ->
     controller: 'JeeBusCtrl'
   navbarProvider.add '/jeebus', 'JeeBus', 25
 
-ng.controller 'JeeBusCtrl', ($scope, jeebus) ->
-  # TODO rewrite these example to use the "tq" service i.s.o. "jeebus"
+ng.controller 'JeeBusCtrl', ($scope, $timeout, jeebus) ->
+  # TODO rewrite these example to use the "TQ" service i.s.o. "jeebus"
+
+  # TODO this delay seems to be required to avoid an error with WS setup - why?
+  $timeout ->
+    $scope.admin = jeebus.attach '/admin/'
+    $scope.$on '$destroy', -> jeebus.detach '/admin/'
+  , 100
 
   $scope.echoTest = ->
     jeebus.send "echoTest!" # send a test message to JB server's stdout
