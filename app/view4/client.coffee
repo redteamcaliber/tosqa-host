@@ -16,7 +16,7 @@ ng.controller 'View4Ctrl', ($scope, primus, TQ, tqNodeTypes, tqNodes) ->
     
 
     console.log tqNodes
- 
+    
 
 
     $scope.addValue = (key, value) ->
@@ -28,7 +28,9 @@ ng.controller 'View4Ctrl', ($scope, primus, TQ, tqNodeTypes, tqNodes) ->
               title: key
 
       TQ.set key, value
-          
+
+      TQ.get "item"
+
     counter = []      
     
     $scope.addNode = (name, type)-> 
