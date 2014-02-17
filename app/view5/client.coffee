@@ -14,7 +14,7 @@ ng.controller 'View5Ctrl', ($scope, primus, TQ, tqNodes, tqNodeTypes, $timeout, 
   
   diagram = createDiagramEditor('diagram')
   diagram_nodes = []
-  
+
   $timeout ->
     $scope.admin = jeebus.attach '/admin/'
     $scope.$on '$destroy', -> jeebus.detach '/admin/'
@@ -26,6 +26,16 @@ ng.controller 'View5Ctrl', ($scope, primus, TQ, tqNodes, tqNodeTypes, $timeout, 
     $scope.nodes = jeebus.attach '/tq/'
   , 100
 
+  $scope.updated = 0
+
+
+  $scope.$watchCollection "nodes", ((newValue, oldValue) ->
+    
+    # console.log "added entry" + Object.keys(oldValue)
+    console.log "added entry" + Object.keys(newValue)
+    $scope.updated++
+
+  ), true
 
   $scope.nodeData = [
     ["properties", "-"]
@@ -56,7 +66,7 @@ ng.controller 'View5Ctrl', ($scope, primus, TQ, tqNodes, tqNodeTypes, $timeout, 
 
 
 
-
+  # add wires
   diagram.wireItUp()
 
   diagram.onMove = (nodeId, x, y, set)->

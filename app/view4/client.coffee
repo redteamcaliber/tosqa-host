@@ -27,7 +27,7 @@ ng.controller 'View4Ctrl', ($scope, primus, TQ, tqNodeTypes, tqNodes) ->
               type:value
               title: key
 
-      TQ.set id, tqNodes[id]
+      TQ.set key, tqNodes[id]
 
     counter = []
     
