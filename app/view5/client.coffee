@@ -10,31 +10,33 @@ ng.config ($stateProvider, navbarProvider, primus) ->
 
 #controller, calls primus.dead only
 ng.controller 'View5Ctrl', ($scope, primus, TQ, tqNodes, tqNodeTypes, $timeout, jeebus) ->
-
-  
   diagram = createDiagramEditor('diagram')
-  diagram_nodes = []
-
-  $timeout ->
-    $scope.admin = jeebus.attach '/admin/'
-    $scope.$on '$destroy', -> jeebus.detach '/admin/'
-  , 100
-
 
   # attach /tq/ to 
   $timeout ->
     $scope.nodes = jeebus.attach '/tq/'
   , 100
 
-  $scope.updated = 0
-
-
-  $scope.$watchCollection "nodes", ((newValue, oldValue) ->
-    
-    # console.log "added entry" + Object.keys(oldValue)
-    console.log "added entry" + Object.keys(newValue)
-    $scope.updated++
-
+  # watch changes in "$scope.nodes"
+  $scope.$watch "nodes", ((newValue, oldValue) -> 
+    if oldValue? and newValue?
+      # compare arrays, add or remove when different
+      array = Object.keys(oldValue)
+      remain = array
+      for key in Object.keys(newValue)
+        index = array.indexOf(key)
+        if index < 0
+          console.log "add", key
+          tqNodes[key] = newValue[key]
+          addItem(key, newValue[key], diagram, tqNodeTypes)
+        else
+          remain.splice index
+      # if newValue contrains less keys than old 
+      if remain.length is 1
+        console.log "remove", remain[0]
+        diagram.removeNode(remain[0])
+      else if remain.length is 0
+        console.log "prop changed"  
   ), true
 
   $scope.nodeData = [
@@ -53,10 +55,10 @@ ng.controller 'View5Ctrl', ($scope, primus, TQ, tqNodes, tqNodeTypes, $timeout, 
     ];    
 
   # add all nodes in view
-  for id in Object.keys(tqNodes)
-    node = tqNodes[id]
+  # for id in Object.keys(tqNodes)
+  #   node = tqNodes[id]
 
-    addItem(id, node, diagram, tqNodeTypes)
+  #   addItem(id, node, diagram, tqNodeTypes)
   
   angular.forEach $scope.nodes, () ->
     console.log "this"

@@ -24,10 +24,12 @@ ng.controller 'View4Ctrl', ($scope, primus, TQ, tqNodeTypes, tqNodes) ->
       id = "id" + new Date().getTime() 
 
       tqNodes[id]=
-              type:value
+              type: value
               title: key
-
-      TQ.set key, tqNodes[id]
+      if value? and value isnt ""
+        TQ.set key, tqNodes[id] # add node to db
+      else
+        TQ.set key, "" # remove key
 
     counter = []
     

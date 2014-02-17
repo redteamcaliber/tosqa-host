@@ -17,17 +17,18 @@
       tr(ng-repeat='row in nodeData')
         td(ng-repeat='col in row')
           input.table-input(ng-model='row[$index]')
-    //- p {{nodeData}}
 
-//- <div ng-controller="MyController"></div>
-p {{ admin.tick }}
-p {{nodes}}    
-    table.pure-table
-      td(ng-repeat='node in nodes')
-        //- td(ng-repeat='col in row')
-        input.table-input(ng-model='node')
+//- p {{nodes}}    
+table
+  tr
+    th Id
+    th First Name
+    th Last Name
+  tr(ng-repeat='node in nodes')
+    td {{node.id}}
+    td {{node.title}}
+    td {{node.type}}
 
-p Name updated: {{updated}} times.
 
 
 //- p <input ng-model="person.name" placeholder="Name"></input>
