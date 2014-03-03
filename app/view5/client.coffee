@@ -19,25 +19,17 @@ ng.controller 'View5Ctrl', ($scope, primus, TQ, tqNodes, tqNodeTypes, $timeout, 
 
   # watch changes in "$scope.nodes"
   $scope.$watch "nodes", ((newValue, oldValue) -> 
-    if oldValue? and newValue?
+    if oldValue? and newValue? and not angular.equals(oldValue, newValue)
       # compare arrays, add or remove when different
-      array = Object.keys(oldValue)
-      remain = array
-      for key in Object.keys(newValue)
-        index = array.indexOf(key)
-        if index < 0
-          console.log "add", key
-          tqNodes[key] = newValue[key]
-          addItem(key, newValue[key], diagram, tqNodeTypes)
-        else
-          remain.splice index
-      # if newValue contrains less keys than old 
-      if remain.length is 1
-        console.log "remove", remain[0]
-        diagram.removeNode(remain[0])
-      else if remain.length is 0
-        console.log "prop changed"  
+      diff = tqFindDiff(oldValue, newValue)
+
+      if diff.action is "add"
+        addItem(diff.key, newValue[diff.key], diagram, tqNodeTypes)
+      else if diff.action is "remove"
+        diagram.removeNode(diff.key)
   ), true
+
+
 
   $scope.nodeData = [
     ["properties", "-"]
@@ -45,37 +37,24 @@ ng.controller 'View5Ctrl', ($scope, primus, TQ, tqNodes, tqNodeTypes, $timeout, 
 
   $scope.update = (nodeId) ->
     console.log "info updated for nodeId:" + nodeId
-    node = tqNodes[nodeId]
+    node = $scope.nodes[nodeId]
 
     $scope.nodeData = [
       ["properties", nodeId],
-      ["title", node.title]
+      ["title", node.title],
+      ["type", node.type],
       ["diagramX", node.diagramX],
       ["diagramY", node.diagramY]
     ];    
-
-  # add all nodes in view
-  # for id in Object.keys(tqNodes)
-  #   node = tqNodes[id]
-
-  #   addItem(id, node, diagram, tqNodeTypes)
-  
-  angular.forEach $scope.nodes, () ->
-    console.log "this"
-
-  # angular.forEach $scope.nodes, (node) ->
-  #     console.log $scope.nodes
-
-
 
   # add wires
   diagram.wireItUp()
 
   diagram.onMove = (nodeId, x, y, set)->
     # update tqNode with new position 
-    tqNodes[nodeId].diagramX = x
-    tqNodes[nodeId].diagramY = y
-    console.log nodeId, tqNodes[nodeId].title, tqNodes[nodeId].diagramX, tqNodes[nodeId].diagramY
+    $scope.nodes[nodeId].diagramX = x
+    $scope.nodes[nodeId].diagramY = y
+    console.log nodeId, $scope.nodes[nodeId].title, $scope.nodes[nodeId].diagramX, $scope.nodes[nodeId].diagramY
 
   
   diagram.onClick = (nodeId)->
@@ -96,15 +75,6 @@ ng.controller 'View5Ctrl', ($scope, primus, TQ, tqNodes, tqNodeTypes, $timeout, 
     data = {prefix:"view5", key:link}
     primus.write ['saveToStorage', data]
 
-
-ng.directive 'highlightOnChange', ($animate) ->
-  (scope, elem, attrs) ->
-    scope.$watch attrs.highlightOnChange, ->
-      $animate.addClass elem, 'highlight', ->
-        attrs.$removeClass 'highlight'  
-
-
-
 addItem = (id, node, diagram, tqNodeTypes) ->
   console.log "addNode", node.title
   console.log node.type
@@ -118,6 +88,21 @@ addItem = (id, node, diagram, tqNodeTypes) ->
       y: node.diagramY or prop.diagramY
       pads: prop.pads
 
-       
+tqFindDiff = (oldValue, newValue) ->
+  array = Object.keys(oldValue)
+  remain = array
+  returnVal = {key:-1, action:"none"}
+  for key in Object.keys(newValue)
+    index = array.indexOf(key)
+    if index < 0
+      console.log "index for", key, "is", index
+      console.log oldValue, newValue
+      returnVal = {key:key, action:"add"}
+    else 
+      remain.splice key
+  if remain.length is 1
+    console.log remain[0]
+    returnVal= {key:remain[0], action:"remove"}
+  returnVal
 
 

@@ -19,9 +19,8 @@ ng.factory "tqNodeTypes", ->
         varType: "float"
         editable: true
     pads:
-      'frequency': {}
-      'timbre': {}
-      'modulation': {}
+      'step': {}
+      'dir': {}
   
   host:
     description: "this the host"
