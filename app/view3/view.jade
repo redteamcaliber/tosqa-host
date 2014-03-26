@@ -1,9 +1,17 @@
 .row
   .large-12.columns
-    p This is the partial for view 3.
-    p <button ng-click="chiliSpicy()">chili</button> <button ng-click="jalapenoSpicy()">jalapeno</button> 
-    p <input ng-model="customSpice">
-    p <button ng-click="cSpice(customSpice)">custom</button> 
-    p The food is {{spice}} spicy!
-    p counter = {{counter}}
-    p <button ng-click="test()">testButton</button> 
+      button( ng-click='open()') Open me!
+      <div ng-controller="View3Ctrl">
+      script( type="text/ng-template" id="myModalContent.html").
+        <h3>I'm a modal!</h3>
+        <ul>
+            <li ng-repeat="item in items">
+                <a ng-click="selected.item = item">{{ item }}</a>
+              </li>
+            </ul>
+            <p>Selected: <b>{{ selected.item }}</b></p>
+            <button class="button" ng-click="ok()">OK</button>
+            <a class="close-reveal-modal" ng-click="cancel()">&#215;</a>
+
+      <div ng-show="selected">Selection from a modal: {{ selected }}</div>
+

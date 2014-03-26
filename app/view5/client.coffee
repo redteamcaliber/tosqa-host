@@ -12,15 +12,26 @@ ng.config ($stateProvider, navbarProvider, primus) ->
 ng.controller 'View5Ctrl', ($scope, primus, TQ, tqNodes, tqNodeTypes, $timeout, jeebus) ->
   diagram = createDiagramEditor('diagram')
 
+  # TODO
+
+  # # 2. table      {id:<e.g. ssb101>{type:<e.g. "ssb">, name:<e.g. "item">}}
+  # # 3. metatable  {table:{id:string: type:string, name:string}}
+
   # attach /tq/ to 
   $timeout ->
     $scope.nodes = jeebus.attach '/tq/'
   , 100
 
+  # jeebus.attach 'tq/diag'
+  # $scope.nodes.rows
+  # $scope.nodes.on "data", ()->
+
+
+
   # watch changes in "$scope.nodes"
   $scope.$watch "nodes", ((newValue, oldValue) -> 
     if oldValue? and newValue? and not angular.equals(oldValue, newValue)
-      # compare arrays, add or remove when different
+      # compare arrays, add or remove when different keys exist
       diff = tqFindDiff(oldValue, newValue)
 
       if diff.action is "add"
