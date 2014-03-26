@@ -190,22 +190,22 @@ func (g *GcodeParser) Run() {
 const modalLimit = 16
 
 var modalGroups = []string{
-	"G4 G10 G28 G30 G53 G92 G92.1 G92.2 G92.3 ",
-	"G0 G1 G2 G3 G33 G38.2 G38.3 G38.4 G38.5 G73 G76 G80 G81 G82 G83 G84 G85 G86 G87 G88 G89",
-	"G17 G18 G19 G17.1 G18.1 G19.1",
-	"G90 G91",
-	"G90.1 G91.1 M0 M1 M2 M30 M60",
-	"G93 G94 G95 M6",
-	"G20 G21",
-	"G40 G41 G42 G41.1 G42.1 M3 M4 M5",
-	"G43 G43.1 G49 M7 M8 M9",
-	"M48 M49",
-	"G98 G99",
-	"",
-	"G54 G55 G56 G57 G58 G59 G59.1 G59.2 G59.3",
-	"G61 G61.1 G64",
-	"G96 G97",
-	"G7 G8",
+	/* 0  */ "G4 G10 G28 G30 G53 G92 G92.1 G92.2 G92.3 ",
+	/* 1  */ "G0 G1 G2 G3 G33 G38.2 G38.3 G38.4 G38.5 G73 G76 G80 G81 G82 G83 G84 G85 G86 G87 G88 G89",
+	/* 2  */ "G17 G18 G19 G17.1 G18.1 G19.1",
+	/* 3  */ "G90 G91",
+	/* 4  */ "G90.1 G91.1 M0 M1 M2 M30 M60",
+	/* 5  */ "G93 G94 G95 M6",
+	/* 6  */ "G20 G21",
+	/* 7  */ "G40 G41 G42 G41.1 G42.1 M3 M4 M5",
+	/* 8  */ "G43 G43.1 G49 M7 M8 M9",
+	/* 9  */ "M48 M49",
+	/* 10 */ "G98 G99",
+	/* 11 */ "",
+	/* 12 */ "G54 G55 G56 G57 G58 G59 G59.1 G59.2 G59.3",
+	/* 13 */ "G61 G61.1 G64",
+	/* 14 */ "G96 G97",
+	/* 15 */ "G7 G8",
 }
 
 // used to determine which modal group a G or M command belongs to
@@ -262,7 +262,9 @@ type GcodeInterp struct {
 	In  flow.Input
 	Out flow.Output
 
-	last [4]float64
+	position  [4]float64
+	mode [modalLimit]string
+	state map[string]float64
 }
 
 const (
@@ -274,7 +276,8 @@ const (
 
 // Start interpreting the word maps and action lists from the parser.
 func (g *GcodeInterp) Run() {
-	words := map[string]float64{}
+	g.state = map[string]float64{}
+	var words map[string]float64
 
 	for m := range g.In {
 		switch v := m.(type) {
@@ -289,12 +292,12 @@ func (g *GcodeInterp) Run() {
 }
 
 func (g *GcodeInterp) process(words map[string]float64, actions []string) {
-	next := g.last
+	target := g.position
 	cmd := ""
 
 	setCoord := func(x string, i int) {
 		if v, ok := words[x]; ok {
-			next[i] = v
+			target[i] = v
 		}
 	}
 
@@ -302,32 +305,48 @@ func (g *GcodeInterp) process(words map[string]float64, actions []string) {
 	setCoord("Y", cY)
 	setCoord("Z", cZ)
 
-	emitNext := func() {
-		g.Out.Send(flow.Tag{cmd, next})
-		g.last = next
+	emitTarget := func() {
+		g.Out.Send(flow.Tag{cmd, target})
+		g.position = target
+		g.updateState(cmd)
 	}
 
 	emitValue := func(value interface{}) {
 		g.Out.Send(flow.Tag{cmd, value})
+		g.updateState(cmd)
 	}
 
 	for _, cmd = range actions {
 		value := words[cmd]
+		if cmd[0] != 'G' && cmd[0] != 'M' {
+			g.state[cmd] = value
+		}
+
 		switch cmd {
 		case "F":
-			next[cF] = value
+			target[cF] = value
 		case "S":
 			emitValue(value)
 		case "G0":
-			rapid := next
+			rapid := target
 			rapid[cF] = 1e9
 			emitValue(rapid)
 		case "G1":
-			emitNext()
-		case "M30":
-			emitValue(nil)
+			emitTarget()
 		default:
-			g.Out.Send(flow.Tag{"<ignored>", cmd})
+			if cmd[0] == 'M' {
+				emitValue(nil)
+			} else {
+				g.Out.Send(flow.Tag{"<ignored>", cmd})
+			}
 		}
+	}
+
+	// fmt.Println(strings.Join(g.mode[:], "-"), g.state)
+}
+
+func (g *GcodeInterp) updateState(cmd string) {
+	if m, ok := modalMap[cmd]; ok {
+		g.mode[m] = cmd
 	}
 }
