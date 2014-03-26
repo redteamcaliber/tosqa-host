@@ -75,7 +75,7 @@ func main() {
 	c.Feed("http.Handlers", flow.Tag{"/", flow.Config["APP_DIR"]})
 	c.Feed("http.Handlers", flow.Tag{"/base/", flow.Config["BASE_DIR"]})
 	c.Feed("http.Handlers", flow.Tag{"/ws", "<websocket>"})
-	
+
 	// start the ball rolling, keep running forever
 	c.Add("forever", "Forever")
 	c.Run()
