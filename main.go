@@ -1,35 +1,82 @@
+// Tosqa: process config, env vars, cmdline args, then start up as needed.
 package main
 
 import (
-	"log"
+	"flag"
+	"fmt"
 	"os"
 
-	"github.com/jcw/jeebus"
+	"github.com/jcw/flow"
+	_ "github.com/jcw/jeebus/gadgets"
+	_ "github.com/tosqa/tosqa-host/gadgets"
 )
 
+var VERSION = "0.9.0" // can be adjusted by goxc at link time
+var BUILD_DATE = ""   // can be adjusted by goxc at link time
+
+var config = flag.String("c", "./config.txt", "name of configuration file to use")
+
+// defaults can also be overridden through environment variables
+const defaults = `
+APP_DIR    = ../../jcw/jeebus/app
+BASE_DIR   = ../../jcw/jeebus/base
+DATA_DIR   = ./data
+HTTP_PORT  = :3333
+MQTT_PORT  = :1883
+SETUP_FILE = ./setup.json
+`
+
 func main() {
-	if len(os.Args) <= 1 {
-		log.Fatalf("usage: tosqa-host <cmd> ... (try 'tosqa-host run')")
+	flag.Parse() // required, to set up the proper glog configuration
+	flow.LoadConfig(defaults, *config)
+	flow.DontPanic()
+
+	// register more definitions from a JSON-formatted setup file, if specified
+	if s := flow.Config["SETUP_FILE"]; s != "" {
+		if err := flow.AddToRegistry(s); err != nil {
+			panic(err)
+		}
 	}
 
-	switch os.Args[1] {
-
-	case "reinitdb":
-		reinitdb()
-
-	case "see":
-		topics := "#"
-		if len(os.Args) > 2 {
-			topics = os.Args[2]
+	// if a registered circuit name is given on the command line, run it
+	if flag.NArg() > 0 {
+		if factory, ok := flow.Registry[flag.Arg(0)]; ok {
+			factory().Run()
+			return
 		}
-		for m := range jeebus.ConnectToServer(topics) {
-			log.Println(m.T, string(m.P.([]byte)), m.R)
-		}
-
-	default:
-		log.Fatal("unknown sub-command: tosqa ", os.Args[1], " ...")
+		fmt.Fprintln(os.Stderr, "Unknown command:", flag.Arg(0))
+		os.Exit(1)
 	}
-}
 
-func reinitdb() {
+	fmt.Printf("Starting webserver for http://%s/\n", flow.Config["HTTP_PORT"])
+
+	// normal startup: save config info in database and start the webserver
+	c := flow.NewCircuit()
+
+	// database setup, save current config settings, register init gadget
+	c.Add("db", "LevelDB")
+	c.Feed("db.In", flow.Tag{"<clear>", "/config/"})
+	c.Feed("db.In", flow.Tag{"/config/appName", "Tosqa"})
+	c.Feed("db.In", flow.Tag{"/config/configFile", *config})
+	for k, v := range flow.Config {
+		c.Feed("db.In", flow.Tag{"/config/" + k, v})
+	}
+	c.Feed("db.In", flow.Tag{"<register>", "/gadget/init"})
+
+	// wait for db to finish, then dispatch to the "init" gadget, if found
+	c.Add("wait", "Waiter")
+	c.Add("disp", "Dispatcher")
+	c.Connect("db.Out", "wait.Gate", 0)
+	c.Connect("wait.Out", "disp.In", 0)
+	c.Feed("wait.In", flow.Tag{"<dispatch>", "init"})
+
+	// webserver setup
+	c.Add("http", "HTTPServer")
+	c.Feed("http.Handlers", flow.Tag{"/", flow.Config["APP_DIR"]})
+	c.Feed("http.Handlers", flow.Tag{"/base/", flow.Config["BASE_DIR"]})
+	c.Feed("http.Handlers", flow.Tag{"/ws", "<websocket>"})
+	
+	// start the ball rolling, keep running forever
+	c.Add("forever", "Forever")
+	c.Run()
 }

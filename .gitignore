@@ -1,4 +1,5 @@
-bower_components
-node_modules
+/data
+/files
 /logger
-/storage
+node_modules
+/setup-prev.json
