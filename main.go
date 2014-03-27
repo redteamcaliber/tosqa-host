@@ -15,7 +15,7 @@ var config = flag.String("c", "./config.txt", "name of configuration file to use
 
 // defaults can also be overridden through environment variables
 const defaults = `
-APP_DIR    = ../../jcw/jeebus/app
+APP_DIR    = ./app
 BASE_DIR   = ../../jcw/jeebus/base
 DATA_DIR   = ./data
 HTTP_PORT  = :3333
