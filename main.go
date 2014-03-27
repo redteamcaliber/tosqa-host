@@ -11,9 +11,6 @@ import (
 	_ "github.com/tosqa/tosqa-host/gadgets"
 )
 
-var VERSION = "0.9.0" // can be adjusted by goxc at link time
-var BUILD_DATE = ""   // can be adjusted by goxc at link time
-
 var config = flag.String("c", "./config.txt", "name of configuration file to use")
 
 // defaults can also be overridden through environment variables
@@ -23,7 +20,7 @@ BASE_DIR   = ../../jcw/jeebus/base
 DATA_DIR   = ./data
 HTTP_PORT  = :3333
 MQTT_PORT  = :1883
-SETUP_FILE = ./setup.json
+SETUP_FILE = ../../jcw/jeebus/setup.json
 `
 
 func main() {
