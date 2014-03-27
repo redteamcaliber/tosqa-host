@@ -263,21 +263,22 @@ type GcodeInterp struct {
 	In  flow.Input
 	Out flow.Output
 
-	position, home, perMm [4]float64
-	mode                  [modalLimit]string
-	// state                 map[string]float64
+	pos, home, perMm [cDim]float64
+	mode             [modalLimit]string
+	// state            map[string]float64
 }
 
 const (
-	cX = iota
-	cY
-	cZ
-	cF
+	cX   = iota // X-axis coordinate
+	cY          // Y-axis coordinate
+	cZ          // Z-axis coordinate
+	cF          // feed rate, pseudo coordinate
+	cDim        // number of coordinates
 )
 
 // Start interpreting the word maps and action lists from the parser.
 func (g *GcodeInterp) Run() {
-	g.perMm = [4]float64{1000, 1000, 1000, 1} // default is 1000 steps/mm
+	g.perMm = [cDim]float64{1000, 1000, 1000, 1} // default is 1000 steps/mm
 
 	for m := range g.Cfg {
 		tag := m.(flow.Tag)
@@ -302,16 +303,16 @@ func (g *GcodeInterp) Run() {
 	}
 }
 
-func (g *GcodeInterp) isRelative() bool {
+func (g GcodeInterp) isRelative() bool {
 	return g.mode[3] == "G91"
 }
 
-func (g *GcodeInterp) isInch() bool {
+func (g GcodeInterp) isInch() bool {
 	return g.mode[6] == "G20"
 }
 
 func (g *GcodeInterp) process(words map[string]float64, actions []string) {
-	target := g.position
+	target := g.pos
 	cmd := ""
 
 	setCoord := func(x string, i int) {
@@ -330,11 +331,10 @@ func (g *GcodeInterp) process(words map[string]float64, actions []string) {
 	setCoord("Y", cY)
 	setCoord("Z", cZ)
 
-	emitMotion := func() {
-		if target != g.position {
-			// g.Out.Send(flow.Tag{cmd, target})
+	emitSteps := func() {
+		if target != g.pos {
 			steps := make([]int, len(target))
-			for i, v := range g.position {
+			for i, v := range g.pos {
 				value := g.perMm[i] * (target[i] - v)
 				if i == cF {
 					value = target[cF]
@@ -345,11 +345,11 @@ func (g *GcodeInterp) process(words map[string]float64, actions []string) {
 				steps[i] = int(value)
 			}
 			g.Out.Send(steps)
-			g.position = target
+			g.pos = target
 		}
 	}
 
-	emitValue := func(value interface{}) {
+	emitAsTag := func(value interface{}) {
 		g.Out.Send(flow.Tag{cmd, value})
 	}
 
@@ -367,33 +367,30 @@ func (g *GcodeInterp) process(words map[string]float64, actions []string) {
 		case "F": // feed rate
 			target[cF] = value
 		case "S": // spindle
-			emitValue(value)
+			emitAsTag(value)
 		case "G4": // dwell
-			emitValue(words["P"])
+			emitAsTag(words["P"])
 
 		case "G92": // set home
 			g.home = target
 		case "G30": // home via
-			cmd = "G1"
-			emitMotion()
-			cmd = "G28"
+			emitSteps()
 			fallthrough
 		case "G28": // home
 			target = g.home
-			cmd = "G0"
 			fallthrough
 		case "G0": // rapid
 			savedF := target[cF]
 			target[cF] = -1
-			emitMotion()
-			g.position[cF] = savedF
+			emitSteps()
+			g.pos[cF] = savedF
 			target[cF] = savedF
 		case "G1": // move
-			emitMotion()
+			emitSteps()
 
 		default:
 			if cmd[0] == 'M' {
-				emitValue(nil)
+				emitAsTag(nil)
 			} else {
 				g.Out.Send(flow.Tag{"<ignored>", cmd})
 			}
