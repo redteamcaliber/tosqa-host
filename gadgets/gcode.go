@@ -1,4 +1,4 @@
-// The (very early) start of a G-code parser.
+// A basic G-code scanner, parser, interpreter, and step generator.
 package gcode
 
 import (
@@ -6,6 +6,8 @@ import (
 	"sort"
 	"strconv"
 	"strings"
+	"sync"
+	"time"
 
 	"github.com/jcw/flow"
 )
@@ -14,6 +16,7 @@ func init() {
 	flow.Registry["GcodeScanner"] = func() flow.Circuitry { return &GcodeScanner{} }
 	flow.Registry["GcodeParser"] = func() flow.Circuitry { return &GcodeParser{} }
 	flow.Registry["GcodeInterp"] = func() flow.Circuitry { return &GcodeInterp{} }
+	flow.Registry["StepGen"] = func() flow.Circuitry { return &StepGen{} }
 }
 
 // GcodeScanner processes G-code text lines and turns each line into a word map.
@@ -263,9 +266,9 @@ type GcodeInterp struct {
 	In  flow.Input
 	Out flow.Output
 
-	pos, home, perMm [cDim]float64
-	mode             [modalLimit]string
-	// state            map[string]float64
+	pos, target, home, perMm [cDim]float64
+	mode                     [modalLimit]string
+	state                    map[string]float64
 }
 
 const (
@@ -288,7 +291,7 @@ func (g *GcodeInterp) Run() {
 		g.Out.Send(m)
 	}
 
-	// g.state = map[string]float64{}
+	g.state = map[string]float64{}
 	var words map[string]float64
 
 	for m := range g.In {
@@ -303,59 +306,17 @@ func (g *GcodeInterp) Run() {
 	}
 }
 
-func (g GcodeInterp) isRelative() bool {
-	return g.mode[3] == "G91"
-}
-
-func (g GcodeInterp) isInch() bool {
-	return g.mode[6] == "G20"
-}
-
 func (g *GcodeInterp) process(words map[string]float64, actions []string) {
-	target := g.pos
+	g.target = g.pos
 	cmd := ""
 
-	setCoord := func(x string, i int) {
-		if v, ok := words[x]; ok {
-			if g.isInch() {
-				v *= 25.4
-			}
-			if g.isRelative() {
-				v += g.home[i]
-			}
-			target[i] = v
-		}
+	for k, v := range words {
+		g.state[k] = v
 	}
 
-	setCoord("X", cX)
-	setCoord("Y", cY)
-	setCoord("Z", cZ)
-
-	emitSteps := func() {
-		if target != g.pos {
-			steps := make([]int, len(target))
-			for i, v := range g.pos {
-				value := g.perMm[i] * (target[i] - v)
-				if i == cF {
-					value = target[cF]
-					if value < 0 {
-						value = g.perMm[i]
-					}
-				}
-				steps[i] = int(value)
-			}
-			g.Out.Send(steps)
-			g.pos = target
-		}
-	}
-
-	emitAsTag := func(value interface{}) {
-		g.Out.Send(flow.Tag{cmd, value})
-	}
-
-	// for k, v := range words {
-	// 	g.state[k] = v
-	// }
+	g.setCoord("X", cX)
+	g.setCoord("Y", cY)
+	g.setCoord("Z", cZ)
 
 	for _, cmd = range actions {
 		value := words[cmd]
@@ -365,32 +326,32 @@ func (g *GcodeInterp) process(words map[string]float64, actions []string) {
 
 		switch cmd {
 		case "F": // feed rate
-			target[cF] = value
+			g.target[cF] = value
 		case "S": // spindle
-			emitAsTag(value)
+			g.Out.Send(flow.Tag{cmd, value})
 		case "G4": // dwell
-			emitAsTag(words["P"])
+			g.Out.Send(flow.Tag{cmd, words["P"]})
 
 		case "G92": // set home
-			g.home = target
+			g.home = g.target
 		case "G30": // home via
-			emitSteps()
+			g.emitSteps()
 			fallthrough
 		case "G28": // home
-			target = g.home
+			g.target = g.home
 			fallthrough
 		case "G0": // rapid
-			savedF := target[cF]
-			target[cF] = -1
-			emitSteps()
+			savedF := g.target[cF]
+			g.target[cF] = -1
+			g.emitSteps()
 			g.pos[cF] = savedF
-			target[cF] = savedF
+			g.target[cF] = savedF
 		case "G1": // move
-			emitSteps()
+			g.emitSteps()
 
 		default:
 			if cmd[0] == 'M' {
-				emitAsTag(nil)
+				g.Out.Send(flow.Tag{cmd, nil})
 			} else {
 				g.Out.Send(flow.Tag{"<ignored>", cmd})
 			}
@@ -398,4 +359,89 @@ func (g *GcodeInterp) process(words map[string]float64, actions []string) {
 	}
 
 	// fmt.Println(strings.Join(g.mode[:], "-"), g.state)
+}
+
+func (g GcodeInterp) isRelative() bool {
+	return g.mode[3] == "G91"
+}
+
+func (g GcodeInterp) isInch() bool {
+	return g.mode[6] == "G20"
+}
+
+func (g *GcodeInterp) setCoord(x string, i int) {
+	if v, ok := g.state[x]; ok {
+		if g.isInch() {
+			v *= 25.4
+		}
+		if g.isRelative() {
+			v += g.home[i]
+		}
+		g.target[i] = v
+	}
+}
+
+func (g *GcodeInterp) emitSteps() {
+	if g.target != g.pos {
+		steps := make([]int, len(g.target))
+		for i, v := range g.pos {
+			value := g.perMm[i] * (g.target[i] - v)
+			if i == cF {
+				value = g.target[cF]
+				if value < 0 || value > g.perMm[i] {
+					value = g.perMm[i]
+				}
+			}
+			steps[i] = int(value)
+		}
+		g.Out.Send(steps)
+		g.pos = g.target
+	}
+}
+
+// StepGen generates steps fed to it from the G-code interpreter.
+type StepGen struct {
+	flow.Gadget
+	In  flow.Input
+	Out flow.Output
+}
+
+// Start generating steps in real time.
+func (g *StepGen) Run() {
+	for m := range g.In {
+		if steps, ok := m.([]int); ok && len(steps) == cDim {
+			g.generate(steps)
+		}
+	}
+}
+
+func (g *StepGen) generate(steps []int) {
+	var wait sync.WaitGroup
+	defer wait.Wait()
+
+	for i := 0; i < cF; i++ {
+		count := steps[i]
+		if count < 0 {
+			count = -count
+		}
+		if steps[cF] == 0 || count == 0 {
+			continue // avoid divide by zero
+		}
+		nsPerStep := time.Duration(1e9 / float64(steps[cF]) / float64(count))
+		// send out int values: X=1, Y=2, Z=3, sign=direction
+		value := (i + 1) * (steps[i] / count)
+
+		wait.Add(1)
+		go func() {
+			defer wait.Done()
+			// place steps in the middle of the time interval
+			time.Sleep(nsPerStep / 2)
+			g.Out.Send(value)
+			for j := 1; j < count; j++ {
+				time.Sleep(nsPerStep)
+				g.Out.Send(value)
+			}
+			time.Sleep(nsPerStep / 2)
+		}()
+	}
 }

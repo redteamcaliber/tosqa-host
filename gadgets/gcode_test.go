@@ -74,3 +74,40 @@ func ExampleGcodeInterp() {
 	// Lost []int: [0 0 34000 12345]
 	// Lost flow.Tag: {M30 <nil>}
 }
+
+func ExampleGcodeInterp_2() {
+	c := flow.NewCircuit()
+	c.Add("s", "GcodeScanner")
+	c.Add("p", "GcodeParser")
+	c.Add("i", "GcodeInterp")
+	c.Connect("s.Out", "p.In", 0)
+	c.Connect("p.Out", "i.In", 0)
+	c.Feed("i.Cfg", flow.Tag{"<perMm>", []float64{1, 1, 1, 1000}})
+	c.Feed("s.In", "G0 X1 Y-2 Z4")
+	c.Run()
+	// Output:
+	// Lost flow.Tag: {<perMm> [1 1 1 1000]}
+	// Lost []int: [1 -2 4 1000]
+}
+
+func ExampleStepGen() {
+	c := flow.NewCircuit()
+	c.Add("s", "GcodeScanner")
+	c.Add("p", "GcodeParser")
+	c.Add("i", "GcodeInterp")
+	c.Add("g", "StepGen")
+	c.Connect("s.Out", "p.In", 0)
+	c.Connect("p.Out", "i.In", 0)
+	c.Connect("i.Out", "g.In", 0)
+	c.Feed("i.Cfg", flow.Tag{"<perMm>", []float64{1, 1, 1, 1000}})
+	c.Feed("s.In", "G0 X1 Y-2 Z4")
+	c.Run()
+	// Output:
+	// Lost int: 3
+	// Lost int: -2
+	// Lost int: 3
+	// Lost int: 1
+	// Lost int: 3
+	// Lost int: -2
+	// Lost int: 3
+}
