@@ -111,7 +111,7 @@ circuits.rf12toDatabase =
     { name: "nm", type: "nodesJeeLabs" }
     { name: "d2", type: "Dispatcher" }
     { name: "rd", type: "Readings" }
-    { name: "ss", type: "SensorSave" }
+    { name: "ss", type: "PutReadings" }
     { name: "f2", type: "FanOut" }
     { name: "sr", type: "SplitReadings" }
     { name: "db", type: "LevelDB" }
@@ -244,7 +244,7 @@ circuits.tableFill =
 
     { to: "db.In", tag: "/table/column", data: { attr: "id name" } }
     { to: "db.In", tag: "/column/column/id", data: { name: "Ident" } }
-    { to: "db.In", tag: "/column/columna/name", data: { name: "Name" } }
+    { to: "db.In", tag: "/column/column/name", data: { name: "Name" } }
 
     { to: "db.In", tag: "/table/driver", data: { attr: "id name unit factor scale" } }
     { to: "db.In", tag: "/column/driver/id", data: { name: "Parameter" } }
@@ -253,12 +253,12 @@ circuits.tableFill =
     { to: "db.In", tag: "/column/driver/factor", data: { name: "Factor" } }
     { to: "db.In", tag: "/column/driver/scale", data: { name: "Scale" } }
 
-    { to: "db.In", tag: "/table/sensor", data: { attr: "id loc val ms typ" } }
-    { to: "db.In", tag: "/column/sensor/id", data: { name: "Ident" } }
-    { to: "db.In", tag: "/column/sensor/loc", data: { name: "Location" } }
-    { to: "db.In", tag: "/column/sensor/val", data: { name: "Values" } }
-    { to: "db.In", tag: "/column/sensor/ms", data: { name: "Timestamp" } }
-    { to: "db.In", tag: "/column/sensor/typ", data: { name: "Type" } }
+    { to: "db.In", tag: "/table/reading", data: { attr: "id loc val ms typ" } }
+    { to: "db.In", tag: "/column/reading/id", data: { name: "Ident" } }
+    { to: "db.In", tag: "/column/reading/loc", data: { name: "Location" } }
+    { to: "db.In", tag: "/column/reading/val", data: { name: "Values" } }
+    { to: "db.In", tag: "/column/reading/ms", data: { name: "Timestamp" } }
+    { to: "db.In", tag: "/column/reading/typ", data: { name: "Type" } }
   ]
 
 # trial circuit
@@ -268,7 +268,7 @@ circuits.try1 =
   ]
   feeds: [
     { data: "./data", to: "db.Name" }
-    { tag: "<range>", data: "/sensor/", to: "db.In" }
+    { tag: "<range>", data: "/reading/", to: "db.In" }
   ]
 
 # write configuration to file, but keep a backup of the original, just in case
