@@ -34,6 +34,7 @@ func ExampleGcodeInterp() {
 	c.Add("i", "GcodeInterp")
 	c.Connect("s.Out", "p.In", 0)
 	c.Connect("p.Out", "i.In", 0)
+	c.Feed("i.Cfg", flow.Tag{"<perMm>", []float64{1000, 1000, 1000, 12345}})
 	c.Feed("s.In", "G00 X6.139 Y11.245 Z8.100")
 	c.Feed("s.In", "G01 Z-2.000 F600 S10000  ")
 	c.Feed("s.In", "G01 Y78.716 F1000        ")
@@ -53,22 +54,23 @@ func ExampleGcodeInterp() {
 	c.Feed("s.In", "M30                      ")
 	c.Run()
 	// Output:
-	// Lost flow.Tag: {G0 [6.139 11.245 8.1 1e+09]}
+	// Lost flow.Tag: {<perMm> [1000 1000 1000 12345]}
+	// Lost []int: [6139 11245 8100 12345]
 	// Lost flow.Tag: {S 10000}
-	// Lost flow.Tag: {G1 [0 0 -2 600]}
-	// Lost flow.Tag: {G1 [0 78.716 -2 1000]}
-	// Lost flow.Tag: {G1 [6.261 79.81 -2 1000]}
-	// Lost flow.Tag: {G1 [6.625 80.904 -2 1000]}
-	// Lost flow.Tag: {G1 [86.765 35.118 -2 1000]}
-	// Lost flow.Tag: {G1 [87.118 35.588 -2 1000]}
-	// Lost flow.Tag: {G0 [87.118 35.588 8 1e+09]}
-	// Lost flow.Tag: {G0 [14.059 64.059 -2 1e+09]}
-	// Lost flow.Tag: {G1 [87.118 35.588 -26 600]}
-	// Lost flow.Tag: {G1 [85.941 35.588 -26 1000]}
-	// Lost flow.Tag: {G0 [85.941 35.588 8 1e+09]}
-	// Lost flow.Tag: {G0 [14.059 25.941 -26 1e+09]}
-	// Lost flow.Tag: {G1 [85.941 35.588 -26 600]}
-	// Lost flow.Tag: {G1 [86.754 35.588 -26 1000]}
-	// Lost flow.Tag: {G0 [86.754 35.588 8 1e+09]}
+	// Lost []int: [0 0 -10100 600]
+	// Lost []int: [0 67470 0 1000]
+	// Lost []int: [121 1094 0 1000]
+	// Lost []int: [363 1093 0 1000]
+	// Lost []int: [80140 -45785 0 1000]
+	// Lost []int: [352 469 0 1000]
+	// Lost []int: [0 0 10000 12345]
+	// Lost []int: [-73059 28470 0 12345]
+	// Lost []int: [0 0 -34000 600]
+	// Lost []int: [71882 0 0 1000]
+	// Lost []int: [0 0 34000 12345]
+	// Lost []int: [-71882 -38117 0 12345]
+	// Lost []int: [0 0 -34000 600]
+	// Lost []int: [72695 0 0 1000]
+	// Lost []int: [0 0 34000 12345]
 	// Lost flow.Tag: {M30 <nil>}
 }

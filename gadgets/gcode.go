@@ -259,12 +259,13 @@ func (a byOrder) Less(i, j int) bool { return wordOrder[a[i]] < wordOrder[a[j]] 
 // GcodeInterp interprets word maps and action lists to generate commands.
 type GcodeInterp struct {
 	flow.Gadget
+	Cfg flow.Input
 	In  flow.Input
 	Out flow.Output
 
-	position  [4]float64
-	mode [modalLimit]string
-	state map[string]float64
+	position, home, perMm [4]float64
+	mode                  [modalLimit]string
+	// state                 map[string]float64
 }
 
 const (
@@ -276,7 +277,17 @@ const (
 
 // Start interpreting the word maps and action lists from the parser.
 func (g *GcodeInterp) Run() {
-	g.state = map[string]float64{}
+	g.perMm = [4]float64{1000, 1000, 1000, 1} // default is 1000 steps/mm
+
+	for m := range g.Cfg {
+		tag := m.(flow.Tag)
+		if tag.Tag == "<perMm>" {
+			copy(g.perMm[:], tag.Msg.([]float64))
+		}
+		g.Out.Send(m)
+	}
+
+	// g.state = map[string]float64{}
 	var words map[string]float64
 
 	for m := range g.In {
@@ -291,12 +302,26 @@ func (g *GcodeInterp) Run() {
 	}
 }
 
+func (g *GcodeInterp) isRelative() bool {
+	return g.mode[3] == "G91"
+}
+
+func (g *GcodeInterp) isInch() bool {
+	return g.mode[6] == "G20"
+}
+
 func (g *GcodeInterp) process(words map[string]float64, actions []string) {
 	target := g.position
 	cmd := ""
 
 	setCoord := func(x string, i int) {
 		if v, ok := words[x]; ok {
+			if g.isInch() {
+				v *= 25.4
+			}
+			if g.isRelative() {
+				v += g.home[i]
+			}
 			target[i] = v
 		}
 	}
@@ -305,34 +330,67 @@ func (g *GcodeInterp) process(words map[string]float64, actions []string) {
 	setCoord("Y", cY)
 	setCoord("Z", cZ)
 
-	emitTarget := func() {
-		g.Out.Send(flow.Tag{cmd, target})
-		g.position = target
-		g.updateState(cmd)
+	emitMotion := func() {
+		if target != g.position {
+			// g.Out.Send(flow.Tag{cmd, target})
+			steps := make([]int, len(target))
+			for i, v := range g.position {
+				value := g.perMm[i] * (target[i] - v)
+				if i == cF {
+					value = target[cF]
+					if value < 0 {
+						value = g.perMm[i]
+					}
+				}
+				steps[i] = int(value)
+			}
+			g.Out.Send(steps)
+			g.position = target
+		}
 	}
 
 	emitValue := func(value interface{}) {
 		g.Out.Send(flow.Tag{cmd, value})
-		g.updateState(cmd)
 	}
+
+	// for k, v := range words {
+	// 	g.state[k] = v
+	// }
 
 	for _, cmd = range actions {
 		value := words[cmd]
-		if cmd[0] != 'G' && cmd[0] != 'M' {
-			g.state[cmd] = value
+		if m, ok := modalMap[cmd]; ok {
+			g.mode[m] = cmd
 		}
 
 		switch cmd {
-		case "F":
+		case "F": // feed rate
 			target[cF] = value
-		case "S":
+		case "S": // spindle
 			emitValue(value)
-		case "G0":
-			rapid := target
-			rapid[cF] = 1e9
-			emitValue(rapid)
-		case "G1":
-			emitTarget()
+		case "G4": // dwell
+			emitValue(words["P"])
+
+		case "G92": // set home
+			g.home = target
+		case "G30": // home via
+			cmd = "G1"
+			emitMotion()
+			cmd = "G28"
+			fallthrough
+		case "G28": // home
+			target = g.home
+			cmd = "G0"
+			fallthrough
+		case "G0": // rapid
+			savedF := target[cF]
+			target[cF] = -1
+			emitMotion()
+			g.position[cF] = savedF
+			target[cF] = savedF
+		case "G1": // move
+			emitMotion()
+
 		default:
 			if cmd[0] == 'M' {
 				emitValue(nil)
@@ -343,10 +401,4 @@ func (g *GcodeInterp) process(words map[string]float64, actions []string) {
 	}
 
 	// fmt.Println(strings.Join(g.mode[:], "-"), g.state)
-}
-
-func (g *GcodeInterp) updateState(cmd string) {
-	if m, ok := modalMap[cmd]; ok {
-		g.mode[m] = cmd
-	}
 }
