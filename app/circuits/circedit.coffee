@@ -32,25 +32,26 @@ ng.directive 'circuitEditor', ->
       .on 'dragstart', (d) ->
         @parentNode.appendChild @ # arrange this gadget in front
       .on 'drag', (d) ->
-        d.x = (d3.event.x | 0) + .5 # stay on .5 off-pixel coordinates
-        d.y = (d3.event.y | 0) + .5 # stay on .5 off-pixel coordinates
+        d.x = d3.event.x | 0 # stay on int coordinates
+        d.y = d3.event.y | 0 # stay on int coordinates
         d3.select(@).attr
           transform: (d) -> "translate(#{d.x},#{d.y})"
       .on 'dragend', (d) ->
-        console.log d # TODO: save to server
+        console.log 'save gadget', d # TODO: save to server
 
     wireDrag = d3.behavior.drag()
       .origin Object
       .on 'dragstart', (d) ->
         console.log 'wireDrag', d
-        @parentNode.appendChild @ # arrange this gadget in front
+        @parentNode.appendChild @ # arrange this wire in front
+        d3.event.sourceEvent.stopPropagation()
       .on 'drag', (d) ->
         d.x = d3.event.x
         d.y = d3.event.y
         d3.select(@).attr
           transform: (d) -> "translate(#{d.x},#{d.y})"
       .on 'dragend', (d) ->
-        console.log d # TODO: save to server
+        console.log 'save wire', d # TODO: save to server
 
     gadgets = svg.selectAll('.gadget').data(scope.data.gadgets)
   
@@ -63,8 +64,9 @@ ng.directive 'circuitEditor', ->
         d.hh = d.gt.height / 2
         me = d3.select(@)
         me.attr
-          x: -d.hw
-          y: -d.hh
+          # 1px lines render sharply when placed on a 0.5px offset
+          x: 0.5 - d.hw
+          y: 0.5 - d.hh
           width: 2 * d.hw
           height: 2 * d.hh
       .style
@@ -80,18 +82,23 @@ ng.directive 'circuitEditor', ->
       .attr
         class: 'type'
         'text-anchor': 'middle'
-        y: (d) -> -5 + d.hh
-    g.append('circle').call(wireDrag)
+        y: (d) -> -4 + d.hh
+    g.append('circle')
+      .on 'mousedown', (d) ->
+        console.log 'c1', d
+        d3.event.sourceEvent.stopPropagation()
       .attr
         class: 'pin'
-        cx: (d) -> -d.hw
+        cx: (d) -> 0.5 - d.hw
         r: 3
-    g.append('circle').call(wireDrag)
+    g.append('circle')
+      .on 'mousedown', (d) ->
+        console.log 'c2', d
+        d3.event.sourceEvent.stopPropagation()
       .attr
         class: 'pin'
-        cx: (d) -> d.hw
+        cx: (d) -> 0.5 + d.hw
         r: 3
 
-    # 1px lines render sharply when placed on a 0.5px offset
     gadgets.attr
-      transform: (d) -> "translate(#{d.x+.5},#{d.y+.5})"
+      transform: (d) -> "translate(#{d.x},#{d.y})"
