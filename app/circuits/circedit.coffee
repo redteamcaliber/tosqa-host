@@ -15,6 +15,7 @@ gadgetTypes =
     shade: 'lightblue'
     pins: [
       { name:'In', type:'i' }
+      { name:'Out', type:'o' }
     ]
 
 ng.directive 'circuitEditor', ->
@@ -89,12 +90,49 @@ ng.directive 'circuitEditor', ->
         console.log 'c2', d
         d3.event.sourceEvent.stopPropagation()
       .attr class: 'pin', cx: ((d) -> 0.5 + d.hw), r: 3
+        
+    pins = gadgets.selectAll('rect .pin').data (d) ->
+      i = 0
+      d.conns = []
+      for p in d.gt.pins
+        d.conns.push
+          pin: p
+          parent: d
+          x: 800+50*i++
+          y:10*i
+    pins.enter().append('circle')
+      .each (d) ->
+        console.log 't', d.pin, d.parent
+        d3.select(@).attr
+          class: 'pin', cx: 100, cy: 50, r:8
 
+    findPin = (name) ->
+      [gid,cpn] = name.split '.'
+      for g in scope.data.gadgets
+        if gid is g.id
+          for c in g.conns
+            console.log 'cpn', cpn, c
+            if cpn is c.pin.name
+              console.log 'gp', name, g, c
+              return [g, c]
+    # console.log 'f1', findPin("g2.Out")...
+    # console.log 'f2', findPin("g1.In")...
+    
     # FIXME
-    diag.source scope.data.gadgets[0]
-    diag.target scope.data.gadgets[1]
+    # diag.source scope.data.gadgets[0]
+    # diag.projection (d) ->
+    #   console.log 'r', d
+    #   [d.cx, d.cy]
+    diag.source (d) ->
+      console.log 'df', d, findPin(d.from)...
+      findPin(d.from)[1]
+    diag.target (d) ->
+      console.log 'dt', d, findPin(d.to)...
+      findPin(d.to)[1]
+    # diag.source scope.data.gadgets[1]
+    # diag.target scope.data.gadgets[0]
 
-    wires = svg.selectAll('.wire').data(scope.data.gadgets)
+    wires = svg.selectAll('.wire').data(scope.data.wires)
     wires.enter().append('path')
       .attr class: 'wire', d: diag
 
