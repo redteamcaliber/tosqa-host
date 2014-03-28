@@ -12,10 +12,11 @@ circuitsCtrl = ($scope, jeebus) ->
   $scope.myData =
     gadgets: [
       { id:'g1', x:800, y:70, title:'Gadget One', type: 'Printer' }
-      { id:'g2', x:800, y:190, title:'Gadget Two', type: 'Pipe' }
+      { id:'g2', x:750, y:190, title:'Gadget Two', type: 'Pipe' }
     ]
-    wires:
-      "g2.Out": { cap: 0, to: [ "g1.In" ] }
+    wires: [
+      { from: "g2.Out", to: "g1.In", cap: 0 }
+    ]
     feeds:
       "g1.In": [ "some data", "more data" ]
     labels:

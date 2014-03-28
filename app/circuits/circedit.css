@@ -1,17 +1,24 @@
 circuit-editor>svg {
   border: 1px solid #d3d3d3;
 }
+.gadget {
+  font-size: 12px;
+}
 .gadget rect {
   stroke: #00f;
   stroke-width: 1px;
   fill: #fff;
 }
-.gadget text {
-  font-size: 12px;
-}
 .gadget text.title {
   fill: #808080;
+  text-anchor: middle;
 }
 .gadget text.type {
   fill: #00f;
+  text-anchor: middle;
+}
+.wire {
+  fill: none;
+  stroke: #808080;
+  stroke-width: 0.5px;
 }
