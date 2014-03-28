@@ -1,0 +1,8 @@
+.gadget rect {
+  stroke: #00f;
+  stroke-width: 1px;
+  fill: #fff;
+}
+.gadget text {
+  font-size: 12px;
+}
