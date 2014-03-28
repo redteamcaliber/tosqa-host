@@ -26,14 +26,14 @@ ng.directive 'circuitEditor', ->
   link: (scope, elem, attr) ->
     svg = d3.select(elem[0]).append 'svg'
       .attr width: 900, height: 400
-    
+
     gadgetDrag = d3.behavior.drag()
       .origin Object
       .on 'dragstart', (d) ->
         @parentNode.appendChild @ # arrange this gadget in front
       .on 'drag', (d) ->
-        d.x += d3.event.dx
-        d.y += d3.event.dy
+        d.x = (d3.event.x | 0) + .5 # stay on .5 off-pixel coordinates
+        d.y = (d3.event.y | 0) + .5 # stay on .5 off-pixel coordinates
         d3.select(@).attr
           transform: (d) -> "translate(#{d.x},#{d.y})"
       .on 'dragend', (d) ->
@@ -45,8 +45,8 @@ ng.directive 'circuitEditor', ->
         console.log 'wireDrag', d
         @parentNode.appendChild @ # arrange this gadget in front
       .on 'drag', (d) ->
-        d.x += d3.event.dx
-        d.y += d3.event.dy
+        d.x = d3.event.x
+        d.y = d3.event.y
         d3.select(@).attr
           transform: (d) -> "translate(#{d.x},#{d.y})"
       .on 'dragend', (d) ->
@@ -59,8 +59,8 @@ ng.directive 'circuitEditor', ->
     g.append('rect')
       .each (d) ->
         d.gt = gadgetTypes[d.type]
-        d.hw = d.gt.width >> 1  # half width, truncated
-        d.hh = d.gt.height >> 1 # half height, truncated
+        d.hw = d.gt.width / 2
+        d.hh = d.gt.height / 2
         me = d3.select(@)
         me.attr
           x: -d.hw
