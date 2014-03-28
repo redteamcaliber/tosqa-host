@@ -6,3 +6,9 @@
 .gadget text {
   font-size: 12px;
 }
+.gadget text.title {
+  fill: #808080;
+}
+.gadget text.type {
+  fill: #f00;
+}
