@@ -14,6 +14,12 @@ circuitsCtrl = ($scope, jeebus) ->
       { id:'g1', x:750, y:30, title:'Gadget One', type:'Printer' }
       { id:'g2', x:750, y:150, title:'Gadget Two', type:'Pipe' }
     ]
+    wires:
+      "g2.Out": { cap: 0, to: [ "g1.In" ] }
+    feeds:
+      "g1.In": [ "some data", "more data" ]
+    labels:
+      "In": "g1.In"
     types:
       Timer:
         pins: [

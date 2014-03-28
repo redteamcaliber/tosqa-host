@@ -10,7 +10,7 @@ ng.directive 'circuitEditor', ->
     svg = d3.select(elem[0]).append 'svg'
       .attr width: 900, height: 400
     
-    gdrag = d3.behavior.drag()
+    gadgetDrag = d3.behavior.drag()
       .origin Object
       .on 'dragstart', (d) ->
         @parentNode.appendChild @ # put this gadget on top
@@ -23,7 +23,7 @@ ng.directive 'circuitEditor', ->
 
     gadgets = svg.selectAll('.gadget').data(scope.data.gadgets)
   
-    g = gadgets.enter().append('g').attr('class', 'gadget').call(gdrag)
+    g = gadgets.enter().append('g').attr('class', 'gadget').call(gadgetDrag)
     g.append('rect')
       .attr width: 120, height: 80
     g.append('text').text (d) -> d.title
