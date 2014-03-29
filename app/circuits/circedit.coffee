@@ -15,7 +15,6 @@ gadgetTypes =
     shade: 'lightblue'
     pins: [
       { name:'In', type:'i', x: -60, y: 0 }
-      { name:'Out', type:'o', x: 60, y: 0 }
     ]
 
 ng.directive 'circuitEditor', ->
@@ -34,8 +33,8 @@ ng.directive 'circuitEditor', ->
         if gid is g.id
           for p in g.gt.pins
             if pname is p.name
-              # console.log 'gp', name, g, p
-              return x: g.x + p.x, y: g.y + p.y, g: g, p: p
+              # reverses x and y and uses projection to get horizontal splines
+              return y: g.x + p.x + .5, x: g.y + p.y + .5, g: g, p: p
 
     for _, d of scope.data.gadgets
       d.gt = gadgetTypes[d.type]
@@ -50,6 +49,7 @@ ng.directive 'circuitEditor', ->
     wires = svg.selectAll('.wire').data(scope.data.wires)
 
     diag = d3.svg.diagonal()
+      .projection (d) -> [d.y, d.x] # undo the x/y reversal from findPin
     
     gadgetDrag = d3.behavior.drag()
       .origin Object
@@ -88,14 +88,13 @@ ng.directive 'circuitEditor', ->
         
     pins = gadgets.selectAll('rect .pin').data (d) -> d.gt.pins
     pins.enter().append('circle')
-      .attr class: 'pin', cx: ((d) -> d.x), cy: ((d) -> d.y), r: 3
+      .attr class: 'pin', cx: ((d) -> d.x+.5), cy: ((d) -> d.y+.5), r: 3
       .on 'mousedown', (d) ->
         console.log 'c1', d
     pins.exit().remove()
 
-    wires.enter().append('path')
+    wires.enter().insert('path', 'g') # uses insert to move to back right away
       .attr class: 'wire', d: diag
     wires.exit().remove()
 
-    gadgets.attr
-      transform: (d) -> "translate(#{d.x},#{d.y})"
+    gadgets.attr transform: (d) -> "translate(#{d.x},#{d.y})"

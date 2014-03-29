@@ -8,6 +8,7 @@ circuit-editor>svg {
   stroke: #00f;
   stroke-width: 1px;
   fill: #fff;
+  fill-opacity: 0.8;
 }
 .gadget .title {
   fill: #808080;
@@ -20,5 +21,5 @@ circuit-editor>svg {
 .wire {
   fill: none;
   stroke: #000;
-  stroke-width: 0.5px;
+  stroke-width: 1px;
 }
