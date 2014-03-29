@@ -18,9 +18,9 @@ circuitsCtrl = ($scope, jeebus) ->
       { from: "g2.Out", to: "g1.In", cap: 0 }
     ]
     feeds:
-      "g1.In": [ "some data", "more data" ]
+      "g1.In": { data: [ "some data", "more data" ], x: 800, y: 270 }
     labels:
-      "In": "g1.In"
+      "In": "g2.In"
   
   setup = ->
     jeebus.attach 'circuit'

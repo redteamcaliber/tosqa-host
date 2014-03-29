@@ -1,19 +1,25 @@
 ng = angular.module 'myApp'
 
 gadgetDefs =
+  Feed:
+    width: 200
+    shade: 'white'
+    pins: [
+      { name: 'Out', dir: 'out' }
+    ]
   Pipe:
     name: 'Ceci est une pipe'
     width: 160
     pins: [
-      { name: 'In', dir: 'i' }
-      { name: 'Out', dir: 'o' }
+      { name: 'In', dir: 'in' }
+      { name: 'Out', dir: 'out' }
     ]
   Printer:
     width: 120
     shade: 'lightblue'
     pins: [
-      { name: 'In', dir: 'i' }
-      { name: 'In2', dir: 'i' }
+      { name: 'In', dir: 'in' }
+      { name: 'In2', dir: 'in' }
     ]
 
 # pre-calculate sizes and relative pin coordinates
@@ -22,7 +28,7 @@ for n, d of gadgetDefs
   ins = 0
   for p in d.pins
     p.x = d.width / 2
-    if p.dir is 'i'
+    if p.dir is 'in'
       p.x = -p.x
       ++ins
   outs = d.pins.length - ins
@@ -30,7 +36,7 @@ for n, d of gadgetDefs
   yIn = - (ins - 1) * step / 2
   yOut = - (outs - 1) * step / 2
   for p in d.pins
-    if p.dir is 'i'
+    if p.dir is 'in'
       p.y = yIn
       yIn += step
     else
@@ -46,7 +52,7 @@ ng.directive 'circuitEditor', ->
     
   link: (scope, elem, attr) ->
     svg = d3.select(elem[0]).append 'svg'
-      .attr height: "75%"
+      .attr height: "70%"
 
     findPin = (name) ->
       [gid,pname] = name.split '.'
@@ -115,8 +121,8 @@ ng.directive 'circuitEditor', ->
         console.log 'c1', d
     p.append('text').text (d) -> d.name
       .attr
-        class: (d) -> if d.dir is 'i' then 'in' else 'out'
-        x: (d) -> if d.dir is 'i' then d.x + 7 else d.x - 7
+        class: (d) -> d.dir
+        x: (d) -> if d.dir is 'in' then d.x + 7 else d.x - 7
         y: (d) -> d.y + 5
 
     wires.enter().insert('path', 'g') # uses insert to move to back right away
