@@ -1,6 +1,12 @@
 circuit-editor>svg {
   border: 1px solid #d3d3d3;
 }
+.iconfont {
+  text-anchor: middle;
+  dominant-baseline: central;
+  font-family: FontAwesome;
+  font-size: 18px;
+}
 .gadget {
   font-size: 12px;
 }

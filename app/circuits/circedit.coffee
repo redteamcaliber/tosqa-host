@@ -8,7 +8,7 @@ gadgetDefs =
       { name: 'Out', dir: 'out' }
     ]
   Pipe:
-    name: 'Ceci est une pipe'
+    name: 'Pipeline'
     width: 160
     pins: [
       { name: 'In', dir: 'in' }
@@ -17,6 +17,7 @@ gadgetDefs =
   Printer:
     width: 120
     shade: 'lightblue'
+    icon: '\uf02f'
     pins: [
       { name: 'In', dir: 'in' }
       { name: 'In2', dir: 'in' }
@@ -112,6 +113,8 @@ ng.directive 'circuitEditor', ->
       .attr class: 'title', y: (d) -> 12 - d.hh
     g.append('text').text (d) -> d.def.name
       .attr class: 'type', y: (d) -> -4 + d.hh
+    g.append('text').text (d) -> d.def.icon
+      .attr class: 'iconfont', x: 0, y: 0
         
     pins = gadgets.selectAll('rect .pin').data (d) -> d.def.pins
     p = pins.enter()
