@@ -5,9 +5,9 @@ ng = angular.module 'myApp', [
 ]
 
 ng.value 'appInfo',
-  name: 'JeeBus'
+  name: 'Tosqa'
   version: '0.9.0'
-  home: 'https://github.com/jcw/jeebus'
+  home: 'https://github.com/tosqa/tosqa-host'
 
 ng.run (jeebus) ->
   jeebus.connect 'jeebus'
