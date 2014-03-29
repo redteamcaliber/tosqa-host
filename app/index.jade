@@ -3,10 +3,8 @@ extends ../../../jcw/jeebus/base/layout
 //- block vars
 //- block title
 
-block styles
+append styles
   link(rel='stylesheet',href='/style.css')
-  link(rel='stylesheet',href='/circuits/circedit.css')
-  link(rel='stylesheet',href='//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css')
 
 //- block nav
 //- block main
@@ -20,7 +18,6 @@ prepend vendor
 append scripts
   script console.log('AFTER scripts');
   script(src='/base/vendor/ee3.js')
-  script(src='/circuits/circedit.js')
   script(src='/circuits/circuits.js')
   script(src='/demo/demo.js')
   script(src='/data/data.js')
