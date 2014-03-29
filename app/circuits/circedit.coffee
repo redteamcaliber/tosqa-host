@@ -25,7 +25,7 @@ ng.directive 'circuitEditor', ->
     
   link: (scope, elem, attr) ->
     svg = d3.select(elem[0]).append 'svg'
-      .attr height: "70%"
+      .attr height: "75%"
 
     findPin = (name) ->
       [gid,pname] = name.split '.'
@@ -91,10 +91,8 @@ ng.directive 'circuitEditor', ->
       .attr class: 'pin', cx: ((d) -> d.x+.5), cy: ((d) -> d.y+.5), r: 3
       .on 'mousedown', (d) ->
         console.log 'c1', d
-    pins.exit().remove()
 
     wires.enter().insert('path', 'g') # uses insert to move to back right away
       .attr class: 'wire', d: diag
-    wires.exit().remove()
 
     gadgets.attr transform: (d) -> "translate(#{d.x},#{d.y})"
