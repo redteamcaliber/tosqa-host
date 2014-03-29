@@ -1,21 +1,42 @@
 ng = angular.module 'myApp'
 
-gadgetTypes =
+gadgetDefs =
   Pipe:
-    width: 80
-    height: 60
-    shade: 'lightyellow'
+    name: 'Ceci est une pipe'
+    width: 160
     pins: [
-      { name:'In', type:'i', x: -40, y: 0 }
-      { name:'Out', type:'o', x: 40, y: 0 }
+      { name: 'In', dir: 'i' }
+      { name: 'Out', dir: 'o' }
     ]
   Printer:
     width: 120
-    height: 40
     shade: 'lightblue'
     pins: [
-      { name:'In', type:'i', x: -60, y: 0 }
+      { name: 'In', dir: 'i' }
+      { name: 'In2', dir: 'i' }
     ]
+
+# pre-calculate sizes and relative pin coordinates
+for n, d of gadgetDefs
+  d.name or= n
+  ins = 0
+  for p in d.pins
+    p.x = d.width / 2
+    if p.dir is 'i'
+      p.x = -p.x
+      ++ins
+  outs = d.pins.length - ins
+  step = 16
+  yIn = - (ins - 1) * step / 2
+  yOut = - (outs - 1) * step / 2
+  for p in d.pins
+    if p.dir is 'i'
+      p.y = yIn
+      yIn += step
+    else
+      p.y = yOut
+      yOut += step
+  d.height = 30 + step * (if ins > outs then ins else outs)
 
 ng.directive 'circuitEditor', ->
   restrict: 'E'
@@ -31,17 +52,17 @@ ng.directive 'circuitEditor', ->
       [gid,pname] = name.split '.'
       for g in scope.data.gadgets
         if gid is g.id
-          for p in g.gt.pins
+          for p in g.def.pins
             if pname is p.name
               # reverses x and y and uses projection to get horizontal splines
               return y: g.x + p.x + .5, x: g.y + p.y + .5, g: g, p: p
 
-    for _, d of scope.data.gadgets
-      d.gt = gadgetTypes[d.type]
-      d.hw = d.gt.width / 2
-      d.hh = d.gt.height / 2
+    for d in scope.data.gadgets
+      d.def = gadgetDefs[d.type]
+      d.hw = d.def.width / 2
+      d.hh = d.def.height / 2
 
-    for _, d of scope.data.wires
+    for d in scope.data.wires
       d.source = findPin d.from
       d.target = findPin d.to
 
@@ -80,17 +101,23 @@ ng.directive 'circuitEditor', ->
           y: 0.5 - d.hh
           width: 2 * d.hw
           height: 2 * d.hh
-      .style fill: (d) -> d.gt.shade
+      .style fill: (d) -> d.def.shade
     g.append('text').text (d) -> d.title
       .attr class: 'title', y: (d) -> 12 - d.hh
-    g.append('text').text (d) -> d.type
+    g.append('text').text (d) -> d.def.name
       .attr class: 'type', y: (d) -> -4 + d.hh
         
-    pins = gadgets.selectAll('rect .pin').data (d) -> d.gt.pins
-    pins.enter().append('circle')
+    pins = gadgets.selectAll('rect .pin').data (d) -> d.def.pins
+    p = pins.enter()
+    p.append('circle')
       .attr class: 'pin', cx: ((d) -> d.x+.5), cy: ((d) -> d.y+.5), r: 3
       .on 'mousedown', (d) ->
         console.log 'c1', d
+    p.append('text').text (d) -> d.name
+      .attr
+        class: (d) -> if d.dir is 'i' then 'in' else 'out'
+        x: (d) -> if d.dir is 'i' then d.x + 7 else d.x - 7
+        y: (d) -> d.y + 5
 
     wires.enter().insert('path', 'g') # uses insert to move to back right away
       .attr class: 'wire', d: diag
