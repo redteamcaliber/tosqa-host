@@ -1,59 +1,37 @@
 ng = angular.module 'myApp'
 
-gadgetDefs =
-  Feed:
-    width: 200
-    shade: 'white'
-    pins: [
-      { name: 'Out', dir: 'out' }
-    ]
-  Pipe:
-    name: 'Pipeline'
-    width: 160
-    pins: [
-      { name: 'In', dir: 'in' }
-      { name: 'Out', dir: 'out' }
-    ]
-  Printer:
-    width: 120
-    shade: 'lightblue'
-    icon: '\uf02f'
-    pins: [
-      { name: 'In', dir: 'in' }
-      { name: 'In2', dir: 'in' }
-    ]
-
-# pre-calculate sizes and relative pin coordinates
-for n, d of gadgetDefs
-  d.name or= n
-  ins = 0
-  for p in d.pins
-    p.x = d.width / 2
-    if p.dir is 'in'
-      p.x = -p.x
-      ++ins
-  outs = d.pins.length - ins
-  step = 16
-  yIn = - (ins - 1) * step / 2
-  yOut = - (outs - 1) * step / 2
-  for p in d.pins
-    if p.dir is 'in'
-      p.y = yIn
-      yIn += step
-    else
-      p.y = yOut
-      yOut += step
-  d.height = 30 + step * (if ins > outs then ins else outs)
-
 ng.directive 'circuitEditor', ->
   restrict: 'E'
   
   scope:
+    defs: '='
     data: '='
     
   link: (scope, elem, attr) ->
     svg = d3.select(elem[0]).append 'svg'
       .attr height: "70%"
+
+    # pre-calculate sizes and relative pin coordinates
+    for n, d of scope.defs
+      d.name or= n
+      ins = 0
+      for p in d.pins
+        p.x = d.width / 2
+        if p.dir is 'in'
+          p.x = -p.x
+          ++ins
+      outs = d.pins.length - ins
+      step = 16
+      yIn = - (ins - 1) * step / 2
+      yOut = - (outs - 1) * step / 2
+      for p in d.pins
+        if p.dir is 'in'
+          p.y = yIn
+          yIn += step
+        else
+          p.y = yOut
+          yOut += step
+      d.height = 30 + step * (if ins > outs then ins else outs)
 
     findPin = (name) ->
       [gid,pname] = name.split '.'
@@ -65,7 +43,7 @@ ng.directive 'circuitEditor', ->
               return y: g.x + p.x + .5, x: g.y + p.y + .5, g: g, p: p
 
     for d in scope.data.gadgets
-      d.def = gadgetDefs[d.type]
+      d.def = scope.defs[d.type]
       d.hw = d.def.width / 2
       d.hh = d.def.height / 2
 

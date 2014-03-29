@@ -8,7 +8,24 @@ ng.config ($stateProvider, navbarProvider) ->
   navbarProvider.add '/circuits', 'Circuits', 30
 
 circuitsCtrl = ($scope, jeebus) ->
-  $scope.circuitId = 'def'
+  $scope.myDefs =
+    Pipe:
+      name: 'Pipeline'
+      width: 160
+      icon: '\uf061' # fa-arrow-right
+      pins: [
+        { name: 'In', dir: 'in' }
+        { name: 'Out', dir: 'out' }
+      ]
+    Printer:
+      width: 120
+      shade: 'lightblue'
+      icon: '\uf02f' # fa-print
+      pins: [
+        { name: 'In', dir: 'in' }
+        { name: 'In2', dir: 'in' }
+      ]
+      
   $scope.myData =
     gadgets: [
       { id:'g1', x:800, y:70, title:'Gadget One', type: 'Printer' }
