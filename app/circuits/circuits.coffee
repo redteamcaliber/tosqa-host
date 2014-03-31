@@ -8,7 +8,7 @@ ng.config ($stateProvider, navbarProvider) ->
   navbarProvider.add '/circuits', 'Circuits', 30
 
 circuitsCtrl = ($scope, jeebus) ->
-  $scope.myDefs =
+  $scope.gadgets =
     Pipe:
       name: 'Pipeline'
       width: 160
@@ -26,7 +26,7 @@ circuitsCtrl = ($scope, jeebus) ->
         { name: 'In2', dir: 'in' }
       ]
       
-  $scope.myData =
+  $scope.circuit =
     gadgets: [
       { id: 'g1', x: 120, y: 100, title: 'Gadget One', type: 'Printer' }
       { id: 'g2', x: 120, y: 200, title: 'Gadget Two', type: 'Pipe' }

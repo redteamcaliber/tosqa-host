@@ -34,7 +34,7 @@ ng.directive 'circuitEditor', ->
         console.log 'save gadget', d # TODO: save to server
 
     dragInfo = {}
-    dragWire = svg.append('path').datum(dragInfo).attr class: 'drag'
+    dragWire = svg.append('path').datum(dragInfo).attr id: 'drag'
 
     pinDrag = d3.behavior.drag()
       .origin Object
@@ -42,20 +42,20 @@ ng.directive 'circuitEditor', ->
         @parentNode.appendChild @ # move to front
         d3.event.sourceEvent.stopPropagation()
         dragInfo.from = d.pin
+        delete dragInfo.to
         dragInfo.source = findPin d.pin, scope.data.gadgets
       .on 'drag', (d) ->
         [mx,my] = d3.mouse(@)
         orig = dragInfo.source
         dragInfo.target = x: orig.x+my-d.y, y: orig.y+mx-d.x # flipped
-        dragWire.style stroke: 'red'
-        dragWire.attr d: diag
+        dragWire.attr class: 'drawing', fill: 'none', d: diag
       .on 'dragend', (d) ->
-        dragWire.style stroke: 'none'
+        dragWire.classed 'drawing', false
         if dragInfo.to
           nw = from: dragInfo.from, to: dragInfo.to
-          console.log 'add wire', nw # TODO: save to server
-          scope.data.wires.push nw
-          delete dragInfo.to
+          unless nw.from is nw.to
+            console.log 'add wire', nw # TODO: save to server
+            scope.data.wires.push nw
           redraw()
 
     redraw = ->
@@ -91,18 +91,17 @@ ng.directive 'circuitEditor', ->
       p.append('circle')
         .attr class: 'pin', cx: ((d) -> d.x+.5), cy: ((d) -> d.y+.5), r: 3
       p.append('circle').call(pinDrag)
-        .attr cx: ((d) -> d.x+.5), cy: ((d) -> d.y+.5), r: 7
-        .style "fill-opacity": .1 # don't show, but do pick up the mouse
+        .attr class: 'hit', cx: ((d) -> d.x+.5), cy: ((d) -> d.y+.5), r: 7
         .on 'mouseup', (d) -> dragInfo.to = d.pin
       p.append('text').text (d) -> d.name
         .attr
           class: (d) -> d.dir
-          x: (d) -> if d.dir is 'in' then d.x + 7 else d.x - 7
+          x: (d) -> if d.dir is 'in' then d.x + 10 else d.x - 10
           y: (d) -> d.y + 5
       pins.exit().remove()
 
       wires.enter().insert('path', 'g') # uses insert to move to back right away
-        .attr class: 'wire', d: diag
+        .attr class: 'wire', fill: 'none', d: diag
       wires.exit().remove()
 
       gadgets.attr transform: (d) -> "translate(#{d.x},#{d.y})"
