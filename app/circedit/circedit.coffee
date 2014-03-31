@@ -40,8 +40,8 @@ ng.directive 'circuitEditor', ->
     pinDrag = d3.behavior.drag()
       .origin Object
       .on 'dragstart', (d) ->
-        @parentNode.appendChild @ # move to front
         d3.event.sourceEvent.stopPropagation()
+        @parentNode.appendChild @ # move to front
         dragInfo.from = d.pin
         delete dragInfo.to
         dragInfo.source = findPin d.pin, scope.data.gadgets
@@ -62,7 +62,8 @@ ng.directive 'circuitEditor', ->
     redraw = ->
       lastg = prepareData scope.defs, scope.data
       gadgets = svg.selectAll('.gadget').data scope.data.gadgets, (d) -> d.id
-      wires = svg.selectAll('.wire').data scope.data.wires
+      wires = svg.selectAll('.wire').data scope.data.wires, (d) ->
+                "#{d.from}/#{d.to}" # essential for adding or removing wires
 
       g = gadgets.enter().append('g').call(gadgetDrag)
         .attr class: 'gadget'
@@ -83,10 +84,28 @@ ng.directive 'circuitEditor', ->
         .attr class: 'type', y: (d) -> -4 + d.hh
       g.append('text').text (d) -> d.def.icon
         .attr class: 'iconfont', x: 0, y: 0
+      g.append('text').text (d) -> '\uf014' # fa-trash-o
+        .attr class: 'iconfont', x: ((d) -> d.hw-8), y: ((d) -> 8-d.hh)
+        .style 'font-size': '12px'
+        .on 'mousedown', (d) ->
+          d3.event.stopPropagation()
+          # delete all attached wires
+          sdw = scope.data.wires
+          n = sdw.length
+          while n
+            w = sdw[--n]
+            if w.from.split('.')[0] is d.id or w.to.split('.')[0] is d.id
+              console.log 'del attached', w # TODO: save to server
+              sdw.splice n, 1
+          console.log 'del gadget', d # TODO: save to server
+          for i, g of scope.data.gadgets when g is d
+            scope.data.gadgets.splice i, 1
+            break
+          redraw()
       gadgets.exit().remove()
         
       pins = gadgets.selectAll('.pin').data (d) ->
-        for p in d.def.pins
+        d.conn = for p in d.def.pins
           x: p.x, y: p.y, name: p.name, dir: p.dir, pin: "#{d.id}.#{p.name}"
       p = pins.enter()
       p.append('circle')
@@ -116,7 +135,7 @@ ng.directive 'circuitEditor', ->
     svg.on 'mousedown', ->
       # return  if d3.event.defaultPrevented
       if wireUnderCursor
-        console.log 'delete wire', wireUnderCursor
+        console.log 'del wire', wireUnderCursor # TODO: save to server
         for i, w of scope.data.wires when w is wireUnderCursor
           scope.data.wires.splice i, 1
           break
@@ -145,7 +164,7 @@ prepareData = (gdefs, gdata) ->
         p.x = -p.x
         ++ins
     outs = d.pins.length - ins
-    step = 16
+    step = 20
     yIn = - (ins - 1) * step / 2
     yOut = - (outs - 1) * step / 2
     for p in d.pins
@@ -155,7 +174,7 @@ prepareData = (gdefs, gdata) ->
       else
         p.y = yOut
         yOut += step
-    d.height = 30 + step * (if ins > outs then ins else outs)
+    d.height = 40 + step * (if ins > outs then ins else outs)
 
   seq = '' # find the largest "g<n>" id to help generate the next one
   for d in gdata.gadgets
