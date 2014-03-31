@@ -35,6 +35,7 @@ ng.directive 'circuitEditor', ->
 
     dragInfo = {}
     dragWire = svg.append('path').datum(dragInfo).attr id: 'drag'
+    wireUnderCursor = null
 
     pinDrag = d3.behavior.drag()
       .origin Object
@@ -102,6 +103,10 @@ ng.directive 'circuitEditor', ->
 
       wires.enter().insert('path', 'g') # uses insert to move to back right away
         .attr class: 'wire', fill: 'none', d: diag
+        # can't use mouseclick, see
+        # https://groups.google.com/d/msg/d3-js/gHzOj91X2NA/65BEf2DuRV4J
+        .on 'mouseenter', (d) -> wireUnderCursor = d
+        .on 'mouseleave', (d) -> wireUnderCursor = null
       wires.exit().remove()
 
       gadgets.attr transform: (d) -> "translate(#{d.x},#{d.y})"
@@ -110,10 +115,16 @@ ng.directive 'circuitEditor', ->
     
     svg.on 'mousedown', ->
       # return  if d3.event.defaultPrevented
-      [x,y] = d3.mouse @
-      ng = id: "g#{++lastg}", x: x|0, y: y|0, title: 'Gadget Two', type: 'Pipe'
-      console.log "add gadget", ng # TODO: save to server
-      scope.data.gadgets.push ng
+      if wireUnderCursor
+        console.log 'delete wire', wireUnderCursor
+        for i, w of scope.data.wires when w is wireUnderCursor
+          scope.data.wires.splice i, 1
+          break
+      else
+        [x,y] = d3.mouse @
+        ng = id: "g#{++lastg}", x: x|0, y: y|0, title: 'Gadget Two', type: 'Pipe'
+        console.log "add gadget", ng # TODO: save to server
+        scope.data.gadgets.push ng
       redraw()
 
 findPin = (name, gdata) ->

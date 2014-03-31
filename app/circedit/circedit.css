@@ -14,6 +14,7 @@ circuit-editor>svg {
   stroke: #00f;
   fill: #ffffe0;
   fill-opacity: 0.8;
+  cursor: move;
 }
 .gadget .title {
   fill: #808080;
@@ -25,6 +26,7 @@ circuit-editor>svg {
 }
 .gadget .hit {
   fill-opacity: 0.2;
+  cursor: pointer;
 }
 .gadget .in {
   text-anchor: start;
@@ -33,7 +35,9 @@ circuit-editor>svg {
   text-anchor: end;
 }
 .wire {
-  stroke: #000;
+  stroke: #808080;
+  stroke-width: 1px;
+  cursor: crosshair;
 }
 #drag.drawing {
   stroke: #f00;
