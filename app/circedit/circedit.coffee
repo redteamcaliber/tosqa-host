@@ -14,7 +14,7 @@ ng.directive 'circuitEditor', ->
       break
     
     svg = d3.select(elem[0]).append 'svg'
-      .attr height: "60%"
+      .attr height: '60%'
     diag = d3.svg.diagonal()
       .projection (d) -> [d.y, d.x] # undo the x/y reversal from findPin
     
@@ -147,7 +147,7 @@ ng.directive 'circuitEditor', ->
       else
         [x,y] = d3.mouse @
         ng = id: "g#{++lastg}", x: x|0, y: y|0, type: scope.type
-        console.log "add gadget", ng # TODO: save to server
+        console.log 'add gadget', ng # TODO: save to server
         scope.data.gadgets.push ng
       redraw()
 
@@ -181,9 +181,11 @@ prepareData = (gdefs, gdata) ->
         yOut += step
     d.height = 40 + step * (if ins > outs then ins else outs)
 
-  seq = '' # find the largest "g<n>" id to help generate the next one
+  seq = 0 # find the largest "g<n>" id to help generate the next one
   for d in gdata.gadgets
-    seq = d.id  if /^g\d+$/.test(d.id) and d.id > seq
+    if /^g\d+$/.test(d.id)
+      n = d.id.slice(1) | 0 # drop the leading "g" and convert to int
+      seq = n  if n > seq
     d.def = gdefs[d.type]
     d.hw = d.def.width / 2
     d.hh = d.def.height / 2
@@ -192,4 +194,4 @@ prepareData = (gdefs, gdata) ->
     d.source = findPin d.from, gdata.gadgets
     d.target = findPin d.to, gdata.gadgets
     
-  return seq.slice(1) | 0 # drop the leading "g", return as int
+  return seq
