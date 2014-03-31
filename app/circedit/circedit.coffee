@@ -6,8 +6,13 @@ ng.directive 'circuitEditor', ->
   scope:
     defs: '='
     data: '='
+    type: '='
     
-  link: (scope, elem, attr) ->    
+  link: (scope, elem, attr) ->
+    for k of scope.defs
+      scope.type = k # set initial type to a valid key from the definitions
+      break
+    
     svg = d3.select(elem[0]).append 'svg'
       .attr height: "60%"
     diag = d3.svg.diagonal()
@@ -78,7 +83,7 @@ ng.directive 'circuitEditor', ->
             x: 0.5 - d.hw, y: 0.5 - d.hh
             width: 2 * d.hw, height: 2 * d.hh
         .style fill: (d) -> d.def.shade
-      g.append('text').text (d) -> d.title
+      g.append('text').text (d) -> d.title or "#{d.type} #{d.id}"
         .attr class: 'title', y: (d) -> 12 - d.hh
       g.append('text').text (d) -> d.def.name
         .attr class: 'type', y: (d) -> -4 + d.hh
@@ -141,7 +146,7 @@ ng.directive 'circuitEditor', ->
           break
       else
         [x,y] = d3.mouse @
-        ng = id: "g#{++lastg}", x: x|0, y: y|0, title: 'Gadget Two', type: 'Pipe'
+        ng = id: "g#{++lastg}", x: x|0, y: y|0, type: scope.type
         console.log "add gadget", ng # TODO: save to server
         scope.data.gadgets.push ng
       redraw()

@@ -2,6 +2,12 @@
 <div class="row">
   <div class="large-12 columns">
     <h3>Circuit Editor</h3>
-    <circuit-editor data="circuit" defs="gadgets"></circuit-editor>
+    <form>
+      <select ng-model="type">
+        <option value="Pipe">Pipe</option>
+        <option value="Printer">Printer</option>
+      </select>
+    </form>
+    <circuit-editor data="circuit" defs="gadgets" type="type"></circuit-editor>
   </div>
 </div>

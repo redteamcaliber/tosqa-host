@@ -2,4 +2,9 @@
   .large-12.columns
     h3 Circuit Editor
 
-    circuit-editor(data='circuit',defs='gadgets')
+    form
+      select(ng-model='type')
+        option(value="Pipe") Pipe
+        option( value="Printer") Printer
+
+    circuit-editor(data='circuit',defs='gadgets',type='type')
