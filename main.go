@@ -11,7 +11,10 @@ import (
 	_ "github.com/tosqa/tosqa-host/gadgets"
 )
 
-var config = flag.String("c", "./config.txt", "name of configuration file to use")
+var (
+	config = flag.String("c", "./config.txt", "name of configuration file to use")
+	describe = flag.Bool("d", false, "describe the main circuit used as Tosqa server")
+)
 
 // defaults can also be overridden through environment variables
 const defaults = `
@@ -76,5 +79,11 @@ func main() {
 
 	// start the ball rolling, keep running forever
 	c.Add("forever", "Forever")
+
+	if *describe {
+		flow.PrintDescription(c)
+		return
+	}
+
 	c.Run()
 }
