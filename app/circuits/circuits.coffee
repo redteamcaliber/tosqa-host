@@ -55,6 +55,7 @@ circuitsCtrl = ($scope, jeebus) ->
     
   $scope.delFeed = (pin, index) ->
     items = $scope.circuit.feeds[pin]
+    console.log 'delFeed', pin, index, items[index]
     items.splice index, 1
     delete $scope.circuit.feeds[pin]  if items.length is 0
   
