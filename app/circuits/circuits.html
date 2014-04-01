@@ -48,4 +48,29 @@
       </tr>
     </table>
   </div>
+  <div class="large-8 columns">
+    <table>
+      <tr>
+        <th>Pin</th>
+        <th>Feeds</th>
+      </tr>
+      <tr ng-repeat="(pin,feeds) in circuit.feeds">
+        <td valign="top" class="right">{{pin}}&nbsp;<a ng-click="addFeed(pin)">+</a></td>
+        <td>
+          <table>
+            <tr ng-repeat="row in feeds">
+              <td>
+                <pre contenteditable="true">{{row | json}}</pre>
+              </td>
+              <td><a ng-click="delFeed(pin,$index)">-</a></td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+      <tr>
+        <td class="right">Add:</td>
+        <td><a ng-click="addFeed()">Select an input pin...</a></td>
+      </tr>
+    </table>
+  </div>
 </div>

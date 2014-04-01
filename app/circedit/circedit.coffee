@@ -43,7 +43,7 @@ ng.directive 'circuitEditor', ->
       .on 'dragend', (d) ->
         if d.moved
           delete d.moved
-          console.log 'save gadget', d # TODO: save to server
+          console.log 'move gadget', d.id, d.x, d.y # TODO: save to server
 
     dragInfo = {}
     dragWire = svg.append('path').datum(dragInfo).attr id: 'drag'
@@ -66,7 +66,7 @@ ng.directive 'circuitEditor', ->
         if dragInfo.to
           nw = from: dragInfo.from, to: dragInfo.to
           unless nw.from is nw.to
-            console.log 'add wire', nw # TODO: save to server
+            console.log 'add wire', nw.from, nw.to # TODO: save to server
             scope.data.wires.push nw
           redraw()
 
@@ -107,9 +107,9 @@ ng.directive 'circuitEditor', ->
           while n
             w = sdw[--n]
             if w.from.split('.')[0] is d.id or w.to.split('.')[0] is d.id
-              console.log 'del attached', w # TODO: save to server
+              console.log 'del attached', w.from, w.to # TODO: save to server
               sdw.splice n, 1
-          console.log 'del gadget', d # TODO: save to server
+          console.log 'del gadget', d.id # TODO: save to server
           for i, g of scope.data.gadgets when g is d
             scope.data.gadgets.splice i, 1
             updateSelect null
@@ -148,17 +148,19 @@ ng.directive 'circuitEditor', ->
     
     svg.on 'mousedown', ->
       # return  if d3.event.defaultPrevented
-      if wireUnderCursor
-        console.log 'del wire', wireUnderCursor # TODO: save to server
-        for i, w of scope.data.wires when w is wireUnderCursor
+      wuc = wireUnderCursor
+      if wuc
+        console.log 'del wire', wuc.from, wuc.to # TODO: save to server
+        for i, w of scope.data.wires when w is wuc
           scope.data.wires.splice i, 1
           break
+        wireUnderCursor = null
       else
         [x,y] = d3.mouse @
-        ng = id: "g#{++lastg}", x: x|0, y: y|0, type: scope.type
-        console.log 'add gadget', ng # TODO: save to server
-        scope.data.gadgets.push ng
-      redraw -> updateSelect ng # update scope after ng has been filled in
+        g = id: "g#{++lastg}", x: x|0, y: y|0, type: scope.type
+        console.log 'add gadget', g.id, g.x, g.y, g.type # TODO: save to server
+        scope.data.gadgets.push g
+      redraw -> updateSelect g # update scope after g has been filled in
 
 findPin = (name, gdata) ->
   [gid,pname] = name.split '.'

@@ -12,7 +12,6 @@ circuit-editor>svg {
 }
 .gadget .outline {
   stroke: #00f;
-  fill: #ffffe0;
   fill-opacity: 0.8;
   cursor: move;
 }

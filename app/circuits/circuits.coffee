@@ -12,6 +12,7 @@ circuitsCtrl = ($scope, jeebus) ->
     Pipe:
       name: 'Pipeline'
       width: 160
+      shade: 'lightyellow'
       icon: '\uf061' # fa-arrow-right
       pins: [
         { name: 'In', dir: 'in' }
@@ -32,12 +33,22 @@ circuitsCtrl = ($scope, jeebus) ->
       { id: 'g2', x: 120, y: 200, title: 'Gadget Two', type: 'Pipe' }
     ]
     wires: [
-      { from: "g2.Out", to: "g1.In", cap: 0 }
+      { from: 'g2.Out', to: 'g1.In', cap: 0 }
     ]
     feeds:
-      "g1.In": { data: [ "some data", "more data" ], x: 120, y: 300 }
+      'g1.In': [ 'some data', { Tag: 'blah', Msg: 'tagged data' } ]
     labels:
-      "In": "g2.In"
+      In: 'g2.In'
+      
+  $scope.addFeed = (pin) ->
+    unless pin
+      pin = 'g7.In' # TODO: need to select the input pit name
+      $scope.circuit.feeds[pin] = []
+    $scope.circuit.feeds[pin].push ''
+  $scope.delFeed = (pin, index) ->
+    items = $scope.circuit.feeds[pin]
+    items.splice index, 1
+    delete $scope.circuit.feeds[pin]  if items.length is 0
   
   $scope.$watch 'currSel.id', (x) ->
     console.log 'fix id', x
