@@ -27,8 +27,8 @@ ng.directive 'circuitEditor', ->
     gadgetDrag = d3.behavior.drag()
       .origin Object
       .on 'dragstart', (d) ->
-        @parentNode.appendChild @ # move to front
         d3.event.sourceEvent.stopPropagation()
+        @parentNode.appendChild @ # move to front
       .on 'drag', (d) ->
         d.moved = true
         d.x = d3.event.x | 0 # stay on int coordinates
@@ -53,7 +53,6 @@ ng.directive 'circuitEditor', ->
       .origin Object
       .on 'dragstart', (d) ->
         d3.event.sourceEvent.stopPropagation()
-        @parentNode.appendChild @ # move to front
         dragInfo.from = d.pin
         delete dragInfo.to
         dragInfo.source = findPin d.pin, scope.data.gadgets
