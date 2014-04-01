@@ -90,9 +90,9 @@ ng.directive 'circuitEditor', ->
             width: 2 * d.hw, height: 2 * d.hh
         .on 'mousedown', updateSelect # same as: (d) -> updateSelect d
         .style fill: (d) -> d.def.shade
-      g.append('text').text (d) -> d.title or "#{d.type} #{d.id}"
+      g.append('text').text (d) -> d.title or d.def.name
         .attr class: 'title', y: (d) -> 12 - d.hh
-      g.append('text').text (d) -> d.def.name
+      g.append('text').text (d) -> "#{d.type} - #{d.id}"
         .attr class: 'type', y: (d) -> -4 + d.hh
       g.append('text').text (d) -> d.def.icon
         .attr class: 'iconfont', x: 0, y: 0
