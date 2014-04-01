@@ -8,6 +8,51 @@
         <option value="Printer">Printer</option>
       </select>
     </form>
-    <circuit-editor data="circuit" defs="gadgets" type="type"></circuit-editor>
+    <circuit-editor data="circuit" defs="gadgets" type="type" select="currSel"></circuit-editor>
+  </div>
+</div>
+<div class="row">
+  <div class="large-4 columns">
+    <form ng-show="currSel">
+      <table width="100%">
+        <tr style="background:{{currSel.def.shade}}">
+          <th colspan="2">
+            <h3>{{currSel.def.name}}</h3>
+          </th>
+        </tr>
+        <tr>
+          <td>
+            <label class="right inline">ID</label>
+          </td>
+          <td>
+            <input type="text" ng-model="currSel.id"/>
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <label class="right inline">Title</label>
+          </td>
+          <td>
+            <input type="text" ng-model="currSel.title"/>
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <label class="right inline">Type</label>
+          </td>
+          <td>
+            <input type="text" ng-model="currSel.type" readonly="readonly"/>
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <label class="right inline">Width</label>
+          </td>
+          <td>
+            <input type="text" ng-model="currSel.def.width" readonly="readonly"/>
+          </td>
+        </tr>
+      </table>
+    </form>
   </div>
 </div>

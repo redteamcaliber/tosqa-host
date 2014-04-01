@@ -7,6 +7,7 @@ ng.directive 'circuitEditor', ->
     defs: '='
     data: '='
     type: '='
+    select: '='
     
   link: (scope, elem, attr) ->
     for k of scope.defs
@@ -20,12 +21,16 @@ ng.directive 'circuitEditor', ->
     
     lastg = gadgets = wires = null
     
+    updateSelect = (d) ->
+      scope.$apply -> scope.select = d
+    
     gadgetDrag = d3.behavior.drag()
       .origin Object
       .on 'dragstart', (d) ->
         @parentNode.appendChild @ # move to front
         d3.event.sourceEvent.stopPropagation()
       .on 'drag', (d) ->
+        d.moved = true
         d.x = d3.event.x | 0 # stay on int coordinates
         d.y = d3.event.y | 0 # stay on int coordinates
         d3.select(@).attr transform: (d) -> "translate(#{d.x},#{d.y})"
@@ -36,7 +41,9 @@ ng.directive 'circuitEditor', ->
             d.target = findPin d.to, scope.data.gadgets
           .attr d: diag
       .on 'dragend', (d) ->
-        console.log 'save gadget', d # TODO: save to server
+        if d.moved
+          delete d.moved
+          console.log 'save gadget', d # TODO: save to server
 
     dragInfo = {}
     dragWire = svg.append('path').datum(dragInfo).attr id: 'drag'
@@ -64,7 +71,7 @@ ng.directive 'circuitEditor', ->
             scope.data.wires.push nw
           redraw()
 
-    redraw = ->
+    redraw = (cb) ->
       lastg = prepareData scope.defs, scope.data
       gadgets = svg.selectAll('.gadget').data scope.data.gadgets, (d) -> d.id
       wires = svg.selectAll('.wire').data scope.data.wires, (d) ->
@@ -82,6 +89,7 @@ ng.directive 'circuitEditor', ->
             # 1px lines render sharply when on a 0.5px offset
             x: 0.5 - d.hw, y: 0.5 - d.hh
             width: 2 * d.hw, height: 2 * d.hh
+        .on 'mousedown', updateSelect # same as: (d) -> updateSelect d
         .style fill: (d) -> d.def.shade
       g.append('text').text (d) -> d.title or "#{d.type} #{d.id}"
         .attr class: 'title', y: (d) -> 12 - d.hh
@@ -105,6 +113,7 @@ ng.directive 'circuitEditor', ->
           console.log 'del gadget', d # TODO: save to server
           for i, g of scope.data.gadgets when g is d
             scope.data.gadgets.splice i, 1
+            updateSelect null
             break
           redraw()
       gadgets.exit().remove()
@@ -134,6 +143,7 @@ ng.directive 'circuitEditor', ->
       wires.exit().remove()
 
       gadgets.attr transform: (d) -> "translate(#{d.x},#{d.y})"
+      cb?()
     
     redraw()
     
@@ -149,7 +159,7 @@ ng.directive 'circuitEditor', ->
         ng = id: "g#{++lastg}", x: x|0, y: y|0, type: scope.type
         console.log 'add gadget', ng # TODO: save to server
         scope.data.gadgets.push ng
-      redraw()
+      redraw -> updateSelect ng # update scope after ng has been filled in
 
 findPin = (name, gdata) ->
   [gid,pname] = name.split '.'

@@ -39,6 +39,11 @@ circuitsCtrl = ($scope, jeebus) ->
     labels:
       "In": "g2.In"
   
+  $scope.$watch 'currSel.id', (x) ->
+    console.log 'fix id', x
+  $scope.$watch 'currSel.title', (x) ->
+    console.log 'fix title', x
+    
   # setup = ->
   #   jeebus.attach 'circuit'
   #     .on 'sync', ->

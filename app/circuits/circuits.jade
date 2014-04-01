@@ -7,4 +7,23 @@
         option(value="Pipe") Pipe
         option( value="Printer") Printer
 
-    circuit-editor(data='circuit',defs='gadgets',type='type')
+    circuit-editor(data='circuit',defs='gadgets',type='type',select='currSel')
+
+.row
+  .large-4.columns
+    form(ng-show='currSel')
+      table(width='100%')
+        tr(style='background:{{currSel.def.shade}}')
+          th(colspan=2): h3 {{currSel.def.name}}
+        tr
+          td: label.right.inline ID
+          td: input(type='text',ng-model='currSel.id')
+        tr
+          td: label.right.inline Title
+          td: input(type='text',ng-model='currSel.title')
+        tr
+          td: label.right.inline Type
+          td: input(type='text',ng-model='currSel.type',readonly)
+        tr
+          td: label.right.inline Width
+          td: input(type='text',ng-model='currSel.def.width',readonly)
