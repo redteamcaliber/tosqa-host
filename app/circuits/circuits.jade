@@ -27,13 +27,13 @@
         th Pin
         th Feeds
       tr(ng-repeat='(pin,feeds) in circuit.feeds')
-        td.right(valign='top') {{pin}}&nbsp;
-          a(ng-click='addFeed(pin)') +
+        td.right(valign='top') {{pin}}
         td
           table
-            tr(ng-repeat='row in feeds')
+            tr(ng-repeat='row in feeds track by $index')
               td: pre(contenteditable='true') {{row | json}}
               td: a(ng-click='delFeed(pin,$index)') -
       tr
         td.right Add:
-        td: a(ng-click='addFeed()') Select an input pin...
+        td: select(ng-model='addPin',ng-options='p for p in inputPins')
+              option(value='') Select an input pin...

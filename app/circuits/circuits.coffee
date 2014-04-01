@@ -40,11 +40,19 @@ circuitsCtrl = ($scope, jeebus) ->
     labels:
       In: 'g2.In'
       
-  $scope.addFeed = (pin) ->
-    unless pin
-      pin = 'g7.In' # TODO: need to select the input pit name
-      $scope.circuit.feeds[pin] = []
-    $scope.circuit.feeds[pin].push ''
+  $scope.inputPins = []
+  for g in $scope.circuit.gadgets
+    for p in $scope.gadgets[g.type].pins when p.dir is 'in'
+      $scope.inputPins.push "#{g.id}.#{p.name}"
+  $scope.inputPins.sort()
+  
+  $scope.$watch 'addPin', (pin) ->
+    if pin
+      $scope.circuit.feeds[pin] ?= []
+      console.log 'addFeed', pin, $scope.circuit.feeds[pin].length
+      $scope.circuit.feeds[pin].push ''
+      $scope.addPin = null
+    
   $scope.delFeed = (pin, index) ->
     items = $scope.circuit.feeds[pin]
     items.splice index, 1

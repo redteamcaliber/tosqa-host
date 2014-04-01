@@ -55,10 +55,10 @@
         <th>Feeds</th>
       </tr>
       <tr ng-repeat="(pin,feeds) in circuit.feeds">
-        <td valign="top" class="right">{{pin}}&nbsp;<a ng-click="addFeed(pin)">+</a></td>
+        <td valign="top" class="right">{{pin}}</td>
         <td>
           <table>
-            <tr ng-repeat="row in feeds">
+            <tr ng-repeat="row in feeds track by $index">
               <td>
                 <pre contenteditable="true">{{row | json}}</pre>
               </td>
@@ -69,7 +69,11 @@
       </tr>
       <tr>
         <td class="right">Add:</td>
-        <td><a ng-click="addFeed()">Select an input pin...</a></td>
+        <td>
+          <select ng-model="addPin" ng-options="p for p in inputPins">
+            <option value="">Select an input pin...</option>
+          </select>
+        </td>
       </tr>
     </table>
   </div>
