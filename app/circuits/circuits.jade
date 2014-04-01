@@ -1,12 +1,7 @@
 .row
   .large-12.columns
     h3 Circuit Editor
-
-    form
-      select(ng-model='type')
-        option(value="Pipe") Pipe
-        option( value="Printer") Printer
-
+    select(ng-model='type',ng-options='k as v.name for (k,v) in gadgets')
     circuit-editor(data='circuit',defs='gadgets',type='type',select='currSel')
 
 .row
