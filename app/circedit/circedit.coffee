@@ -6,14 +6,8 @@ ng.directive 'jbCircuitEditor', ->
   scope:
     defs: '='
     data: '='
-    type: '='
-    select: '='
     
   link: (scope, elem, attr) ->
-    for k of scope.defs
-      scope.type = k # set initial type to a valid key from the definitions
-      break
-    
     svg = d3.select(elem[0]).append 'svg'
       .attr height: '60%'
     diag = d3.svg.diagonal()
@@ -25,16 +19,12 @@ ng.directive 'jbCircuitEditor', ->
       # force a digest, since d3 events happen outside of ng's event context
       scope.$apply -> scope.$emit attr.event ? 'circuit', args...
       
-    updateSelect = (d) ->
-      scope.$apply -> scope.select = d
-    
     gadgetDrag = d3.behavior.drag()
       .origin Object
       .on 'dragstart', (d) ->
         d3.event.sourceEvent.stopPropagation()
         @parentNode.appendChild @ # move to front
       .on 'drag', (d) ->
-        d.moved = true
         d.x = d3.event.x | 0 # stay on int coordinates
         d.y = d3.event.y | 0 # stay on int coordinates
         d3.select(@).attr transform: (d) -> "translate(#{d.x},#{d.y})"
@@ -45,9 +35,7 @@ ng.directive 'jbCircuitEditor', ->
             d.target = findPin d.to, scope.data.gadgets
           .attr d: diag
       .on 'dragend', (d) ->
-        if d.moved
-          delete d.moved
-          emit 'moveGadget', d.id, d.x, d.y
+        emit 'moveGadget', d.id, d.x, d.y
 
     dragInfo = {}
     dragWire = svg.append('path').datum(dragInfo).attr id: 'drag'
@@ -71,10 +59,9 @@ ng.directive 'jbCircuitEditor', ->
           nw = from: dragInfo.from, to: dragInfo.to
           unless nw.from is nw.to
             emit 'addWire', nw.from, nw.to
-            scope.data.wires.push nw
           redraw()
 
-    redraw = (cb) ->
+    redraw = ->
       lastg = prepareData scope.defs, scope.data
       gadgets = svg.selectAll('.gadget').data scope.data.gadgets, (d) -> d.id
       wires = svg.selectAll('.wire').data scope.data.wires, (d) ->
@@ -92,7 +79,7 @@ ng.directive 'jbCircuitEditor', ->
             # 1px lines render sharply when on a 0.5px offset
             x: 0.5 - d.hw, y: 0.5 - d.hh
             width: 2 * d.hw, height: 2 * d.hh
-        .on 'mousedown', (d) -> updateSelect d
+        .on 'mousedown', (d) -> emit 'selectGadget', d.id
         .style fill: (d) -> d.def.shade
       g.append('text').text (d) -> d.title or d.def.name
         .attr class: 'title', y: (d) -> 12 - d.hh
@@ -105,19 +92,7 @@ ng.directive 'jbCircuitEditor', ->
         .style 'font-size': '12px'
         .on 'mousedown', (d) ->
           d3.event.stopPropagation()
-          # delete all attached wires
-          sdw = scope.data.wires
-          n = sdw.length
-          while n
-            w = sdw[--n]
-            if w.from.split('.')[0] is d.id or w.to.split('.')[0] is d.id
-              emit 'delAttached', w.from, w.to
-              sdw.splice n, 1
           emit 'delGadget', d.id
-          for i, g of scope.data.gadgets when g is d
-            scope.data.gadgets.splice i, 1
-            updateSelect null
-            break
           redraw()
       gadgets.exit().remove()
         
@@ -146,25 +121,18 @@ ng.directive 'jbCircuitEditor', ->
       wires.exit().remove()
 
       gadgets.attr transform: (d) -> "translate(#{d.x},#{d.y})"
-      cb?()
     
     redraw()
     
     svg.on 'mousedown', ->
       # return  if d3.event.defaultPrevented
-      wuc = wireUnderCursor
-      if wuc
-        emit 'delWire', wuc.from, wuc.to
-        for i, w of scope.data.wires when w is wuc
-          scope.data.wires.splice i, 1
-          break
+      if wireUnderCursor
+        emit 'delWire', wireUnderCursor.from, wireUnderCursor.to
         wireUnderCursor = null
       else
         [x,y] = d3.mouse @
-        g = id: "g#{++lastg}", x: x|0, y: y|0, type: scope.type
-        emit 'addGadget', g.id, g.x, g.y, g.type
-        scope.data.gadgets.push g
-      redraw -> updateSelect g # update scope after g has been filled in
+        emit 'addGadget', x: x|0, y: y|0
+      redraw()
 
 findPin = (name, gdata) ->
   [gid,pname] = name.split '.'

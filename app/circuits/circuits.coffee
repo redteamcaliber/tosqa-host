@@ -8,6 +8,7 @@ ng.config ($stateProvider, navbarProvider) ->
   navbarProvider.add '/circuits', 'Circuits', 30
 
 circuitsCtrl = ($scope, jeebus) ->
+    
   $scope.gadgets =
     Pipe:
       name: 'Pipeline'
@@ -49,7 +50,7 @@ circuitsCtrl = ($scope, jeebus) ->
   
   $scope.$watch 'addPin', (pin) ->
     if pin
-      $scope.circuit.feeds[pushin] ?= []
+      $scope.circuit.feeds[pin] ?= []
       console.log 'addFeed', pin, $scope.circuit.feeds[pin].length
       $scope.circuit.feeds[pin].push ''
       $scope.addPin = null
@@ -65,9 +66,18 @@ circuitsCtrl = ($scope, jeebus) ->
     updatePinList() # for new and deleted gadgets
   $scope.$watch 'currSel.title', (x) ->
     console.log 'fix title', x
-    
-  $scope.$on 'circuit', (event, args...) ->
-    console.log 'C:', args...
+  
+  handlers =
+    addGadget: (x, y) ->
+    delGadget: (id) ->
+    addWire: (from, to) ->
+    delWire: (from, to) ->
+    selectGadget: (id) ->
+    moveGadget: (id, x, y) ->
+      
+  $scope.$on 'circuit', (event, type, args...) ->
+    console.log 'C:', type, args...
+    handlers[type] args...
     
   # setup = ->
   #   jeebus.attach 'circuit'
