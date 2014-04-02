@@ -40,11 +40,12 @@ circuitsCtrl = ($scope, jeebus) ->
     labels:
       In: 'g2.In'
       
-  $scope.inputPins = []
-  for g in $scope.circuit.gadgets
-    for p in $scope.gadgets[g.type].pins when p.dir is 'in'
-      $scope.inputPins.push "#{g.id}.#{p.name}"
-  $scope.inputPins.sort()
+  updatePinList = () ->
+    $scope.inputPins = []
+    for g in $scope.circuit.gadgets
+      for p in $scope.gadgets[g.type].pins when p.dir is 'in'
+        $scope.inputPins.push "#{g.id}.#{p.name}"
+    $scope.inputPins.sort()
   
   $scope.$watch 'addPin', (pin) ->
     if pin
@@ -61,6 +62,7 @@ circuitsCtrl = ($scope, jeebus) ->
   
   $scope.$watch 'currSel.id', (x) ->
     console.log 'fix id', x
+    updatePinList() # for new and deleted gadgets
   $scope.$watch 'currSel.title', (x) ->
     console.log 'fix title', x
     

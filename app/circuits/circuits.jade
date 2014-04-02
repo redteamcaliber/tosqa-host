@@ -32,7 +32,7 @@
           table
             tr(ng-repeat='row in feeds track by $index')
               td: pre(contenteditable='true') {{row | json}}
-              td: a(ng-click='delFeed(pin,$index)') -
+              td(valign='top'): a(ng-click='delFeed(pin,$index)') -
       tr
         td.right Add:
         td: select(ng-model='addPin',ng-options='p for p in inputPins')
