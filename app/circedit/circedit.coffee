@@ -1,6 +1,6 @@
 ng = angular.module 'myApp'
 
-ng.directive 'circuitEditor', ->
+ng.directive 'jbCircuitEditor', ->
   restrict: 'E'
   
   scope:
@@ -21,6 +21,10 @@ ng.directive 'circuitEditor', ->
     
     lastg = gadgets = wires = null
     
+    emit = (args...) ->
+      # force a digest, since d3 events happen outside of ng's event context
+      scope.$apply -> scope.$emit attr.event ? 'circuit', args...
+      
     updateSelect = (d) ->
       scope.$apply -> scope.select = d
     
@@ -43,7 +47,7 @@ ng.directive 'circuitEditor', ->
       .on 'dragend', (d) ->
         if d.moved
           delete d.moved
-          console.log 'move gadget', d.id, d.x, d.y # TODO: save to server
+          emit 'moveGadget', d.id, d.x, d.y
 
     dragInfo = {}
     dragWire = svg.append('path').datum(dragInfo).attr id: 'drag'
@@ -66,7 +70,7 @@ ng.directive 'circuitEditor', ->
         if dragInfo.to
           nw = from: dragInfo.from, to: dragInfo.to
           unless nw.from is nw.to
-            console.log 'add wire', nw.from, nw.to # TODO: save to server
+            emit 'addWire', nw.from, nw.to
             scope.data.wires.push nw
           redraw()
 
@@ -88,7 +92,7 @@ ng.directive 'circuitEditor', ->
             # 1px lines render sharply when on a 0.5px offset
             x: 0.5 - d.hw, y: 0.5 - d.hh
             width: 2 * d.hw, height: 2 * d.hh
-        .on 'mousedown', updateSelect # same as: (d) -> updateSelect d
+        .on 'mousedown', (d) -> updateSelect d
         .style fill: (d) -> d.def.shade
       g.append('text').text (d) -> d.title or d.def.name
         .attr class: 'title', y: (d) -> 12 - d.hh
@@ -107,9 +111,9 @@ ng.directive 'circuitEditor', ->
           while n
             w = sdw[--n]
             if w.from.split('.')[0] is d.id or w.to.split('.')[0] is d.id
-              console.log 'del attached', w.from, w.to # TODO: save to server
+              emit 'delAttached', w.from, w.to
               sdw.splice n, 1
-          console.log 'del gadget', d.id # TODO: save to server
+          emit 'delGadget', d.id
           for i, g of scope.data.gadgets when g is d
             scope.data.gadgets.splice i, 1
             updateSelect null
@@ -150,7 +154,7 @@ ng.directive 'circuitEditor', ->
       # return  if d3.event.defaultPrevented
       wuc = wireUnderCursor
       if wuc
-        console.log 'del wire', wuc.from, wuc.to # TODO: save to server
+        emit 'delWire', wuc.from, wuc.to
         for i, w of scope.data.wires when w is wuc
           scope.data.wires.splice i, 1
           break
@@ -158,7 +162,7 @@ ng.directive 'circuitEditor', ->
       else
         [x,y] = d3.mouse @
         g = id: "g#{++lastg}", x: x|0, y: y|0, type: scope.type
-        console.log 'add gadget', g.id, g.x, g.y, g.type # TODO: save to server
+        emit 'addGadget', g.id, g.x, g.y, g.type
         scope.data.gadgets.push g
       redraw -> updateSelect g # update scope after g has been filled in
 

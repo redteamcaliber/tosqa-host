@@ -49,7 +49,7 @@ circuitsCtrl = ($scope, jeebus) ->
   
   $scope.$watch 'addPin', (pin) ->
     if pin
-      $scope.circuit.feeds[pin] ?= []
+      $scope.circuit.feeds[pushin] ?= []
       console.log 'addFeed', pin, $scope.circuit.feeds[pin].length
       $scope.circuit.feeds[pin].push ''
       $scope.addPin = null
@@ -65,6 +65,9 @@ circuitsCtrl = ($scope, jeebus) ->
     updatePinList() # for new and deleted gadgets
   $scope.$watch 'currSel.title', (x) ->
     console.log 'fix title', x
+    
+  $scope.$on 'circuit', (event, args...) ->
+    console.log 'C:', args...
     
   # setup = ->
   #   jeebus.attach 'circuit'

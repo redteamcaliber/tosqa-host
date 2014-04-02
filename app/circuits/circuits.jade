@@ -2,7 +2,7 @@
   .large-12.columns
     h3 Circuit Editor
     select(ng-model='type',ng-options='k as v.name for (k,v) in gadgets')
-    circuit-editor(data='circuit',defs='gadgets',type='type',select='currSel')
+    jb-circuit-editor(data='circuit',defs='gadgets',type='type',select='currSel')
 
 .row
   .large-4.columns
