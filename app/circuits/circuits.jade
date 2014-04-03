@@ -1,7 +1,7 @@
 .row
   .large-12.columns
     h3 Circuit Editor
-    select(ng-model='type',ng-options='k as k for (k,v) in gadgets')
+    select(ng-model='newtype',ng-options='k as k for (k,v) in gadgets')
     jb-circuit-editor(data='circuit',defs='gadgets')
 
 .row

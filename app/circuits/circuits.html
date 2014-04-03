@@ -2,7 +2,7 @@
 <div class="row">
   <div class="large-12 columns">
     <h3>Circuit Editor</h3>
-    <select ng-model="type" ng-options="k as k for (k,v) in gadgets"></select>
+    <select ng-model="newtype" ng-options="k as k for (k,v) in gadgets"></select>
     <jb-circuit-editor data="circuit" defs="gadgets"></jb-circuit-editor>
   </div>
 </div>

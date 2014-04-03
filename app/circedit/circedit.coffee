@@ -13,7 +13,7 @@ ng.directive 'jbCircuitEditor', ->
     diag = d3.svg.diagonal()
       .projection (d) -> [d.y, d.x] # undo the x/y reversal from findPin
     
-    gadgets = wires = null
+    glist = wlist = gadgets = wires = null
     
     emit = (args...) ->
       # force a digest, since d3 events happen outside of ng's event context
@@ -28,14 +28,16 @@ ng.directive 'jbCircuitEditor', ->
         d.x = d3.event.x | 0 # stay on int coordinates
         d.y = d3.event.y | 0 # stay on int coordinates
         d3.select(@).attr transform: (d) -> "translate(#{d.x},#{d.y})"
-        # recalculate endpoints and redraw all wires attached to this gadget
-        wires.filter (w) -> w.source.g is d or w.target.g is d
+        # recalculate endpoints and move all wires attached to this gadget
+        wires.filter (w) -> w.source.id is d.id or w.target.id is d.id
           .each (d) ->
-            d.source = findPin d.from, scope.data.gadgets
-            d.target = findPin d.to, scope.data.gadgets
+            d.source = findPin d.from
+            d.target = findPin d.to
           .attr d: diag
       .on 'dragend', (d) ->
-        emit 'moveGadget', d.id, d.x, d.y
+        g = scope.data.gadgets[d.id]
+        unless g.x is d.x and g.y is d.y
+          emit 'moveGadget', d.id, d.x, d.y
 
     dragInfo = {}
     dragWire = svg.append('path').datum(dragInfo).attr id: 'drag'
@@ -47,7 +49,7 @@ ng.directive 'jbCircuitEditor', ->
         d3.event.sourceEvent.stopPropagation()
         dragInfo.from = d.pin
         delete dragInfo.to
-        dragInfo.source = findPin d.pin, scope.data.gadgets
+        dragInfo.source = findPin d.pin
       .on 'drag', (d) ->
         [mx,my] = d3.mouse(@)
         orig = dragInfo.source
@@ -55,16 +57,14 @@ ng.directive 'jbCircuitEditor', ->
         dragWire.attr class: 'drawing', fill: 'none', d: diag
       .on 'dragend', (d) ->
         dragWire.classed 'drawing', false
-        if dragInfo.to
-          nw = from: dragInfo.from, to: dragInfo.to
-          unless nw.from is nw.to
-            emit 'addWire', nw.from, nw.to
-          redraw()
+        if dragInfo.to and dragInfo.to isnt dragInfo.from
+          emit 'addWire', dragInfo.from, dragInfo.to
 
     redraw = ->
-      prepareData scope.defs, scope.data
-      gadgets = svg.selectAll('.gadget').data scope.data.gadgets, (d) -> d.id
-      wires = svg.selectAll('.wire').data scope.data.wires, (d) -> d.id
+      prepareData()
+
+      gadgets = svg.selectAll('.gadget').data glist, (d) -> d.id
+      wires = svg.selectAll('.wire').data wlist, (d) -> d.id
 
       g = gadgets.enter().append('g').call(gadgetDrag)
         .attr class: 'gadget'
@@ -89,7 +89,6 @@ ng.directive 'jbCircuitEditor', ->
         .on 'mousedown', (d) ->
           d3.event.stopPropagation()
           emit 'delGadget', d.id
-          redraw()
       gadgets.exit().remove()
 
       pins = gadgets.selectAll('.pin').data (d) -> d.pins
@@ -116,8 +115,6 @@ ng.directive 'jbCircuitEditor', ->
 
       gadgets.attr transform: (d) -> "translate(#{d.x},#{d.y})"
     
-    redraw()
-    
     svg.on 'mousedown', ->
       # return  if d3.event.defaultPrevented
       if wireUnderCursor
@@ -126,38 +123,42 @@ ng.directive 'jbCircuitEditor', ->
       else
         [x,y] = d3.mouse(@)
         emit 'addGadget', x|0, y|0 # convert to ints
-      redraw()
 
-findPin = (pin, gdata) ->
-  [gid,pname] = pin.split '.'
-  for g in gdata when gid is g.id
-    for p in g.pins when pname is p.name
-      # reverses x and y and uses projection to get horizontal splines
-      return y: g.x + p.x + .5, x: g.y + p.y + .5, g: g
+    findPin = (pin) ->
+      [gid,pname] = pin.split '.'
+      for g in glist when gid is g.id
+        for p in g.pins when pname is p.name
+          # reverses x and y and uses projection to get horizontal splines
+          return y: g.x + p.x + .5, x: g.y + p.y + .5, id: gid
 
-prepareData = (gdefs, gdata) ->
-  ystep = 20  # vertical separation between pins
-  width = 140 # fixed width for now
+    prepareData = ->
+      ystep = 20  # vertical separation between pins
+      width = 140 # fixed width for now
 
-  # pre-calculate sizes and relative pin coordinates
-  for d in gdata.gadgets
-    d.def = gdefs[d.type]
-    d.pins = []
-    placePins = (pnames, dir, x) ->
-      nlist = (pnames ? '').split ' '
-      y = -ystep * (nlist.length - 1) >> 1
-      for name in nlist
-        d.pins.push { x, y, name, dir, pin: "#{d.id}.#{name}" }
-        y += ystep
-      nlist.length
-    d.hw = width / 2
-    ins = placePins d.def.inputs, 'in', -d.hw
-    outs = placePins d.def.outputs, 'out', d.hw
-    d.height = 40 + ystep * (if ins > outs then ins else outs)
-    d.hh = d.height / 2
+      # set up a list of gadgets with sizes and relative pin coordinates
+      glist = for id, g of scope.data.gadgets
+        {x,y,title,type} = g
+        def = scope.defs[type]
+        pins = []
+        placePins = (pnames, dir, xi) ->
+          nlist = if pnames then pnames.split ' ' else []
+          yi = -ystep * (nlist.length - 1) >> 1
+          for name in nlist
+            pins.push { x: xi, y: yi, name, dir, pin: "#{id}.#{name}" }
+            yi += ystep
+          nlist.length
+        hw = width / 2
+        ins = placePins def.inputs, 'in', -hw
+        outs = placePins def.outputs, 'out', hw
+        height = 40 + ystep * (if ins > outs then ins else outs)
+        hh = height / 2
+        { id, x, y, title, type, def, pins, hw, hh, height }
 
-  # lookup the wire endpoints in the gadgets
-  for d in gdata.wires
-    d.id = "#{d.from}/#{d.to}"
-    d.source = findPin d.from, gdata.gadgets
-    d.target = findPin d.to, gdata.gadgets
+      # convert object to list and lookup the wire endpoints in the gadgets
+      wlist = for id, cap of scope.data.wires
+        [from,to] = id.split '/'
+        source = findPin from
+        target = findPin to
+        { id, from, to, source, target, cap }
+    
+    redraw()
