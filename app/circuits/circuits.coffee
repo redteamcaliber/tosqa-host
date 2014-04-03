@@ -34,10 +34,10 @@ circuitsCtrl = ($scope, jeebus) ->
       
   updatePinList = () ->
     $scope.inputPins = []
-    for g in $scope.circuit.gadgets
+    for gid, g of $scope.circuit.gadgets
       if ins = $scope.gadgets[g.type].inputs
-        for p in ins?.split(' ') when p.dir is 'in'
-          $scope.inputPins.push "#{g.id}.#{p.name}"
+        for p in ins.split ' '
+          $scope.inputPins.push "#{gid}.#{p}"
     $scope.inputPins.sort()
   
   $scope.$watch 'addPin', (pin) ->

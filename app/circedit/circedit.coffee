@@ -119,7 +119,7 @@ ng.directive 'jbCircuitEditor', ->
       # return  if d3.event.defaultPrevented
       if wireUnderCursor
         emit 'delWire', wireUnderCursor.from, wireUnderCursor.to
-        wireUnderCursor = null
+        # wireUnderCursor = null
       else
         [x,y] = d3.mouse(@)
         emit 'addGadget', x|0, y|0 # convert to ints
