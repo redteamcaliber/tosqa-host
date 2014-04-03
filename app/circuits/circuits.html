@@ -2,7 +2,7 @@
 <div class="row">
   <div class="large-12 columns">
     <h3>Circuit Editor</h3>
-    <select ng-model="type" ng-options="k as v.name for (k,v) in gadgets"></select>
+    <select ng-model="type" ng-options="k as k for (k,v) in gadgets"></select>
     <jb-circuit-editor data="circuit" defs="gadgets"></jb-circuit-editor>
   </div>
 </div>
@@ -36,14 +36,6 @@
         </td>
         <td>
           <input type="text" ng-model="currSel.type" readonly="readonly"/>
-        </td>
-      </tr>
-      <tr>
-        <td>
-          <label class="right inline">Width</label>
-        </td>
-        <td>
-          <input type="text" ng-model="currSel.def.width" readonly="readonly"/>
         </td>
       </tr>
     </table>

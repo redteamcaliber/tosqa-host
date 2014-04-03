@@ -13,7 +13,7 @@ ng.directive 'jbCircuitEditor', ->
     diag = d3.svg.diagonal()
       .projection (d) -> [d.y, d.x] # undo the x/y reversal from findPin
     
-    lastg = gadgets = wires = null
+    gadgets = wires = null
     
     emit = (args...) ->
       # force a digest, since d3 events happen outside of ng's event context
@@ -62,18 +62,14 @@ ng.directive 'jbCircuitEditor', ->
           redraw()
 
     redraw = ->
-      lastg = prepareData scope.defs, scope.data
+      prepareData scope.defs, scope.data
       gadgets = svg.selectAll('.gadget').data scope.data.gadgets, (d) -> d.id
-      wires = svg.selectAll('.wire').data scope.data.wires, (d) ->
-                "#{d.from}/#{d.to}" # essential for adding or removing wires
+      wires = svg.selectAll('.wire').data scope.data.wires, (d) -> d.id
 
       g = gadgets.enter().append('g').call(gadgetDrag)
         .attr class: 'gadget'
       g.append('rect')
         .each (d) ->
-          d.def = scope.defs[d.type]
-          d.hw = d.def.width / 2
-          d.hh = d.def.height / 2
           d3.select(@).attr
             class: 'outline'
             # 1px lines render sharply when on a 0.5px offset
@@ -95,10 +91,8 @@ ng.directive 'jbCircuitEditor', ->
           emit 'delGadget', d.id
           redraw()
       gadgets.exit().remove()
-        
-      pins = gadgets.selectAll('.pin').data (d) ->
-        d.conn = for p in d.def.pins
-          x: p.x, y: p.y, name: p.name, dir: p.dir, pin: "#{d.id}.#{p.name}"
+
+      pins = gadgets.selectAll('.pin').data (d) -> d.pins
       p = pins.enter()
       p.append('circle')
         .attr class: 'pin', cx: ((d) -> d.x+.5), cy: ((d) -> d.y+.5), r: 3
@@ -130,51 +124,40 @@ ng.directive 'jbCircuitEditor', ->
         emit 'delWire', wireUnderCursor.from, wireUnderCursor.to
         wireUnderCursor = null
       else
-        [x,y] = d3.mouse @
-        emit 'addGadget', x: x|0, y: y|0
+        [x,y] = d3.mouse(@)
+        emit 'addGadget', x|0, y|0 # convert to ints
       redraw()
 
-findPin = (name, gdata) ->
-  [gid,pname] = name.split '.'
+findPin = (pin, gdata) ->
+  [gid,pname] = pin.split '.'
   for g in gdata when gid is g.id
-    for p in g.def.pins when pname is p.name
+    for p in g.pins when pname is p.name
       # reverses x and y and uses projection to get horizontal splines
-      return y: g.x + p.x + .5, x: g.y + p.y + .5, g: g, p: p
+      return y: g.x + p.x + .5, x: g.y + p.y + .5, g: g
 
 prepareData = (gdefs, gdata) ->
+  ystep = 20  # vertical separation between pins
+  width = 140 # fixed width for now
+
   # pre-calculate sizes and relative pin coordinates
-  for n, d of gdefs
-    d.name or= n
-    ins = 0
-    for p in d.pins
-      p.x = d.width / 2
-      if p.dir is 'in'
-        p.x = -p.x
-        ++ins
-    outs = d.pins.length - ins
-    step = 20
-    yIn = - (ins - 1) * step / 2
-    yOut = - (outs - 1) * step / 2
-    for p in d.pins
-      if p.dir is 'in'
-        p.y = yIn
-        yIn += step
-      else
-        p.y = yOut
-        yOut += step
-    d.height = 40 + step * (if ins > outs then ins else outs)
-
-  seq = 0 # find the largest "g<n>" id to help generate the next one
   for d in gdata.gadgets
-    if /^g\d+$/.test(d.id)
-      n = d.id.slice(1) | 0 # drop the leading "g" and convert to int
-      seq = n  if n > seq
     d.def = gdefs[d.type]
-    d.hw = d.def.width / 2
-    d.hh = d.def.height / 2
+    d.pins = []
+    placePins = (pnames, dir, x) ->
+      nlist = (pnames ? '').split ' '
+      y = -ystep * (nlist.length - 1) >> 1
+      for name in nlist
+        d.pins.push { x, y, name, dir, pin: "#{d.id}.#{name}" }
+        y += ystep
+      nlist.length
+    d.hw = width / 2
+    ins = placePins d.def.inputs, 'in', -d.hw
+    outs = placePins d.def.outputs, 'out', d.hw
+    d.height = 40 + ystep * (if ins > outs then ins else outs)
+    d.hh = d.height / 2
 
+  # lookup the wire endpoints in the gadgets
   for d in gdata.wires
+    d.id = "#{d.from}/#{d.to}"
     d.source = findPin d.from, gdata.gadgets
     d.target = findPin d.to, gdata.gadgets
-    
-  return seq

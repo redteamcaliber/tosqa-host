@@ -12,21 +12,14 @@ circuitsCtrl = ($scope, jeebus) ->
   $scope.gadgets =
     Pipe:
       name: 'Pipeline'
-      width: 160
       shade: 'lightyellow'
       icon: '\uf061' # fa-arrow-right
-      pins: [
-        { name: 'In', dir: 'in' }
-        { name: 'Out', dir: 'out' }
-      ]
+      inputs: 'In'
+      outputs: 'Out'
     Printer:
-      width: 120
       shade: 'lightblue'
       icon: '\uf02f' # fa-print
-      pins: [
-        { name: 'In', dir: 'in' }
-        { name: 'In2', dir: 'in' }
-      ]
+      inputs: 'In In2'
       
   $scope.circuit =
     gadgets: [
@@ -44,8 +37,9 @@ circuitsCtrl = ($scope, jeebus) ->
   updatePinList = () ->
     $scope.inputPins = []
     for g in $scope.circuit.gadgets
-      for p in $scope.gadgets[g.type].pins when p.dir is 'in'
-        $scope.inputPins.push "#{g.id}.#{p.name}"
+      if ins = $scope.gadgets[g.type].inputs
+        for p in ins?.split(' ') when p.dir is 'in'
+          $scope.inputPins.push "#{g.id}.#{p.name}"
     $scope.inputPins.sort()
   
   $scope.$watch 'addPin', (pin) ->
