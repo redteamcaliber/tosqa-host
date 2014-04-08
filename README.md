@@ -2,9 +2,14 @@
 
 Work in progress.
 
-Tosqa uses [jcw/jeebus](JB) with WebSockets, MQTT, LevelDB, Lua, and Go.
+[![GoDoc][G]][D] [![License][B]][L]
 
-(the old version was derived from jcw/housemon v0.8, see its [README][HMR])
+Based on [JeeBus](JB) + [Flow](FW) with AngularJS, WebSockets, LevelDB, and Go.
 
-[JB]: http://redmine.jeelabs.org/projects/jeebus/wiki
-[HMR]: https://github.com/jcw/housemon/blob/master/README-0.8.md
+[G]: https://godoc.org/github.com/tosqa/tosqa-host?status.png
+[D]: https://godoc.org/github.com/tosqa/tosqa-host
+[B]: http://img.shields.io/badge/license-MIT-brightgreen.svg
+[L]: http://opensource.org/licenses/MIT
+
+[JB]: http://redmine.jeelabs.org/projects/housemon/wiki/jeebus
+[FW]: http://redmine.jeelabs.org/projects/housemon/wiki/flow

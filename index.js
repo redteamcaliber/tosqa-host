@@ -1,1 +1,1 @@
-require('primus-live');
+require('../../jcw/jeebus/base/devmode');

@@ -1,0 +1,72 @@
+
+<div class="row">
+  <div class="large-12 columns">
+    <h3>Circuit Editor</h3>
+    <select ng-model="newtype" ng-options="k as k for (k,v) in gadgets"></select>
+    <jb-circuit-editor data="circuit" defs="gadgets"></jb-circuit-editor>
+  </div>
+</div>
+<div class="row">
+  <div class="large-4 columns">
+    <table ng-show="currSel" width="100%">
+      <tr style="background:{{currSel.def.shade}}">
+        <th colspan="2">
+          <h3>{{currSel.def.name}}</h3>
+        </th>
+      </tr>
+      <tr>
+        <td>
+          <label class="right inline">ID</label>
+        </td>
+        <td>
+          <input type="text" ng-model="currSel.id"/>
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <label class="right inline">Title</label>
+        </td>
+        <td>
+          <input type="text" ng-model="currSel.title"/>
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <label class="right inline">Type</label>
+        </td>
+        <td>
+          <input type="text" ng-model="currSel.type" readonly="readonly"/>
+        </td>
+      </tr>
+    </table>
+  </div>
+  <div class="large-8 columns">
+    <table>
+      <tr>
+        <th>Pin</th>
+        <th>Feeds</th>
+      </tr>
+      <tr ng-repeat="(pin,feeds) in circuit.feeds">
+        <td valign="top" class="right">{{pin}}</td>
+        <td>
+          <table>
+            <tr ng-repeat="row in feeds track by $index">
+              <td>
+                <pre contenteditable="true">{{row | json}}</pre>
+              </td>
+              <td valign="top"><a ng-click="delFeed(pin,$index)">-</a></td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+      <tr>
+        <td class="right">Add:</td>
+        <td>
+          <select ng-model="addPin" ng-options="p for p in inputPins">
+            <option value="">Select an input pin...</option>
+          </select>
+        </td>
+      </tr>
+    </table>
+  </div>
+</div>

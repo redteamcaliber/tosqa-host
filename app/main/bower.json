@@ -1,8 +1,0 @@
-{
-  "name": "main",
-  "dependencies": {
-    "angular-animate": "*",
-    "foundation": "*",
-    "bower-foundation-css": "*"
-  }
-}

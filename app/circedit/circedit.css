@@ -1,0 +1,43 @@
+jb-circuit-editor>svg {
+  border: 1px solid #d3d3d3;
+}
+.iconfont {
+  text-anchor: middle;
+  dominant-baseline: central;
+  font-family: FontAwesome;
+  font-size: 20px;
+}
+.gadget {
+  font-size: 12px;
+}
+.gadget .outline {
+  stroke: #00f;
+  fill-opacity: 0.8;
+  cursor: move;
+}
+.gadget .title {
+  fill: #808080;
+  text-anchor: middle;
+}
+.gadget .type {
+  fill: #00f;
+  text-anchor: middle;
+}
+.gadget .hit {
+  fill-opacity: 0.2;
+  cursor: pointer;
+}
+.gadget .in {
+  text-anchor: start;
+}
+.gadget .out {
+  text-anchor: end;
+}
+.wire {
+  stroke: #808080;
+  stroke-width: 1px;
+  cursor: crosshair;
+}
+#drag.drawing {
+  stroke: #f00;
+}

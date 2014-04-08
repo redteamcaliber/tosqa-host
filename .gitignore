@@ -1,6 +1,4 @@
 bower_components
 node_modules
 /logger
-/storage
-/storage_old
-*view3db*
+/data
