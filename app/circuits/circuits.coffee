@@ -60,13 +60,14 @@ circuitsCtrl = ($scope, jeebus) ->
     console.log 'fix title', x
   
   handlers =
-    addGadget: (x, y) -> # ask for type -> place in db
-      jeebus.put "item","value"
-      console.log "item is stored"
+    addGadget: (x, y) -> # ask for type from newtype-> place in db
+      if $scope.newtype?
+        jeebus.put "circuit/item", {type:$scope.newtype, x:x, y:y}
+      else
+        alert "gadget cannot be added, please select type first"
     delGadget: (id, wires) -> # remove gadget and wires from db
     addWire: (from, to) -> # 
     delWire: (from, to) ->
-      console.log "this"
     selectGadget: (id) ->
     moveGadget: (id, x, y) ->
       
