@@ -1,4 +1,9 @@
-bower_components
-node_modules
-/logger
 /data
+/files
+/logger
+<<<<<<< HEAD
+/data
+=======
+node_modules
+/setup-prev.json
+>>>>>>> master
