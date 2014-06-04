@@ -12,7 +12,7 @@ import (
 )
 
 var (
-	config = flag.String("c", "./config.txt", "name of configuration file to use")
+	config   = flag.String("c", "./config.txt", "name of configuration file to use")
 	describe = flag.Bool("d", false, "describe the main circuit used as Tosqa server")
 )
 

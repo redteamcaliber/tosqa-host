@@ -14,5 +14,4 @@ func ExampleSocketCan() {
 	c.Feed("d.Delay", "3s")
 	c.Feed("d.In", flow.Tag{"456", []byte("abc{123}")})
 	c.Run()
-	// Output:
 }
