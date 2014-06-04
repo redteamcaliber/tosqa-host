@@ -1,1 +1,1 @@
-HTTP_PORT   = :3334
+HTTP_PORT   = :3333

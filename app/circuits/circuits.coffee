@@ -61,7 +61,7 @@ circuitsCtrl = ($scope, jeebus) ->
   
   handlers =
     addGadget: (x, y) -> # ask for type -> place in db
-      jeebus.put "circuit/item"
+      jeebus.put "/item", "value"
       console.log "item is stored"
     delGadget: (id, wires) -> # remove gadget and wires from db
     addWire: (from, to) -> # 
