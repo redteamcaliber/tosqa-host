@@ -60,20 +60,13 @@ circuitsCtrl = ($scope, jeebus) ->
     console.log 'fix title', x
   
   handlers =
-<<<<<<< HEAD
     addGadget: (x, y) -> # ask for type -> place in db
-      jeebus.put "item","value"
+      jeebus.put "circuit/item"
       console.log "item is stored"
     delGadget: (id, wires) -> # remove gadget and wires from db
     addWire: (from, to) -> # 
     delWire: (from, to) ->
       console.log "this"
-=======
-    addGadget: (x, y) ->
-    delGadget: (id) ->
-    addWire: (from, to) ->
-    delWire: (from, to) ->
->>>>>>> master
     selectGadget: (id) ->
     moveGadget: (id, x, y) ->
       
@@ -81,7 +74,6 @@ circuitsCtrl = ($scope, jeebus) ->
     console.log 'C:', type, args...
     handlers[type] args...
     
-<<<<<<< HEAD
   setup = ->
     jeebus.attach 'circuit'
       .on 'sync', ->
@@ -93,13 +85,10 @@ circuitsCtrl = ($scope, jeebus) ->
         # $scope.circuits push k, v
         #3. tell editor
         
-
-=======
   # setup = ->
   #   jeebus.attach 'circuit'
   #     .on 'sync', ->
   #       $scope.circuits = @rows
->>>>>>> master
   #     
   # setup()  if $scope.serverStatus is 'connected'
   # $scope.$on 'ws-open', setup
