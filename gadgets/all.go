@@ -4,6 +4,7 @@ package tosqa
 import (
 	// "github.com/jcw/flow"
 	_ "github.com/jcw/flow/gadgets"
+	_ "github.com/tosqa/tosqa-host/gadgets/canbus"
 	_ "github.com/tosqa/tosqa-host/gadgets/gcode"
 )
 

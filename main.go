@@ -16,15 +16,18 @@ var (
 	describe = flag.Bool("d", false, "describe the main circuit used as Tosqa server")
 )
 
-// defaults can also be overridden through environment variables
+// these defaults can be overridden via a file or with environment variables
 const defaults = `
+# do not change, as the following defaults are hard-coded in devmode.coffee
+# use a "./config.txt" file to override these, or use environment variables
 APP_DIR     = ./app
-BASE_DIR    = ../../jcw/jeebus/base
-DATA_DIR    = ./data
+BASE_DIR    = ./base
 GADGETS_DIR = ./gadgets
-HTTP_PORT   = :3333
+# the following defaults can be whatever is convenient for this application
+DATA_DIR    = ./data
+HTTP_PORT   = :3000
 MQTT_PORT   = :1883
-SETUP_FILE  = ../../jcw/jeebus/setup.json
+SETUP_FILE  = ./setup.json
 `
 
 func main() {
@@ -42,7 +45,12 @@ func main() {
 	// if a registered circuit name is given on the command line, run it
 	if flag.NArg() > 0 {
 		if factory, ok := flow.Registry[flag.Arg(0)]; ok {
-			factory().Run()
+			c := factory()
+			if *describe {
+				flow.PrintDescription(c)
+				return
+			}
+			c.Run()
 			return
 		}
 		fmt.Fprintln(os.Stderr, "Unknown command:", flag.Arg(0))
