@@ -46,7 +46,7 @@ circuitsCtrl = ($scope, jeebus) ->
       console.log 'addFeed', pin, $scope.circuit.feeds[pin].length
       $scope.circuit.feeds[pin].push ''
       $scope.addPin = null
-    
+
   $scope.delFeed = (pin, index) ->
     items = $scope.circuit.feeds[pin]
     console.log 'delFeed', pin, index, items[index]
@@ -71,10 +71,10 @@ circuitsCtrl = ($scope, jeebus) ->
     console.log 'C:', type, args...
     handlers[type] args...
     
-  # setup = ->
-  #   jeebus.attach 'circuit'
-  #     .on 'sync', ->
-  #       $scope.circuits = @rows
-  #     
-  # setup()  if $scope.serverStatus is 'connected'
-  # $scope.$on 'ws-open', setup
+  setup = ->
+    jeebus.attach 'circuit'
+      .on 'sync', ->
+        $scope.circuits = @rows
+
+  setup()  if $scope.serverStatus is 'connected'
+  $scope.$on 'ws-open', setup
