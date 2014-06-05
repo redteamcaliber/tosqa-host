@@ -61,7 +61,11 @@ circuitsCtrl = ($scope, jeebus) ->
   
   handlers =
     addGadget: (x, y) ->
+      id = Date.now() / 1000 | 0 # use int seconds as id for this new entry
+      jeebus.put "/circuit/#{id}",
+        { name: "pipe-#{id}", type: 'Pipe', x: x, y: y }
     delGadget: (id) ->
+      jeebus.put "/circuit/#{id}"
     addWire: (from, to) ->
     delWire: (from, to) ->
     selectGadget: (id) ->
