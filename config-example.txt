@@ -1,4 +1,4 @@
-# This is an example configuration which re-uses the base and setup files from
+# This is an example configuration which re-uses the common base files from
 # the "jcw/jeebus" project on github. To use this configuration, you have to
 # make a copy of this file and call it "config.txt". The lines which have been
 # commented out are the default values when there is no "config.txt" file.
@@ -17,12 +17,10 @@ BASE_DIR    = ../../jcw/jeebus/base
 #GADGETS_DIR = ./gadgets
 
 # default port to use for the HTTP web server
-#HTTP_PORT   = :3000
-HTTP_PORT   = :3333
+#HTTP_PORT   = :3333
 
 # default port to use for the MQTT pubsub server
 #MQTT_PORT   = :1883
 
 # default circuits to define, in addition to the built-in gadgets and circuits
 #SETUP_FILE  = ./setup.json
-SETUP_FILE  = ../../jcw/jeebus/setup.json

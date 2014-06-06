@@ -7,10 +7,10 @@ ng = angular.module 'myApp', [
 ng.value 'appInfo',
   name: 'Tosqa'
   version: '0.9.0'
-  home: 'https://github.com/tosqa/tosqa-host'
+  home: 'http://tosqa.com/'
 
 ng.run (jeebus) ->
-  jeebus.connect 'jeebus'
+  jeebus.connect 'tosqa'
 
 ng.run ($rootScope, appInfo) ->
   $rootScope.shared = {}
@@ -19,7 +19,6 @@ ng.run ($rootScope, appInfo) ->
     $rootScope.serverStatus = 'connected'
   $rootScope.$on 'ws-lost', ->
     $rootScope.serverStatus = 'disconnected'
-  window.$rootScope = $rootScope # console access, for debugging
 
 ng.directive 'highlightOnChange', ($animate) ->
   (scope, elem, attrs) ->

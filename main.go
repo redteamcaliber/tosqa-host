@@ -25,7 +25,7 @@ BASE_DIR    = ./base
 GADGETS_DIR = ./gadgets
 # the following defaults can be whatever is convenient for this application
 DATA_DIR    = ./data
-HTTP_PORT   = :3000
+HTTP_PORT   = :3333
 MQTT_PORT   = :1883
 SETUP_FILE  = ./setup.json
 `

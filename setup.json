@@ -1,0 +1,248 @@
+{
+    "main": {
+        "gadgets": [
+            {
+                "name": "http",
+                "type": "HTTPServer"
+            },
+            {
+                "name": "init",
+                "type": "init"
+            }
+        ],
+        "feeds": [
+            {
+                "tag": "/",
+                "data": "./app",
+                "to": "http.Handlers"
+            },
+            {
+                "tag": "/base/",
+                "data": "./base",
+                "to": "http.Handlers"
+            },
+            {
+                "tag": "/ws",
+                "data": "<websocket>",
+                "to": "http.Handlers"
+            },
+            {
+                "data": ":3333",
+                "to": "http.Port"
+            }
+        ]
+    },
+    "init": {
+        "gadgets": [
+            {
+                "name": "reload",
+                "type": "WSLiveReload"
+            },
+            {
+                "name": "dummy",
+                "type": "Pipe"
+            },
+            {
+                "name": "driverFill",
+                "type": "driverFill"
+            },
+            {
+                "name": "tableFill",
+                "type": "tableFill"
+            }
+        ],
+        "labels": [
+            {
+                "external": "In",
+                "internal": "dummy.In"
+            },
+            {
+                "external": "Out",
+                "internal": "dummy.Out"
+            }
+        ]
+    },
+    "WebSocket-tosqa": {
+        "gadgets": [
+            {
+                "name": "rpc",
+                "type": "RpcHandler"
+            }
+        ],
+        "labels": [
+            {
+                "external": "In",
+                "internal": "rpc.In"
+            },
+            {
+                "external": "Out",
+                "internal": "rpc.Out"
+            }
+        ]
+    },
+    "demo": {
+        "gadgets": [
+            {
+                "name": "c",
+                "type": "Clock"
+            }
+        ],
+        "feeds": [
+            {
+                "data": "1s",
+                "to": "c.Rate"
+            }
+        ]
+    },
+    "tableFill": {
+        "gadgets": [
+            {
+                "name": "db",
+                "type": "LevelDB"
+            }
+        ],
+        "feeds": [
+            {
+                "to": "db.In",
+                "tag": "/table/table",
+                "data": {
+                    "attr": "id attr"
+                }
+            },
+            {
+                "to": "db.In",
+                "tag": "/column/table/id",
+                "data": {
+                    "name": "Ident"
+                }
+            },
+            {
+                "to": "db.In",
+                "tag": "/column/table/attr",
+                "data": {
+                    "name": "Attributes"
+                }
+            },
+            {
+                "to": "db.In",
+                "tag": "/table/column",
+                "data": {
+                    "attr": "id name"
+                }
+            },
+            {
+                "to": "db.In",
+                "tag": "/column/column/id",
+                "data": {
+                    "name": "Ident"
+                }
+            },
+            {
+                "to": "db.In",
+                "tag": "/column/column/name",
+                "data": {
+                    "name": "Name"
+                }
+            },
+            {
+                "to": "db.In",
+                "tag": "/table/driver",
+                "data": {
+                    "attr": "id name unit factor scale"
+                }
+            },
+            {
+                "to": "db.In",
+                "tag": "/column/driver/id",
+                "data": {
+                    "name": "Parameter"
+                }
+            },
+            {
+                "to": "db.In",
+                "tag": "/column/driver/name",
+                "data": {
+                    "name": "Name"
+                }
+            },
+            {
+                "to": "db.In",
+                "tag": "/column/driver/unit",
+                "data": {
+                    "name": "Unit"
+                }
+            },
+            {
+                "to": "db.In",
+                "tag": "/column/driver/factor",
+                "data": {
+                    "name": "Factor"
+                }
+            },
+            {
+                "to": "db.In",
+                "tag": "/column/driver/scale",
+                "data": {
+                    "name": "Scale"
+                }
+            },
+            {
+                "to": "db.In",
+                "tag": "/table/reading",
+                "data": {
+                    "attr": "id loc val ms typ"
+                }
+            },
+            {
+                "to": "db.In",
+                "tag": "/column/reading/id",
+                "data": {
+                    "name": "Ident"
+                }
+            },
+            {
+                "to": "db.In",
+                "tag": "/column/reading/loc",
+                "data": {
+                    "name": "Location"
+                }
+            },
+            {
+                "to": "db.In",
+                "tag": "/column/reading/val",
+                "data": {
+                    "name": "Values"
+                }
+            },
+            {
+                "to": "db.In",
+                "tag": "/column/reading/ms",
+                "data": {
+                    "name": "Timestamp"
+                }
+            },
+            {
+                "to": "db.In",
+                "tag": "/column/reading/typ",
+                "data": {
+                    "name": "Type"
+                }
+            }
+        ]
+    },
+    "try1": {
+        "gadgets": [
+            {
+                "name": "db",
+                "type": "LevelDB"
+            }
+        ],
+        "feeds": [
+            {
+                "tag": "<range>",
+                "data": "/reading/",
+                "to": "db.In"
+            }
+        ]
+    }
+}
