@@ -10,7 +10,7 @@ ng.value 'appInfo',
   home: 'http://tosqa.com/'
 
 ng.run (jeebus) ->
-  jeebus.connect 'tosqa'
+  jeebus.connect 'jeebus'
 
 ng.run ($rootScope, appInfo) ->
   $rootScope.shared = {}

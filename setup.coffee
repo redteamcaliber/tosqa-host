@@ -20,7 +20,6 @@ circuits.init =
   gadgets: [
     { name: "reload", type: "WSLiveReload" } # needed if using node in dev mode
     { name: "dummy", type: "Pipe" } # needed for dispatcher in HouseMon
-    { name: "driverFill", type: "driverFill" } # pre-load the database
     { name: "tableFill", type: "tableFill" }   # pre-load the database
   ]
   labels: [
@@ -29,7 +28,7 @@ circuits.init =
   ]
 
 # define the websocket handler using a loop in and out of RpcHandler
-circuits["WebSocket-tosqa"] =
+circuits["WebSocket-jeebus"] =
   gadgets: [
     { name: "rpc", type: "RpcHandler" }
   ]

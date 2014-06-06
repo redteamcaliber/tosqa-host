@@ -43,10 +43,6 @@
                 "type": "Pipe"
             },
             {
-                "name": "driverFill",
-                "type": "driverFill"
-            },
-            {
                 "name": "tableFill",
                 "type": "tableFill"
             }
@@ -62,7 +58,7 @@
             }
         ]
     },
-    "WebSocket-tosqa": {
+    "WebSocket-jeebus": {
         "gadgets": [
             {
                 "name": "rpc",
