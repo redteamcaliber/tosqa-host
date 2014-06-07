@@ -73,8 +73,11 @@ func main() {
 	c.Feed("db.In", flow.Tag{"<register>", "/gadget/init"})
 
 	// wait for db to finish, then dispatch to the "init" gadget, if found
+	fmt.Println("aaa1")
 	c.Add("wait", "Waiter")
+	fmt.Println("aaa2")
 	c.Add("disp", "Dispatcher")
+	fmt.Println("aaa3")
 	c.Connect("db.Out", "wait.Gate", 0)
 	c.Connect("wait.Out", "disp.In", 0)
 	c.Feed("wait.In", flow.Tag{"<dispatch>", "init"})
