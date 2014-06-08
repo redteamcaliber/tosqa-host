@@ -32,18 +32,18 @@ circuitsCtrl = ($scope, jeebus) ->
       
   $scope.circuit =
     gadgets:
-      g1: { x: 300, y: 250, title: 'Gadget One', type: 'Printer' }
-      g2: { x: 120, y: 220, title: 'Gadget Two', type: 'Pipe' }
+      g1: { x: 120, y: 220, title: 'Gadget One', type: 'Pipe' }
+      g2: { x: 300, y: 250, title: 'Gadget Two', type: 'Printer' }
       g3: { x: 320, y:  60, title: 'StepGen-X', type: 'StepGen' }
-      g4: { x: 520, y:  70, title: 'SSB-X', type: 'SSB' }
+      g4: { x: 540, y:  70, title: 'SSB-X', type: 'SSB' }
       g5: { x: 340, y: 140, title: 'StepGen-Y', type: 'StepGen' }
-      g6: { x: 540, y: 150, title: 'SSB-Y', type: 'SSB' }
+      g6: { x: 520, y: 150, title: 'SSB-Y', type: 'SSB' }
     wires:
-      'g2.Out/g1.In': 0
+      'g1.Out/g2.In': 0
       'g3.Out/g4.Cmds': 0
       'g5.Out/g6.Cmds': 0
     feeds:
-      'g1.In': [ 'some data', { Tag: 'blah', Msg: 'tagged data' } ]
+      'g2.In': [ 'some data', { Tag: 'blah', Msg: 'tagged data' } ]
       'g3.Params': [ 1000, 500 ]
       'g5.Params': [ 500, 1000 ]
     labels:
