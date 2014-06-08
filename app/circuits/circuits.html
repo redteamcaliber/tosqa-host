@@ -45,7 +45,7 @@
     </table>
   </div>
   <div class="pure-u-2-3">
-    <table class="pure-table">
+    <table class="pure-table pure-table-horizontal">
       <thead>
         <tr>
           <th>Pin</th>
@@ -54,20 +54,20 @@
       </thead>
       <tbody>
         <tr ng-repeat="(pin,feeds) in circuit.feeds">
-          <td valign="top" class="right">{{pin}}</td>
+          <td>{{pin}}</td>
           <td>
-            <table>
+            <table class="pure-table">
               <tr ng-repeat="row in feeds track by $index">
                 <td>
-                  <pre contenteditable="true">{{row | json}}</pre>
+                  <div contenteditable="true">{{row | json}}</div>
                 </td>
-                <td valign="top"><a ng-click="delFeed(pin,$index)">-</a></td>
+                <td><a ng-click="delFeed(pin,$index)">-</a></td>
               </tr>
             </table>
           </td>
         </tr>
         <tr>
-          <td class="right">Add:</td>
+          <td>Add:</td>
           <td>
             <select ng-model="addPin" ng-options="p for p in inputPins">
               <option value="">Select an input pin...</option>

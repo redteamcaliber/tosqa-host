@@ -21,20 +21,20 @@
           td: label.right.inline Type
           td: input(type='text',ng-model='currSel.type',readonly)
   .pure-u-2-3
-    table.pure-table
+    table.pure-table.pure-table-horizontal
       thead
         tr
           th Pin
           th Feeds
       tbody
         tr(ng-repeat='(pin,feeds) in circuit.feeds')
-          td.right(valign='top') {{pin}}
+          td {{pin}}
           td
-            table
+            table.pure-table
               tr(ng-repeat='row in feeds track by $index')
-                td: pre(contenteditable='true') {{row | json}}
-                td(valign='top'): a(ng-click='delFeed(pin,$index)') -
+                td: div(contenteditable='true') {{row | json}}
+                td: a(ng-click='delFeed(pin,$index)') -
         tr
-          td.right Add:
+          td Add:
           td: select(ng-model='addPin',ng-options='p for p in inputPins')
                 option(value='') Select an input pin...
