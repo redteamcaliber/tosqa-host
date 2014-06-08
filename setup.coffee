@@ -21,6 +21,12 @@ circuits.init =
     { name: "reload", type: "WSLiveReload" } # needed if using node in dev mode
     { name: "dummy", type: "Pipe" } # needed for dispatcher in HouseMon
     { name: "tableFill", type: "tableFill" }   # pre-load the database
+    { name: "cb", type: "CanBridge" }
+    { name: "bm", type: "BootMaster" }
+  ]
+  wires: [
+    { from: "cb.Out", to: "bm.In" }
+    { from: "bm.Out", to: "cb.In" }
   ]
   labels: [
     { external: "In", internal: "dummy.In" }

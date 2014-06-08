@@ -45,6 +45,24 @@
             {
                 "name": "tableFill",
                 "type": "tableFill"
+            },
+            {
+                "name": "cb",
+                "type": "CanBridge"
+            },
+            {
+                "name": "bm",
+                "type": "BootMaster"
+            }
+        ],
+        "wires": [
+            {
+                "from": "cb.Out",
+                "to": "bm.In"
+            },
+            {
+                "from": "bm.Out",
+                "to": "cb.In"
             }
         ],
         "labels": [
