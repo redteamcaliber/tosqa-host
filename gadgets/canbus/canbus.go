@@ -160,13 +160,14 @@ type BootMaster struct {
 }
 
 func (g *BootMaster) Run() {
+	database.OpenDatabase()
 	for m := range g.In {
 		tag := m.(flow.Tag)
 		addr, err := strconv.ParseInt(tag.Tag, 16, 32)
 		flow.Check(err)
 		hwid := fmt.Sprintf("%02X", tag.Msg.([]byte))
 		if addr&0x1FFFFF80 == 0x1F123480 && len(hwid) == 16 {
-			node := g.issueId(int8(addr&0x7F), hwid)
+			node := g.assignNodeId(int8(addr&0x7F), hwid)
 			tag.Tag = fmt.Sprintf("%02X", 0x1F123400 + int(node))
 			g.Out.Send(tag)
 		}
@@ -184,23 +185,38 @@ func (g *BootMaster) Run() {
 // in:  S101#FA00000000
 // in:  S101#FA00000000
 
-func (g *BootMaster) issueId(typ int8, hwid string) int8 {
+type CanNodeInfo struct {
+	Type   int8      // node type reported in boot request, 0..127
+	Node   int8      // assigned node ID, 1..127
+	Issued time.Time // when was the node ID assigned
+	Used   time.Time // when was the node ID requested
+}
+
+var activeNodes = map[string]CanNodeInfo{}
+var activeHwids = []string{""} // first entry is not used
+
+func (g *BootMaster) assignNodeId(typ int8, hwid string) int8 {
 	key := "/can/node/" + hwid
-	var info struct {
-		Type   int8      // node type reported in boot request, 0..127
-		Node   int8      // assigned node ID, 1..127
-		Issued time.Time // when was the node ID assigned
-	}
+	var info CanNodeInfo
 	myCast(database.Get(key), &info)
-	glog.Infoln("issueId", typ, hwid, info)
+	glog.Infoln("assignNodeId", typ, hwid)
 	if typ != 0 {
 		info.Type = typ
+		info.Issued = time.Now()
+		if _, ok := activeNodes[hwid]; ok {
+			info.Node = activeNodes[hwid].Node
+		} else {
+			info.Node = int8(len(activeHwids)) // next ID
+			activeHwids = append(activeHwids, hwid)
+		}
+	} else {
+		info.Used = time.Now()
 	}
-	if info.Node == 0 {
-		info.Node = 11
-	}
-	info.Issued = time.Now()
 	database.Put(key, info)
+	activeNodes[hwid] = info
+	for i, x := range activeNodes {
+		fmt.Println(" ", i, x.Type, x.Node)
+	}
 	return info.Node
 }
 
