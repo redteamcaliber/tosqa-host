@@ -96,6 +96,14 @@ circuitsCtrl = ($scope, jeebus) ->
     jeebus.attach 'circuit'
       .on 'sync', ->
         $scope.circuits = @rows
+        angular.forEach @rows, (value) ->
+          console.log value
+      .on 'data', (k,v) ->
+        #1. TODO: check for value, else remove
+        console.log k, v
+        #2. add to circuits
+        # $scope.circuits push k, v
+        #3. tell editor
 
   setup()  if $scope.serverStatus is 'connected'
   $scope.$on 'ws-open', setup
