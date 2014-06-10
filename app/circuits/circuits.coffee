@@ -75,21 +75,23 @@ circuitsCtrl = ($scope, jeebus) ->
     updatePinList() # for new and deleted gadgets
   $scope.$watch 'currSel.title', (x) ->
     console.log 'fix title', x
+    
+  obj = 'demo1'
   
   handlers =
-    addGadget: (x, y) ->      jeebus.send { cmd: 'ced-ag', x, y     }
-    delGadget: (id) ->        jeebus.send { cmd: 'ced-dg', id       }
-    addWire: (from, to) ->    jeebus.send { cmd: 'ced-aw', from, to }
-    delWire: (from, to) ->    jeebus.send { cmd: 'ced-dw', from, to }
-    selectGadget: (id) ->     jeebus.send { cmd: 'ced-sg', id       }
-    moveGadget: (id, x, y) -> jeebus.send { cmd: 'ced-mg', id, x, y }
+    addGadget: (x, y) ->      jeebus.send { cmd: 'ced-ag', obj, x, y     }
+    delGadget: (id) ->        jeebus.send { cmd: 'ced-dg', obj, id       }
+    addWire: (from, to) ->    jeebus.send { cmd: 'ced-aw', obj, from, to }
+    delWire: (from, to) ->    jeebus.send { cmd: 'ced-dw', obj, from, to }
+    selectGadget: (id) ->     jeebus.send { cmd: 'ced-sg', obj, id       }
+    moveGadget: (id, x, y) -> jeebus.send { cmd: 'ced-mg', obj, id, x, y }
 
   $scope.$on 'circuit', (event, type, args...) ->
     console.log 'C:', type, args...
     handlers[type] args...
     
   setup = ->
-    jeebus.attach 'circuit'
+    jeebus.attach "circuit/#{obj}"
       .on 'sync', -> $scope.circuits = @rows
       .on 'data', (args...) -> console.log 111, args
 
