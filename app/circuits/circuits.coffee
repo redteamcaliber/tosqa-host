@@ -32,12 +32,12 @@ circuitsCtrl = ($scope, jeebus) ->
       
   $scope.circuit =
     gadgets:
-      g1: { x: 120, y: 220, title: 'Gadget One', type: 'Pipe' }
-      g2: { x: 300, y: 250, title: 'Gadget Two', type: 'Printer' }
-      g3: { x: 320, y:  60, title: 'StepGen-X', type: 'StepGen' }
-      g4: { x: 540, y:  70, title: 'SSB-X', type: 'SSB' }
-      g5: { x: 340, y: 140, title: 'StepGen-Y', type: 'StepGen' }
-      g6: { x: 520, y: 150, title: 'SSB-Y', type: 'SSB' }
+      g1: { x: 120, y: 220, title: 'Gadget One', type: 'Pipe',    }
+      g2: { x: 300, y: 250, title: 'Gadget Two', type: 'Printer', }
+      g3: { x: 320, y:  60, title: 'StepGen-X',  type: 'StepGen', }
+      g4: { x: 540, y:  70, title: 'SSB-X',      type: 'SSB',     }
+      g5: { x: 340, y: 140, title: 'StepGen-Y',  type: 'StepGen', }
+      g6: { x: 520, y: 150, title: 'SSB-Y',      type: 'SSB',     }
     wires:
       'g1.Out/g2.In': 0
       'g3.Out/g4.Cmds': 0
@@ -77,25 +77,21 @@ circuitsCtrl = ($scope, jeebus) ->
     console.log 'fix title', x
   
   handlers =
-    addGadget: (x, y) ->
-      id = Date.now() / 1000 | 0 # use int seconds as id for this new entry
-      jeebus.put "/circuit/#{id}",
-        { name: "pipe-#{id}", type: 'Pipe', x: x, y: y }
-    delGadget: (id) ->
-      jeebus.put "/circuit/#{id}"
-    addWire: (from, to) ->
-    delWire: (from, to) ->
-    selectGadget: (id) ->
-    moveGadget: (id, x, y) ->
-      
+    addGadget: (x, y) ->      jeebus.send { cmd: 'ced-ag', x, y     }
+    delGadget: (id) ->        jeebus.send { cmd: 'ced-dg', id       }
+    addWire: (from, to) ->    jeebus.send { cmd: 'ced-aw', from, to }
+    delWire: (from, to) ->    jeebus.send { cmd: 'ced-dw', from, to }
+    selectGadget: (id) ->     jeebus.send { cmd: 'ced-sg', id       }
+    moveGadget: (id, x, y) -> jeebus.send { cmd: 'ced-mg', id, x, y }
+
   $scope.$on 'circuit', (event, type, args...) ->
     console.log 'C:', type, args...
     handlers[type] args...
     
   setup = ->
     jeebus.attach 'circuit'
-      .on 'sync', ->
-        $scope.circuits = @rows
+      .on 'sync', -> $scope.circuits = @rows
+      .on 'data', (args...) -> console.log 111, args
 
   setup()  if $scope.serverStatus is 'connected'
   $scope.$on 'ws-open', setup

@@ -1,4 +1,4 @@
-// motion planning - this is just wishful thinking for now
+// Motion and motion planning - the latter is wishful thinking for now.
 package motion
 
 import (
@@ -8,7 +8,15 @@ import (
 )
 
 func init() {
+	flow.Registry["StepGen"] = func() flow.Circuitry { return &StepGen{} }
 	flow.Registry["SinglePlanner"] = func() flow.Circuitry { return &SinglePlanner{} }
+}
+
+type StepGen struct {
+	flow.Gadget
+}
+
+func (g *StepGen) Run() {
 }
 
 type SinglePlanner struct {

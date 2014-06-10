@@ -1,3 +1,4 @@
+// Interface to the CAN bus, including the boot master.
 package canbus
 
 import (
@@ -95,7 +96,11 @@ type CanBridge struct {
 
 func (g *CanBridge) Run() {
 	sock, err := net.Dial("tcp", "192.168.1.20:3531")
-	flow.Check(err)
+	// flow.Check(err)
+	if err != nil {
+		glog.Warning("cannot connect to 192.168.1.20:3531")
+		return
+	}
 
 	go func() {
 		for m := range g.In {

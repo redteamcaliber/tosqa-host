@@ -47,6 +47,10 @@
                 "type": "tableFill"
             },
             {
+                "name": "circuitFill",
+                "type": "circuitFill"
+            },
+            {
                 "name": "cb",
                 "type": "CanBridge"
             },
@@ -240,6 +244,74 @@
                 "tag": "/column/reading/typ",
                 "data": {
                     "name": "Type"
+                }
+            }
+        ]
+    },
+    "circuitFill": {
+        "gadgets": [
+            {
+                "name": "db",
+                "type": "LevelDB"
+            }
+        ],
+        "feeds": [
+            {
+                "to": "db.In",
+                "tag": "/circuit/demo1/g3",
+                "data": {
+                    "x": 320,
+                    "y": 60,
+                    "title": "StepGen-X",
+                    "type": "StepGen",
+                    "feed": {
+                        "Params": [
+                            1000,
+                            500
+                        ]
+                    },
+                    "wire": {
+                        "Out": "g4.Cmds"
+                    }
+                }
+            },
+            {
+                "to": "db.In",
+                "tag": "/circuit/demo1/g4",
+                "data": {
+                    "x": 540,
+                    "y": 70,
+                    "title": "SSB-X",
+                    "type": "SSB"
+                }
+            },
+            {
+                "to": "db.In",
+                "tag": "/circuit/demo1/g5",
+                "data": {
+                    "x": 340,
+                    "y": 140,
+                    "title": "StepGen-Y",
+                    "type": "StepGen",
+                    "feed": {
+                        "Params": [
+                            300,
+                            900
+                        ]
+                    },
+                    "wire": {
+                        "Out": "g6.Cmds"
+                    }
+                }
+            },
+            {
+                "to": "db.In",
+                "tag": "/circuit/demo1/g6",
+                "data": {
+                    "x": 520,
+                    "y": 150,
+                    "title": "SSB-Y",
+                    "type": "SSB"
                 }
             }
         ]
