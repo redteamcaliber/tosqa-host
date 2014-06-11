@@ -20,7 +20,8 @@ circuits.init =
   gadgets: [
     { name: "reload", type: "WSLiveReload" } # needed if using node in dev mode
     { name: "dummy", type: "Pipe" } # needed for dispatcher in HouseMon
-    { name: "tableFill", type: "tableFill" }   # pre-load the database
+    { name: "tableFill", type: "tableFill" }      # pre-load the database
+    { name: "circuitFill", type: "circuitFill" }  # pre-load the database
     { name: "cb", type: "CanBridge" }
     { name: "bm", type: "BootMaster" }
   ]
@@ -79,6 +80,30 @@ circuits.tableFill =
     { to: "db.In", tag: "/column/reading/val", data: { name: "Values" } }
     { to: "db.In", tag: "/column/reading/ms", data: { name: "Timestamp" } }
     { to: "db.In", tag: "/column/reading/typ", data: { name: "Type" } }
+  ]
+
+# pre-load some circuit info into the database
+circuits.circuitFill =
+  gadgets: [
+    { name: "db", type: "LevelDB" }
+  ]
+  feeds: [
+    { to: "db.In", tag: "/circuit/demo1/g3", data: {
+      x: 320, y:  60, title: 'StepGen-X',  type: 'StepGen'
+      feed: { Params: [ 1000, 500 ] }
+      wire: { Out: 'g4.Cmds' }
+    }}
+    { to: "db.In", tag: "/circuit/demo1/g4", data: {
+      x: 540, y:  70, title: 'SSB-X',      type: 'SSB'
+    }}
+    { to: "db.In", tag: "/circuit/demo1/g5", data: {
+      x: 340, y: 140, title: 'StepGen-Y',  type: 'StepGen'
+      feed: { Params: [ 300, 900 ] }
+      wire: { Out: 'g6.Cmds' }
+    }}
+    { to: "db.In", tag: "/circuit/demo1/g6", data: {
+      x: 520, y: 150, title: 'SSB-Y',      type: 'SSB'
+    }}
   ]
 
 # trial circuit
