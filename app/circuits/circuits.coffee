@@ -102,11 +102,11 @@ circuitsCtrl = ($scope, jeebus) ->
         obj = {title:"#{type}-#{id}", type:$scope.newtype, x:x, y:y}
 
         # jeebus.send { cmd: 'ced-ag', obj}
-        jeebus.put("/circuit/demo1/#{id}", obj)
+        jeebus.put "/circuit/demo1/#{id}", obj 
     delGadget: (id) ->        
       # jeebus.send { cmd: 'ced-dg', obj, id}
       # put nil value to delete id
-      jeebus.put("/circuit/demo1/#{id}")  
+      jeebus.put "/circuit/demo1/#{id}"  
     addWire: (from, to) ->    jeebus.send { cmd: 'ced-aw', obj, from, to }
     delWire: (from, to) ->    jeebus.send { cmd: 'ced-dw', obj, from, to }
     selectGadget: (id) ->     jeebus.send { cmd: 'ced-sg', obj, id       }
