@@ -22,12 +22,19 @@ circuits.init =
     { name: "dummy", type: "Pipe" } # needed for dispatcher in HouseMon
     { name: "tableFill", type: "tableFill" }      # pre-load the database
     { name: "circuitFill", type: "circuitFill" }  # pre-load the database
-    { name: "cb", type: "CanBridge" }
+    # { name: "cb", type: "CanBridge" }
+    { name: "cb", type: "CanSerial" }
+    { name: "sp", type: "SerialPort" }
     { name: "bm", type: "BootMaster" }
+  ]
+  feeds: [
+    { data: "/dev/tty.usbserial-A6006eRB", to: "sp.Port" }
   ]
   wires: [
     { from: "cb.Out", to: "bm.In" }
     { from: "bm.Out", to: "cb.In" }
+    { from: "sp.From", to: "cb.SerIn" }
+    { from: "cb.SerOut", to: "sp.To" }
   ]
   labels: [
     { external: "In", internal: "dummy.In" }
