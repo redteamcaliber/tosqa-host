@@ -57,6 +57,10 @@ circuitsCtrl = ($scope, jeebus) ->
           $scope.inputPins.push "#{gid}.#{p}"
     $scope.inputPins.sort()
   
+  $scope.$watch 'circuit', (oldValue, newValue) ->
+    console.log newValue
+  
+  
   $scope.$watch 'addPin', (pin) ->
     if pin
       $scope.circuit.feeds[pin] ?= []
