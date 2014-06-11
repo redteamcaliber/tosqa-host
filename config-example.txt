@@ -8,7 +8,6 @@
 
 # location of some common files usually needed in any JeeBus-based application
 #BASE_DIR    = ./base
-BASE_DIR    = ../../jcw/jeebus/base
 
 # location of the database files, managed by the LevelDB package
 #DATA_DIR    = ./data
