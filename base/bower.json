@@ -1,0 +1,10 @@
+{
+  "name": "jeebus",
+  "dependencies": {
+    "angular-animate": "*",
+    "angular-ui-router": "*",
+    "d3": "*",
+    "pure": "*",
+    "fontawesome": "*"
+  }
+}

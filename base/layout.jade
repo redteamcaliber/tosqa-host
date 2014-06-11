@@ -1,0 +1,65 @@
+doctype
+
+block vars
+
+html(lang='en')
+  head
+    meta(charset='utf-8')
+    meta(name='viewport',content='width=device-width,initial-scale=1.0')
+    style [ng-cloak] { display: none; }
+    
+    block title
+      title JeeBus
+
+    link(rel='stylesheet',href='/base/vendor/pure/pure-min.css')
+    link(rel='stylesheet',href='/base/pure-side-menu.css')
+
+    //- additional stylesheets, can be adjusted as needed
+    block styles
+      link(rel='stylesheet',href='/base/vendor/fontawesome/css/font-awesome.css')
+
+  body(ng-cloak,ng-app='myApp')
+    #layout
+      
+      block nav
+        a#menuLink.menu-link(href="#menu",name="menuLink")
+          // Hamburger icon
+          span
+        #menu
+          .pure-menu.pure-menu-open(ng-controller='NavCtrl')
+            a.pure-menu-heading(ng-href='{{appInfo.home}}') {{appInfo.name}}
+            ul
+              li(ng-repeat='nav in navbar')
+                a(ng-href='{{nav.route}}') {{nav.title}}
+              li
+                a(href='/admin') Admin
+
+      #main
+        .content
+          block main
+            div(ui-view)
+          block footer
+            .pure-g
+              .pure-u-1-2
+                p.secondary.label Version {{appInfo.version}}
+              .pure-u-1-2
+                p.secondary.label Server {{serverStatus}}
+    
+    //- AngularJS is always included first
+    script(src='/base/vendor/angular/angular.min.js')
+
+    //- not essential, these can be replaced
+    block vendor
+      script(src='/base/vendor/angular-ui-router/release/angular-ui-router.min.js')
+      script(src='/base/vendor/angular-animate/angular-animate.min.js')
+      script(src='/base/vendor/d3/d3.min.js')
+
+    //- main setup of the Angular app and WebSocket connection
+    block startup
+      script(src='/startup.js')
+      script(src='/base/jeebus.js')
+
+    //- useful additions, can be replaced
+    block scripts
+      script(src='/base/nav.js')
+      script(src='/base/pure-ui.js')
