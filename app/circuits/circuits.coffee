@@ -57,9 +57,19 @@ circuitsCtrl = ($scope, jeebus) ->
           $scope.inputPins.push "#{gid}.#{p}"
     $scope.inputPins.sort()
   
-  $scope.$watch 'circuit', (oldValue, newValue) ->
-    console.log newValue
+  # $scope.$watch "circuits", (newValue, oldValue) ->
+  #   console.log "$watch"
   
+  $scope.$watchCollection "circuits", ((newNames, oldNames) ->
+    if newNames?
+      console.log newNames.length  
+  ), true
+  
+  $scope.$watch "circuits", ((newValue, oldValue) ->
+    console.log oldValue, newValue
+    # angular.forEach newValue, (value, key) ->
+    #   console.log "$watch id", value.id
+  ), true
   
   $scope.$watch 'addPin', (pin) ->
     if pin
@@ -83,8 +93,20 @@ circuitsCtrl = ($scope, jeebus) ->
   obj = 'demo1'
   
   handlers =
-    addGadget: (x, y) ->      jeebus.send { cmd: 'ced-ag', obj, x, y     }
-    delGadget: (id) ->        jeebus.send { cmd: 'ced-dg', obj, id       }
+    addGadget: (x, y) ->      
+      if $scope.newtype? 
+        # {"feed":{"Params":[1000,500]},"title":"StepGen-X","type":"StepGen","wire":{"Out":"g4.Cmds"},"x":320,"y":60}
+        date = String Date.now() 
+        id= "g" + date #date.substr(date .length - 9) # => "Tabs1"
+        type = $scope.newtype
+        obj = {title:"#{type}-#{id}", type:$scope.newtype, x:x, y:y}
+
+        # jeebus.send { cmd: 'ced-ag', obj}
+        jeebus.put("/circuit/demo1/#{id}", obj)
+    delGadget: (id) ->        
+      # jeebus.send { cmd: 'ced-dg', obj, id}
+      # put nil value to delete id
+      jeebus.put("/circuit/demo1/#{id}")  
     addWire: (from, to) ->    jeebus.send { cmd: 'ced-aw', obj, from, to }
     delWire: (from, to) ->    jeebus.send { cmd: 'ced-dw', obj, from, to }
     selectGadget: (id) ->     jeebus.send { cmd: 'ced-sg', obj, id       }
@@ -100,9 +122,10 @@ circuitsCtrl = ($scope, jeebus) ->
         $scope.circuits = @rows
         angular.forEach @rows, (value) ->
           console.log value
-      .on 'data', (k,v) ->
+      .on 'data', (args...) -> 
+        console.log 111, args
+      
         #1. TODO: check for value, else remove
-        console.log k, v
         #2. add to circuits
         # $scope.circuits push k, v
         #3. tell editor
