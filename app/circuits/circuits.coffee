@@ -51,6 +51,9 @@ circuitsCtrl = ($scope, jeebus) ->
     labels:
       In: 'g2.In'
       
+  $scope.circuit =
+    gadgets:{} 
+      
   updatePinList = () ->
     $scope.inputPins = []
     for gid, g of $scope.circuit.gadgets
@@ -59,24 +62,22 @@ circuitsCtrl = ($scope, jeebus) ->
           $scope.inputPins.push "#{gid}.#{p}"
     $scope.inputPins.sort()
   
-  
-  # $scope.$watchCollection "circuits", ((newNames, oldNames) ->
-  #   if newNames?
-  #     console.log newNames.length  
-  # ), true
-  
+  # watch circuits for change
   $scope.$watch "circuits", ((newValue, oldValue) ->
     old = Object.keys oldValue
     angular.forEach newValue, (value, key) ->
       if old.indexOf key is -1 # if key does not exist in oldValue, key add
+        $scope.circuit.gadgets[key] = value
         console.log "object #{key} is added", value
-        $scope.circuit.gadgets[key] = { x: value.x, y: value.y, title: value.title, type: value.type,    }
 
       index = old.indexOf(key) # remove item from old
       if index > -1
         old.splice index, 1
     for each in old  # old now contains all keys that do no onger exist in newValue
-      console.log "this key is removed:", key 
+      # index = $scope.circuit.gadgets.indexOf(each)
+      # $scope.circuit.gadgets.splice index, 1
+      console.log "this key is removed:", key
+            
   ), true
   
   $scope.$watch 'addPin', (pin) ->

@@ -7,7 +7,7 @@ ng.directive 'jbCircuitEditor', ->
     defs: '='
     data: '='
     
-  link: (scope, elem, attr) ->
+  link: (scope, elem, attr) ->  
     svg = d3.select(elem[0]).append 'svg'
       .attr height: '60%'
     diag = d3.svg.diagonal()
@@ -160,5 +160,10 @@ ng.directive 'jbCircuitEditor', ->
         source = findPin from
         target = findPin to
         { id, from, to, source, target, cap }
+    
+    scope.$watch "data", (->
+      console.log "gadgets changed"
+      redraw()
+    ), true
     
     redraw()
