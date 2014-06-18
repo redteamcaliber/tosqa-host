@@ -1,4 +1,4 @@
-# JeeBus base: AngularJS + Zurb Foundation
+# JeeBus base: AngularJS + Pure CSS
 
-* bower used for main dependencies (angular, foundation, raphael)
+* bower used for main dependencies (angular, pure, d3, fontawesome)
 * angular-ui-router downloaded separately

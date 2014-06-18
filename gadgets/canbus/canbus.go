@@ -173,7 +173,7 @@ func (g *BootMaster) Run() {
 		hwid := fmt.Sprintf("%02X", tag.Msg.([]byte))
 		if addr&0x1FFFFF80 == 0x1F123480 && len(hwid) == 16 {
 			node := g.assignNodeId(int8(addr&0x7F), hwid)
-			tag.Tag = fmt.Sprintf("%02X", 0x1F123400 + int(node))
+			tag.Tag = fmt.Sprintf("%02X", 0x1F123400+int(node))
 			g.Out.Send(tag)
 		}
 	}
