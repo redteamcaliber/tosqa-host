@@ -8,7 +8,9 @@ ng.config ($stateProvider, navbarProvider) ->
   navbarProvider.add '/circuits', 'Circuits', 30
 
 circuitsCtrl = ($scope, jeebus) ->
-    
+  
+  $scope.circuits ={}
+  
   $scope.gadgets =
     Pipe:
       name: 'Pipeline'
@@ -57,18 +59,24 @@ circuitsCtrl = ($scope, jeebus) ->
           $scope.inputPins.push "#{gid}.#{p}"
     $scope.inputPins.sort()
   
-  # $scope.$watch "circuits", (newValue, oldValue) ->
-  #   console.log "$watch"
   
-  $scope.$watchCollection "circuits", ((newNames, oldNames) ->
-    if newNames?
-      console.log newNames.length  
-  ), true
+  # $scope.$watchCollection "circuits", ((newNames, oldNames) ->
+  #   if newNames?
+  #     console.log newNames.length  
+  # ), true
   
   $scope.$watch "circuits", ((newValue, oldValue) ->
-    console.log oldValue, newValue
-    # angular.forEach newValue, (value, key) ->
-    #   console.log "$watch id", value.id
+    old = Object.keys oldValue
+    angular.forEach newValue, (value, key) ->
+      if old.indexOf key is -1 # if key does not exist in oldValue, key add
+        console.log "object #{key} is added", value
+        $scope.circuit.gadgets[key] = { x: value.x, y: value.y, title: value.title, type: value.type,    }
+
+      index = old.indexOf(key) # remove item from old
+      if index > -1
+        old.splice index, 1
+    for each in old  # old now contains all keys that do no onger exist in newValue
+      console.log "this key is removed:", key 
   ), true
   
   $scope.$watch 'addPin', (pin) ->
@@ -107,10 +115,10 @@ circuitsCtrl = ($scope, jeebus) ->
       # jeebus.send { cmd: 'ced-dg', obj, id}
       # put nil value to delete id
       jeebus.put "/circuit/demo1/#{id}"  
-    addWire: (from, to) ->    jeebus.send { cmd: 'ced-aw', obj, from, to }
-    delWire: (from, to) ->    jeebus.send { cmd: 'ced-dw', obj, from, to }
-    selectGadget: (id) ->     jeebus.send { cmd: 'ced-sg', obj, id       }
-    moveGadget: (id, x, y) -> jeebus.send { cmd: 'ced-mg', obj, id, x, y }
+    addWire: (from, to) ->    #jeebus.send { cmd: 'ced-aw', obj, from, to }
+    delWire: (from, to) ->    #jeebus.send { cmd: 'ced-dw', obj, from, to }
+    selectGadget: (id) ->     #jeebus.send { cmd: 'ced-sg', obj, id       }
+    moveGadget: (id, x, y) -> #jeebus.send { cmd: 'ced-mg', obj, id, x, y }
 
   $scope.$on 'circuit', (event, type, args...) ->
     console.log 'C:', type, args...
@@ -118,11 +126,14 @@ circuitsCtrl = ($scope, jeebus) ->
     
   setup = ->
     jeebus.attach 'circuit'
-      .on 'sync', ->
-        $scope.circuits = @rows
-        angular.forEach @rows, (value) ->
-          console.log value
+      .on 'sync', (args...) ->
+        temp = @rows
+        console.log "init circuits"
+        for obj in temp
+          $scope.circuits[obj.id] = obj 
+  
       .on 'data', (args...) -> 
+        
         console.log 111, args
       
         #1. TODO: check for value, else remove
