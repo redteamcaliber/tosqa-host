@@ -22,6 +22,7 @@ func init() {
 	flow.Registry["CanBridge"] = func() flow.Circuitry { return &CanBridge{} }
 	flow.Registry["CanSerial"] = func() flow.Circuitry { return &CanSerial{} }
 	flow.Registry["BootMaster"] = func() flow.Circuitry { return &BootMaster{} }
+	flow.Registry["MotionDemo"] = func() flow.Circuitry { return &MotionDemo{} }
 }
 
 type SocketCan struct {
@@ -230,4 +231,27 @@ func myCast(in, out interface{}) {
 	flow.Check(err)
 	err = json.Unmarshal(data, out)
 	flow.Check(err)
+}
+
+type MotionDemo struct {
+	flow.Gadget
+	Addr flow.Input
+	In   flow.Input
+	Out  flow.Output
+}
+
+func (g *MotionDemo) Run() {
+	addr := (<-g.Addr).(string)
+	for _ = range g.In {
+		g.emit(addr, "401F640001000100")
+		g.emit(addr, "A00F9CFF01000100")
+		g.emit(addr, "A00F640001000100")
+		g.emit(addr, "401F9CFF01000100")
+	}
+}
+
+func (g *MotionDemo) emit(addr, command string) {
+	payload, err := hex.DecodeString(command)
+	flow.Check(err)
+	g.Out.Send(flow.Tag{addr, payload})
 }
