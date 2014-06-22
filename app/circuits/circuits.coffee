@@ -53,6 +53,7 @@ circuitsCtrl = ($scope, jeebus) ->
       
   $scope.circuit =
     gadgets:{} 
+    wires:[]
       
   updatePinList = () ->
     $scope.inputPins = []
@@ -69,6 +70,10 @@ circuitsCtrl = ($scope, jeebus) ->
       if old.indexOf key is -1 # if key does not exist in oldValue, key add
         $scope.circuit.gadgets[key] = value
         console.log "object #{key} is added", value
+        
+        if value.wire?
+          k = "#{key}.Out/#{value.wire.Out}"
+          $scope.circuit.wires[k] = 0
 
       index = old.indexOf(key) # remove item from old
       if index > -1
@@ -102,27 +107,23 @@ circuitsCtrl = ($scope, jeebus) ->
   handlers =
     addGadget: (x, y) ->      
       if $scope.newtype? 
-        # {"feed":{"Params":[1000,500]},"title":"StepGen-X","type":"StepGen","wire":{"Out":"g4.Cmds"},"x":320,"y":60}
-        date = String Date.now() 
-        id= "g" + date #date.substr(date .length - 9) # => "Tabs1"
+        # jeebus.send { cmd: 'ced-ag', obj}
+        id= "g" + String Date.now()
         type = $scope.newtype
         obj = {title:"#{type}-#{id}", type:$scope.newtype, x:x, y:y}
 
-        # jeebus.send { cmd: 'ced-ag', obj}
         jeebus.put "/circuit/demo1/#{id}", obj 
     delGadget: (id) ->        
       # jeebus.send { cmd: 'ced-dg', obj, id}
-      # put nil value to delete id
-      jeebus.put "/circuit/demo1/#{id}"  
+      jeebus.put "/circuit/demo1/#{id}"  # put nil value to delete id
     addWire: (from, to) ->    #jeebus.send { cmd: 'ced-aw', obj, from, to }
     delWire: (from, to) ->    #jeebus.send { cmd: 'ced-dw', obj, from, to }
     selectGadget: (id) ->     #jeebus.send { cmd: 'ced-sg', obj, id       }
     moveGadget: (id, x, y) -> #jeebus.send { cmd: 'ced-mg', obj, id, x, y }
-      obj = jeebus.get "/circuit/demo1/#{id}" 
-      # obj = {title:"#{type}-#{id}", type:$scope.newtype, x:x, y:y}
-      console.log id
-      console.log obj
-      # jeebus.put "/circuit/demo1/#{id}", obj
+      obj = $scope.circuit.gadgets[id]
+      obj.x = x
+      obj.y = y
+      jeebus.put "/circuit/demo1/#{id}", obj
 
   $scope.$on 'circuit', (event, type, args...) ->
     console.log 'C:', type, args...
