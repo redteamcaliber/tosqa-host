@@ -98,9 +98,7 @@ circuitsCtrl = ($scope, jeebus) ->
     updatePinList() # for new and deleted gadgets
   $scope.$watch 'currSel.title', (x) ->
     console.log 'fix title', x
-    
-  obj = 'demo1'
-  
+      
   handlers =
     addGadget: (x, y) ->      
       if $scope.newtype? 
@@ -120,18 +118,24 @@ circuitsCtrl = ($scope, jeebus) ->
     delWire: (from, to) ->    #jeebus.send { cmd: 'ced-dw', obj, from, to }
     selectGadget: (id) ->     #jeebus.send { cmd: 'ced-sg', obj, id       }
     moveGadget: (id, x, y) -> #jeebus.send { cmd: 'ced-mg', obj, id, x, y }
+      obj = jeebus.get "/circuit/demo1/#{id}" 
+      # obj = {title:"#{type}-#{id}", type:$scope.newtype, x:x, y:y}
+      console.log id
+      console.log obj
+      # jeebus.put "/circuit/demo1/#{id}", obj
 
   $scope.$on 'circuit', (event, type, args...) ->
     console.log 'C:', type, args...
     handlers[type] args...
     
   setup = ->
-    jeebus.attach 'circuit'
+    jeebus.attach 'circuit/demo1'
       .on 'sync', (args...) ->
         temp = @rows
         console.log "init circuits"
         for obj in temp
-          $scope.circuits[obj.id] = obj 
+          $scope.circuits[obj.id] = obj
+          console.log obj.id
   
       .on 'data', (args...) -> 
         
