@@ -123,7 +123,10 @@ circuitsCtrl = ($scope, jeebus) ->
       obj.wire = {"Out":to}
       jeebus.put "/circuit/demo1/#{id}", obj 
     delWire: (from, to) ->    #jeebus.send { cmd: 'ced-dw', obj, from, to }
-      
+      id = (from.split '.')[0]
+      obj = $scope.circuit.gadgets[id]
+      obj.wire = null
+      jeebus.put "/circuit/demo1/#{id}", obj
     selectGadget: (id) ->     #jeebus.send { cmd: 'ced-sg', obj, id       }
     moveGadget: (id, x, y) -> #jeebus.send { cmd: 'ced-mg', obj, id, x, y }
       obj = $scope.circuit.gadgets[id]
