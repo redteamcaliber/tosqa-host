@@ -26,15 +26,28 @@ circuits.init =
     { name: "cb", type: "CanSerial" }
     { name: "sp", type: "SerialPort" }
     { name: "bm", type: "BootMaster" }
+    { name: "c1", type: "Clock" }
+    { name: "m1", type: "MotionDemo" }
+    { name: "c2", type: "Clock" }
+    { name: "m2", type: "MotionDemo" }
   ]
   feeds: [
     { data: "/dev/tty.usbserial-A6006eRB", to: "sp.Port" }
+    { data: "2s", to: "c1.In" }
+    { data: "101", to: "m1.Addr" }
+    { data: "9s", to: "c2.In" }
+    { data: "102", to: "m2.Addr" }
   ]
   wires: [
     { from: "cb.Out", to: "bm.In" }
     { from: "bm.Out", to: "cb.In" }
     { from: "sp.From", to: "cb.SerIn" }
-    { from: "cb.SerOut", to: "sp.To" }
+    # { from: "cb.SerOut", to: "sp.To" }
+    { from: "c1.Out", to: "m1.In" }
+    { from: "m1.Out", to: "cb.In" }
+    { from: "c2.Out", to: "m2.In" }
+    { from: "m2.Out", to: "cb.In" }
+    { from: "cb.SerOut", to: "sp.To" } # comment out to disable test motion
   ]
   labels: [
     { external: "In", internal: "dummy.In" }
