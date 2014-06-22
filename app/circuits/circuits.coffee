@@ -113,11 +113,17 @@ circuitsCtrl = ($scope, jeebus) ->
         obj = {title:"#{type}-#{id}", type:$scope.newtype, x:x, y:y}
 
         jeebus.put "/circuit/demo1/#{id}", obj 
-    delGadget: (id) ->        
-      # jeebus.send { cmd: 'ced-dg', obj, id}
+    delGadget: (id) ->   
+      # jeebus.send { cmd: 'ced-dg', obj, id}      
       jeebus.put "/circuit/demo1/#{id}"  # put nil value to delete id
-    addWire: (from, to) ->    #jeebus.send { cmd: 'ced-aw', obj, from, to }
+    addWire: (from, to) ->   
+      #jeebus.send { cmd: 'ced-aw', obj, from, to }
+      id = (from.split '.')[0]
+      obj = $scope.circuit.gadgets[id]
+      obj.wire = {"Out":to}
+      jeebus.put "/circuit/demo1/#{id}", obj 
     delWire: (from, to) ->    #jeebus.send { cmd: 'ced-dw', obj, from, to }
+      
     selectGadget: (id) ->     #jeebus.send { cmd: 'ced-sg', obj, id       }
     moveGadget: (id, x, y) -> #jeebus.send { cmd: 'ced-mg', obj, id, x, y }
       obj = $scope.circuit.gadgets[id]
@@ -136,7 +142,6 @@ circuitsCtrl = ($scope, jeebus) ->
         console.log "init circuits"
         for obj in temp
           $scope.circuits[obj.id] = obj
-          console.log obj.id
   
       .on 'data', (args...) -> 
         
