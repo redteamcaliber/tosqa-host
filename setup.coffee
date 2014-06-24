@@ -22,14 +22,17 @@ circuits.init =
     { name: "dummy", type: "Pipe" } # needed for dispatcher in HouseMon
     { name: "tableFill", type: "tableFill" }      # pre-load the database
     { name: "circuitFill", type: "circuitFill" }  # pre-load the database
-    # { name: "cb", type: "CanBridge" }
-    { name: "cb", type: "CanSerial" }
-    { name: "sp", type: "SerialPort" }
+    { name: "cb", type: "CanBridge" }
+    # { name: "cb", type: "CanSerial" }
+    # { name: "sp", type: "SerialPort" }
     { name: "bm", type: "BootMaster" }
     { name: "c1", type: "Clock" }
     { name: "m1", type: "MotionDemo" }
     { name: "c2", type: "Clock" }
     { name: "m2", type: "MotionDemo" }
+    { name: "demoA", type: "Clock" }
+    { name: "demoB", type: "AddTag" }
+    { name: "demoC", type: "LevelDB" }
   ]
   feeds: [
     { data: "/dev/tty.usbserial-A6006eRB", to: "sp.Port" }
@@ -37,17 +40,21 @@ circuits.init =
     { data: "101", to: "m1.Addr" }
     { data: "9s", to: "c2.In" }
     { data: "102", to: "m2.Addr" }
+    { data: "3s", to: "demoA.In" }
+    { data: "/demo/tick", to: "demoB.Tag" }
   ]
   wires: [
     { from: "cb.Out", to: "bm.In" }
     { from: "bm.Out", to: "cb.In" }
-    { from: "sp.From", to: "cb.SerIn" }
+    # { from: "sp.From", to: "cb.SerIn" }
     # { from: "cb.SerOut", to: "sp.To" }
     { from: "c1.Out", to: "m1.In" }
     { from: "m1.Out", to: "cb.In" }
     { from: "c2.Out", to: "m2.In" }
     { from: "m2.Out", to: "cb.In" }
-    { from: "cb.SerOut", to: "sp.To" } # comment out to disable test motion
+    # { from: "cb.SerOut", to: "sp.To" } # comment out to disable test motion
+    { from: "demoA.Out", to: "demoB.In" }
+    { from: "demoB.Out", to: "demoC.In" }
   ]
   labels: [
     { external: "In", internal: "dummy.In" }

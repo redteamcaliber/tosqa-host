@@ -52,11 +52,7 @@
             },
             {
                 "name": "cb",
-                "type": "CanSerial"
-            },
-            {
-                "name": "sp",
-                "type": "SerialPort"
+                "type": "CanBridge"
             },
             {
                 "name": "bm",
@@ -77,6 +73,18 @@
             {
                 "name": "m2",
                 "type": "MotionDemo"
+            },
+            {
+                "name": "demoA",
+                "type": "Clock"
+            },
+            {
+                "name": "demoB",
+                "type": "AddTag"
+            },
+            {
+                "name": "demoC",
+                "type": "LevelDB"
             }
         ],
         "feeds": [
@@ -99,6 +107,14 @@
             {
                 "data": "102",
                 "to": "m2.Addr"
+            },
+            {
+                "data": "3s",
+                "to": "demoA.In"
+            },
+            {
+                "data": "/demo/tick",
+                "to": "demoB.Tag"
             }
         ],
         "wires": [
@@ -109,10 +125,6 @@
             {
                 "from": "bm.Out",
                 "to": "cb.In"
-            },
-            {
-                "from": "sp.From",
-                "to": "cb.SerIn"
             },
             {
                 "from": "c1.Out",
@@ -131,8 +143,12 @@
                 "to": "cb.In"
             },
             {
-                "from": "cb.SerOut",
-                "to": "sp.To"
+                "from": "demoA.Out",
+                "to": "demoB.In"
+            },
+            {
+                "from": "demoB.Out",
+                "to": "demoC.In"
             }
         ],
         "labels": [
