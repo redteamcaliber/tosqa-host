@@ -84,7 +84,6 @@ circuitsCtrl = ($scope, jeebus) ->
   #function to redraw editor
   $scope.redraw =() ->
     console.log 'redraw'
-    console.log $scope.circuit
     $scope.circuit =
       gadgets:{}
       wires:{}
@@ -93,7 +92,6 @@ circuitsCtrl = ($scope, jeebus) ->
      .on 'data', (args...) ->
         temp = @rows
         for obj in temp
-          console.log obj
           $scope.circuit.gadgets[obj.id] = obj
         for obj in temp
           angular.forEach obj.feed, (v,k)-> 
@@ -102,7 +100,6 @@ circuitsCtrl = ($scope, jeebus) ->
             to = (v.split ".")[0]
             if $scope.circuit.gadgets[to]?
               # TODO:remove wire from db
-              console.log "#{obj.id}.#{k}/#{v}"
               $scope.circuit.wires["#{obj.id}.#{k}/#{v}"] = 0
 
   $scope.$watch 'addPin', (pin) ->
@@ -124,7 +121,6 @@ circuitsCtrl = ($scope, jeebus) ->
   $scope.$watch 'currSel.title', (x) ->
     if $scope.currSel?
       id = $scope.currSel.id
-      console.log id
       obj = $scope.circuit.gadgets[id]
       obj.title = x
       jeebus.put "/circuit/demo1/#{id}", obj

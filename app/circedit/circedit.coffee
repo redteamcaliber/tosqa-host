@@ -162,7 +162,6 @@ ng.directive 'jbCircuitEditor', ->
         { id, from, to, source, target, cap }
     
     scope.$watch "data", (->
-      console.log "gadgets changed"
       redraw()
     ), true
     
