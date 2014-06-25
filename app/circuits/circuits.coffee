@@ -78,14 +78,14 @@ circuitsCtrl = ($scope, jeebus) ->
         console.log "object #{key} is added", value
         
         if value.wire?
-          console.log "wires:", value.wire
+          # console.log "wires:", value.wire
           #TODO: outputs can have other forms than "Out"
           k = "#{key}.Out/#{value.wire.Out}"
           $scope.circuit.wires[k] = 0
 
         if value.feed?
           console.log value.feed
-          $scope.circuit.feeds.push value.feed
+          # $scope.circuit.feeds.push value.feed
           
       index = old.indexOf(key) # remove item from old
       if index > -1
@@ -130,6 +130,7 @@ circuitsCtrl = ($scope, jeebus) ->
     addWire: (from, to) ->   
       #jeebus.send { cmd: 'ced-aw', obj, from, to }
       id = (from.split '.')[0]
+      # console.log (from.split '.')[1]
       obj = $scope.circuit.gadgets[id]
       obj.wire = {"Out":to}
       jeebus.put "/circuit/demo1/#{id}", obj 
