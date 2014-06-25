@@ -47,10 +47,6 @@
                 "type": "tableFill"
             },
             {
-                "name": "circuitFill",
-                "type": "circuitFill"
-            },
-            {
                 "name": "cb",
                 "type": "CanBridge"
             },
