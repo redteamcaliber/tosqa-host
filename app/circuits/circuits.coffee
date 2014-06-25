@@ -11,34 +11,41 @@ circuitsCtrl = ($scope, jeebus) ->
   
   $scope.circuits ={}
   
+  # '#fbea5b'
+  # #dacfc0
+  # #d8d8d8
+  # #d2e38f
+  # #757779
+  
+  
   $scope.gadgets =
     Pipe:
       name: 'Pipeline'
-      shade: 'lightyellow'
+      shade: '#d8d8d8'
       icon: '\uf061' # fa-arrow-right
       inputs: 'In'
       outputs: 'Out'
     Printer:
-      shade: 'lightblue'
+      shade: '#dacfc0'
       icon: '\uf02f' # fa-print
       inputs: 'In In2'
     clock:
-      shade: 'pink'
+      shade: '#dacfc0'
       icon: '\uf017' # fa-clock-o
       inputs: 'Rate'
-      outputs: 'Pusle'
+      outputs: 'Pulse'
     tosqa_logo:
-      shade: 'pink'
+      shade: '#fbea5b'
       icon: 'TQ' # fa-clock-o
       inputs: 'Rate'
       outputs: 'X Y'
     StepGen:
-      shade: 'lightgreen'
+      shade: '#d2e38f'
       icon: '\uf013' # fa-cog
       inputs: 'Params'
       outputs: 'Out'
     SSB:
-      shade: 'lightgray'
+      shade: '#fbea5b'
       icon: '\uf0b2' # fa-arrows-alt
       inputs: 'Cmds'
       
@@ -63,8 +70,8 @@ circuitsCtrl = ($scope, jeebus) ->
       
   $scope.circuit =
     gadgets:{}
-    wires:[]
-    feeds:[]
+    wires:{}
+    feeds:{}
       
   updatePinList = () ->
     $scope.inputPins = []
@@ -115,7 +122,13 @@ circuitsCtrl = ($scope, jeebus) ->
     console.log 'fix id', x
     updatePinList() # for new and deleted gadgets
   $scope.$watch 'currSel.title', (x) ->
-    console.log 'fix title', x
+    if $scope.currSel?
+      id = $scope.currSel.id
+      console.log id
+      obj = $scope.circuit.gadgets[id]
+      obj.title = x
+      jeebus.put "/circuit/demo1/#{id}", obj
+      console.log 'fix title', x
       
   handlers =
     addGadget: (x, y) ->      
@@ -123,7 +136,7 @@ circuitsCtrl = ($scope, jeebus) ->
         # jeebus.send { cmd: 'ced-ag', obj}
         id= "g" + String Date.now()%1234567
         type = $scope.newtype
-        obj = {title:"#{type}-#{id}", type:$scope.newtype, x:x, y:y}
+        obj = {title:"#{type}", type:$scope.newtype, x:x, y:y}
         jeebus.put "/circuit/demo1/#{id}", obj
         $scope.redraw()          
         
@@ -148,6 +161,11 @@ circuitsCtrl = ($scope, jeebus) ->
       jeebus.put "/circuit/demo1/#{id}", obj
       $scope.redraw()
     selectGadget: (id) ->     #jeebus.send { cmd: 'ced-sg', obj, id       }
+      $scope.currSel ={}
+      $scope.currSel.id = id
+      $scope.currSel.title = $scope.circuit.gadgets[id].title
+      $scope.currSel.type = $scope.circuit.gadgets[id].type
+      
     moveGadget: (id, x, y) -> #jeebus.send { cmd: 'ced-mg', obj, id, x, y }
       obj = $scope.circuit.gadgets[id]
       obj.x = x

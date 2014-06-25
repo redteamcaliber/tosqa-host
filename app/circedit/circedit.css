@@ -11,7 +11,7 @@ jb-circuit-editor>svg {
   font-size: 12px;
 }
 .gadget .outline {
-  stroke: #00f;
+  stroke: #505050;
   fill-opacity: 0.8;
   cursor: move;
 }
@@ -20,7 +20,7 @@ jb-circuit-editor>svg {
   text-anchor: middle;
 }
 .gadget .type {
-  fill: #00f;
+  fill: #666;
   text-anchor: middle;
 }
 .gadget .hit {
