@@ -22,6 +22,11 @@ circuitsCtrl = ($scope, jeebus) ->
       shade: 'lightblue'
       icon: '\uf02f' # fa-print
       inputs: 'In In2'
+    clock:
+      shade: 'pink'
+      icon: '\uf017' # fa-clock-o
+      inputs: 'Rate'
+      outputs: 'Out'
     StepGen:
       shade: 'lightgreen'
       icon: '\uf013' # fa-cog
@@ -52,8 +57,9 @@ circuitsCtrl = ($scope, jeebus) ->
       In: 'g2.In'
       
   $scope.circuit =
-    gadgets:{} 
+    gadgets:{}
     wires:[]
+    feeds:[]
       
   updatePinList = () ->
     $scope.inputPins = []
@@ -72,9 +78,15 @@ circuitsCtrl = ($scope, jeebus) ->
         console.log "object #{key} is added", value
         
         if value.wire?
+          console.log "wires:", value.wire
+          #TODO: outputs can have other forms than "Out"
           k = "#{key}.Out/#{value.wire.Out}"
           $scope.circuit.wires[k] = 0
 
+        if value.feed?
+          console.log value.feed
+          $scope.circuit.feeds.push value.feed
+          
       index = old.indexOf(key) # remove item from old
       if index > -1
         old.splice index, 1
@@ -108,11 +120,10 @@ circuitsCtrl = ($scope, jeebus) ->
     addGadget: (x, y) ->      
       if $scope.newtype? 
         # jeebus.send { cmd: 'ced-ag', obj}
-        id= "g" + String Date.now()
+        id= "g" + String Date.now()%1234567
         type = $scope.newtype
         obj = {title:"#{type}-#{id}", type:$scope.newtype, x:x, y:y}
-
-        jeebus.put "/circuit/demo1/#{id}", obj 
+        jeebus.put "/circuit/demo1/#{id}", obj         
     delGadget: (id) ->   
       # jeebus.send { cmd: 'ced-dg', obj, id}      
       jeebus.put "/circuit/demo1/#{id}"  # put nil value to delete id
@@ -134,27 +145,31 @@ circuitsCtrl = ($scope, jeebus) ->
       obj.y = y
       jeebus.put "/circuit/demo1/#{id}", obj
 
+
   $scope.$on 'circuit', (event, type, args...) ->
     console.log 'C:', type, args...
     handlers[type] args...
+  
     
   setup = ->
     jeebus.attach 'circuit/demo1'
-      .on 'sync', (args...) ->
+     .on 'sync', (args...) ->
         temp = @rows
-        console.log "init circuits"
         for obj in temp
           $scope.circuits[obj.id] = obj
+        console.log "init circuits"
   
-      .on 'data', (args...) -> 
-        
+     .on 'data', (args...) ->        
         console.log 111, args
       
         #1. TODO: check for value, else remove
         #2. add to circuits
         # $scope.circuits push k, v
         #3. tell editor
-
+    # jeebus.attach 'demo'
+    #  .on 'data', (args...) ->
+    #     console.log 'data-tim', args
+      
 
   setup()  if $scope.serverStatus is 'connected'
   $scope.$on 'ws-open', setup
