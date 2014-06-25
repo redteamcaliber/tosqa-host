@@ -26,7 +26,12 @@ circuitsCtrl = ($scope, jeebus) ->
       shade: 'pink'
       icon: '\uf017' # fa-clock-o
       inputs: 'Rate'
-      outputs: 'Out'
+      outputs: 'Pusle'
+    tosqa_logo:
+      shade: 'pink'
+      icon: 'TQ' # fa-clock-o
+      inputs: 'Rate'
+      outputs: 'X Y'
     StepGen:
       shade: 'lightgreen'
       icon: '\uf013' # fa-cog
@@ -69,34 +74,30 @@ circuitsCtrl = ($scope, jeebus) ->
           $scope.inputPins.push "#{gid}.#{p}"
     $scope.inputPins.sort()
   
-  # watch circuits for change
-  $scope.$watch "circuits", ((newValue, oldValue) ->
-    old = Object.keys oldValue
-    angular.forEach newValue, (value, key) ->
-      if old.indexOf key is -1 # if key does not exist in oldValue, key add
-        $scope.circuit.gadgets[key] = value
-        console.log "object #{key} is added", value
-        
-        if value.wire?
-          # console.log "wires:", value.wire
-          #TODO: outputs can have other forms than "Out"
-          k = "#{key}.Out/#{value.wire.Out}"
-          $scope.circuit.wires[k] = 0
+  #function to redraw editor
+  $scope.redraw =() ->
+    console.log 'redraw'
+    console.log $scope.circuit
+    $scope.circuit =
+      gadgets:{}
+      wires:{}
+      feeds:{}
+    jeebus.attach 'circuit/demo1'
+     .on 'data', (args...) ->
+        temp = @rows
+        for obj in temp
+          console.log obj
+          $scope.circuit.gadgets[obj.id] = obj
+        for obj in temp
+          angular.forEach obj.feed, (v,k)-> 
+            $scope.circuit.feeds["#{obj.id}.#{k}"] = v
+          angular.forEach obj.wire, (v,k)->
+            to = (v.split ".")[0]
+            if $scope.circuit.gadgets[to]?
+              # TODO:remove wire from db
+              console.log "#{obj.id}.#{k}/#{v}"
+              $scope.circuit.wires["#{obj.id}.#{k}/#{v}"] = 0
 
-        if value.feed?
-          console.log value.feed
-          # $scope.circuit.feeds.push value.feed
-          
-      index = old.indexOf(key) # remove item from old
-      if index > -1
-        old.splice index, 1
-    for each in old  # old now contains all keys that do no onger exist in newValue
-      # index = $scope.circuit.gadgets.indexOf(each)
-      # $scope.circuit.gadgets.splice index, 1
-      console.log "this key is removed:", key
-            
-  ), true
-  
   $scope.$watch 'addPin', (pin) ->
     if pin
       $scope.circuit.feeds[pin] ?= []
@@ -123,33 +124,43 @@ circuitsCtrl = ($scope, jeebus) ->
         id= "g" + String Date.now()%1234567
         type = $scope.newtype
         obj = {title:"#{type}-#{id}", type:$scope.newtype, x:x, y:y}
-        jeebus.put "/circuit/demo1/#{id}", obj         
-    delGadget: (id) ->   
+        jeebus.put "/circuit/demo1/#{id}", obj
+        $scope.redraw()          
+        
+    delGadget: (id) ->
       # jeebus.send { cmd: 'ced-dg', obj, id}      
       jeebus.put "/circuit/demo1/#{id}"  # put nil value to delete id
+      $scope.redraw()          
+      
     addWire: (from, to) ->   
       #jeebus.send { cmd: 'ced-aw', obj, from, to }
       id = (from.split '.')[0]
-      # console.log (from.split '.')[1]
+      output = (from.split '.')[1]
       obj = $scope.circuit.gadgets[id]
-      obj.wire = {"Out":to}
+      obj.wire = obj.wire or {}
+      obj.wire[output] = to
       jeebus.put "/circuit/demo1/#{id}", obj 
+      $scope.redraw()
     delWire: (from, to) ->    #jeebus.send { cmd: 'ced-dw', obj, from, to }
       id = (from.split '.')[0]
       obj = $scope.circuit.gadgets[id]
       obj.wire = null
       jeebus.put "/circuit/demo1/#{id}", obj
+      $scope.redraw()
     selectGadget: (id) ->     #jeebus.send { cmd: 'ced-sg', obj, id       }
     moveGadget: (id, x, y) -> #jeebus.send { cmd: 'ced-mg', obj, id, x, y }
       obj = $scope.circuit.gadgets[id]
       obj.x = x
       obj.y = y
       jeebus.put "/circuit/demo1/#{id}", obj
+      $scope.redraw()          
+      
 
 
   $scope.$on 'circuit', (event, type, args...) ->
     console.log 'C:', type, args...
     handlers[type] args...
+    
   
     
   setup = ->
@@ -159,10 +170,10 @@ circuitsCtrl = ($scope, jeebus) ->
         for obj in temp
           $scope.circuits[obj.id] = obj
         console.log "init circuits"
-  
-     .on 'data', (args...) ->        
-        console.log 111, args
-      
+     # .on 'data', (args...) ->
+     #    console.log 111, args
+     $scope.redraw()
+    
         #1. TODO: check for value, else remove
         #2. add to circuits
         # $scope.circuits push k, v

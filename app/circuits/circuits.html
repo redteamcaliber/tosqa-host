@@ -3,6 +3,7 @@
   <div class="pure-u-1">
     <h1>Circuit Editor</h1>
     <select ng-model="newtype" ng-options="k as k for (k,v) in gadgets"></select>
+    <button ng-click="redraw()">Echo Test</button>
     <jb-circuit-editor data="circuit" defs="gadgets"></jb-circuit-editor>
   </div>
 </div>
