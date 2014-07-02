@@ -9,7 +9,7 @@ ng.directive 'jbCircuitEditor', ->
     
   link: (scope, elem, attr) ->  
     svg = d3.select(elem[0]).append 'svg'
-      .attr height: '60%'
+      .attr width: '100%', height: '400px'
     diag = d3.svg.diagonal()
       .projection (d) -> [d.y, d.x] # undo the x/y reversal from findPin
     
