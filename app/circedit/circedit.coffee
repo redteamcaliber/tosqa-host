@@ -68,25 +68,27 @@ ng.directive 'jbCircuitEditor', ->
 
       g = gadgets.enter().append('g').call(gadgetDrag)
         .attr class: 'gadget'
-      g.append('rect')
+      g.append('rect') #the gadget outline
         .each (d) ->
           d3.select(@).attr
             class: 'outline'
             # 1px lines render sharply when on a 0.5px offset
             x: 0.5 - d.hw, y: 0.5 - d.hh
             width: 2 * d.hw, height: 2 * d.hh
+            rx: 5
+            ry: 5
         .on 'mousedown', (d) -> emit 'selectGadget', d.id
         .style fill: (d) -> d.def.shade
-      g.append('text').text (d) -> d.title or d.def.name
+      g.append('text').text (d) -> d.type
         .attr class: 'title', y: (d) -> 12 - d.hh
-      g.append('text').text (d) -> "#{d.type} - #{d.id}"
+      g.append('text').text (d) -> "#{d.id}"
         .attr class: 'type', y: (d) -> -4 + d.hh
-      g.append('text').text (d) -> d.def.icon
-        .attr class: 'iconfont', x: 0, y: 0
+      #g.append('text').text (d) -> d.def.icon #disable the icon for now
+      #  .attr class: 'iconfont', x: 0, y: 0
       g.append('text').text (d) -> '\uf014' # fa-trash-o
-        .attr class: 'iconfont', x: ((d) -> d.hw-8), y: ((d) -> 8-d.hh)
+        .attr class: 'delete iconfont', x: ((d) -> d.hw-8), y: ((d) -> 8-d.hh)
         .style 'font-size': '12px'
-        .on 'mousedown', (d) ->
+        .on 'mouseup', (d) ->
           d3.event.stopPropagation()
           emit 'delGadget', d.id
       gadgets.exit().remove()
@@ -98,6 +100,8 @@ ng.directive 'jbCircuitEditor', ->
       p.append('circle').call(pinDrag)
         .attr class: 'hit', cx: ((d) -> d.x+.5), cy: ((d) -> d.y+.5), r: 7
         .on 'mouseup', (d) -> dragInfo.to = d.pin
+        .on 'mouseover', (d) -> d3.select(this).classed('active',true)
+        .on 'mouseout', (d) -> d3.select(this).classed('active',false)
       p.append('text').text (d) -> d.name
         .attr
           class: (d) -> d.dir

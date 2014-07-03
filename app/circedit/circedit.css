@@ -11,28 +11,34 @@ jb-circuit-editor>svg {
   font-size: 12px;
   cursor: default;
 }
-.gadget .outline {
-  /*stroke: #505050;*/
-  fill-opacity: 0.8;
-}
-.gadget .title {
-  fill: #808080;
-  text-anchor: middle;
-}
-.gadget .type {
-  fill: #666;
-  text-anchor: middle;
-}
-.gadget .hit {
-  fill-opacity: 0.2;
-  cursor: pointer;
-}
-.gadget .in {
-  text-anchor: start;
-}
-.gadget .out {
-  text-anchor: end;
-}
+  .gadget .outline {
+    /*stroke: #505050;*/
+    fill-opacity: 0.8;
+  }
+  .gadget .delete {
+    cursor: pointer;
+  }
+  .gadget .title {
+    fill: black;
+    text-anchor: middle;
+  }
+  .gadget .type {
+    fill: #ccc;
+    text-anchor: middle;
+  }
+  .gadget .hit {
+    fill-opacity: 0;
+    cursor: pointer;
+  }
+  .gadget .hit.active {
+    stroke: blue;
+  }
+  .gadget .in {
+    text-anchor: start;
+  }
+  .gadget .out {
+    text-anchor: end;
+  }
 .wire {
   stroke: #808080;
   stroke-width: 1px;
