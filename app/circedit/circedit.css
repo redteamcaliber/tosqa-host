@@ -30,7 +30,7 @@ jb-circuit-editor>svg {
     fill-opacity: 0;
     cursor: pointer;
   }
-  .gadget .hit.active {
+  .gadget .hit:hover {
     stroke: blue;
   }
   .gadget .in {

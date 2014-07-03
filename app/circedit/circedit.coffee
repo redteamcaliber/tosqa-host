@@ -100,8 +100,6 @@ ng.directive 'jbCircuitEditor', ->
       p.append('circle').call(pinDrag)
         .attr class: 'hit', cx: ((d) -> d.x+.5), cy: ((d) -> d.y+.5), r: 7
         .on 'mouseup', (d) -> dragInfo.to = d.pin
-        .on 'mouseover', (d) -> d3.select(this).classed('active',true)
-        .on 'mouseout', (d) -> d3.select(this).classed('active',false)
       p.append('text').text (d) -> d.name
         .attr
           class: (d) -> d.dir
