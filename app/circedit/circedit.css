@@ -9,11 +9,11 @@ jb-circuit-editor>svg {
 }
 .gadget {
   font-size: 12px;
+  cursor: default;
 }
 .gadget .outline {
   /*stroke: #505050;*/
   fill-opacity: 0.8;
-  cursor: move;
 }
 .gadget .title {
   fill: #808080;
@@ -36,7 +36,6 @@ jb-circuit-editor>svg {
 .wire {
   stroke: #808080;
   stroke-width: 1px;
-  cursor: crosshair;
 }
 #drag.drawing {
   stroke: #f00;
