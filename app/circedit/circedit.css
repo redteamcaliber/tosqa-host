@@ -33,9 +33,6 @@ jb-circuit-editor > svg {
   fill-opacity: 0;
   cursor: pointer;
 }
-.gadget .hit:hover {
-  stroke: #00f;
-}
 .gadget .in,
 .gadget .out {
   text-anchor: start;
@@ -47,10 +44,16 @@ jb-circuit-editor > svg {
   opacity: 1;
   transition: opacity 0.2s;
 }
+.gadget .pins.hover .hit {
+  stroke: #1f8dd6;
+  stroke-width: 1.5px;
+}
 .wire {
   stroke: #808080;
-  stroke-width: 1px;
+  stroke-width: 1.5px;
+  cursor: pointer;
 }
 #drag.drawing {
-  stroke: #f00;
+  stroke: #1f8dd6;
+  stroke-width: 1.5px;
 }

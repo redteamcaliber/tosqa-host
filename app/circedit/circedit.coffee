@@ -104,7 +104,7 @@ ng.directive 'jbCircuitEditor', ->
       p.append('circle')
         .attr class: 'pin', cx: ((d) -> d.x+0.5), cy: ((d) -> d.y+.5), r: 3
       p.append('circle').call(pinDrag)
-        .attr class: 'hit', cx: ((d) -> d.x+0.5), cy: ((d) -> d.y+.5), r: 7
+        .attr class: 'hit', cx: ((d) -> d.x+0.5), cy: ((d) -> d.y+.5), r: 9
         .on 'mouseup',  (d) -> dragInfo.to = d.pin
         .on 'mouseover', (d) -> d3.select(this.parentNode).classed('hover',true)
         .on 'mouseout',  (d) -> d3.select(this.parentNode).classed('hover',false)

@@ -3,6 +3,7 @@
 // # #d8d8d8
 // # #d2e38f
 // # #757779
+//#1f8dd6
 
 jb-circuit-editor
   & > svg
@@ -33,8 +34,6 @@ jb-circuit-editor
   .hit
     fill-opacity 0
     cursor pointer
-    &:hover
-      stroke blue
   .in, .out
     text-anchor start
     opacity 0
@@ -42,10 +41,15 @@ jb-circuit-editor
   .pins.hover .in, .pins.hover .out
     opacity 1
     transition opacity 0.2s
+  .pins.hover .hit
+    stroke #1f8dd6
+    stroke-width 1.5px
 .wire
   stroke #808080
-  stroke-width 1px
+  stroke-width 1.5px
+  cursor pointer
 
 #drag
   &.drawing
-    stroke #f00
+    stroke #1f8dd6
+    stroke-width 1.5px
