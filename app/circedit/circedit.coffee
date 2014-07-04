@@ -11,7 +11,7 @@ ng.directive 'jbCircuitEditor', ->
     svg = d3.select(elem[0]).append 'svg'
       .attr width: '100%', height: '400px'
     diag = d3.svg.diagonal()
-      .projection (d) -> [d.y, d.x] # undo the x/y reversal from findPin
+      .projection (d) -> [d.x, d.y] # undo the x/y reversal from findPin
     
     glist = wlist = gadgets = wires = null
     
@@ -53,7 +53,8 @@ ng.directive 'jbCircuitEditor', ->
       .on 'drag', (d) ->
         [mx,my] = d3.mouse(@)
         orig = dragInfo.source
-        dragInfo.target = x: orig.x+my-d.y, y: orig.y+mx-d.x # flipped
+        #dragInfo.target = x: orig.x+my-d.y, y: orig.y+mx-d.x # flipped
+        dragInfo.target = x: orig.x+mx-d.x, y: orig.y+my-d.y # flipped
         dragWire.attr class: 'drawing', fill: 'none', d: diag
       .on 'dragend', (d) ->
         dragWire.classed 'drawing', false
@@ -77,12 +78,15 @@ ng.directive 'jbCircuitEditor', ->
             width: 2 * d.hw, height: 2 * d.hh
             rx: 5
             ry: 5
-        .on 'mousedown', (d) -> emit 'selectGadget', d.id
+        .on 'mousedown', (d) -> 
+          d3.selectAll('.gadget-container').classed 'active', false
+          d3.select(this).classed 'active', true
+          emit 'selectGadget', d.id
         .style fill: (d) -> d.def.shade
       g.append('text').text (d) -> d.type
-        .attr class: 'title', y: (d) -> 12 - d.hh
+        .attr class: 'title', y: (d) -> 24- d.hh
       g.append('text').text (d) -> "#{d.id}"
-        .attr class: 'type', y: (d) -> - d.hh - 8
+        .attr class: 'type', x: ((d) -> d.hw), y: (d) -> - d.hh - 8
       #g.append('text').text (d) -> d.def.icon #disable the icon for now
       #  .attr class: 'iconfont', x: 0, y: 0
       g.append('text').text (d) -> '\uf014' # fa-trash-o
@@ -103,8 +107,8 @@ ng.directive 'jbCircuitEditor', ->
       p.append('text').text (d) -> d.name
         .attr
           class: (d) -> d.dir
-          x: (d) -> if d.dir is 'in' then d.x + 10 else d.x - 10
-          y: (d) -> d.y + 5
+          x: (d) -> d.x
+          y: (d) -> if d.dir is 'in' then d.y-8 else d.y+16
       pins.exit().remove()
 
       wires.enter().insert('path', 'g') # uses insert to move to back right away
@@ -131,29 +135,32 @@ ng.directive 'jbCircuitEditor', ->
       for g in glist when gid is g.id
         for p in g.pins when pname is p.name
           # reverses x and y and uses projection to get horizontal splines
-          return y: g.x + p.x + .5, x: g.y + p.y + .5, id: gid
+          return y: g.y + p.y + .5, x: g.x + p.x + .5, id: gid
 
     prepareData = ->
-      ystep = 20  # vertical separation between pins
+      xstep = 20  # horizontal separation between pins
       width = 140 # fixed width for now
+      height = 40
 
       # set up a list of gadgets with sizes and relative pin coordinates
       glist = for id, g of scope.data.gadgets
         {x,y,title,type} = g
         def = scope.defs[type]
         pins = []
-        placePins = (pnames, dir, xi) ->
+
+        placePins = (pnames, dir, yi) ->
           nlist = if pnames then pnames.split ' ' else []
-          yi = -ystep * (nlist.length - 1) >> 1
+          xi = -100 + xstep * (nlist.length - 1) >> 1
           for name in nlist
-            pins.push { x: xi, y: yi, name, dir, pin: "#{id}.#{name}" }
-            yi += ystep
+            pins.push { x: xi, y: yi, name, dir, pin: "#{id}.#{name}" }       
+            xi += xstep
           nlist.length
+
         hw = width / 2
-        ins = placePins def.inputs, 'in', -hw
-        outs = placePins def.outputs, 'out', hw
-        height = 40 + ystep * (if ins > outs then ins else outs)
         hh = height / 2
+        ins = placePins def.inputs, 'in', -hh
+        outs = placePins def.outputs, 'out', hh
+
         { id, x, y, title, type, def, pins, hw, hh, height }
 
       # convert object to list and lookup the wire endpoints in the gadgets

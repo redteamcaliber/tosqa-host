@@ -1,47 +1,50 @@
-jb-circuit-editor>svg
-  border 1px solid lightgray
-  
+// # '#fbea5b'
+// # #dacfc0
+// # #d8d8d8
+// # #d2e38f
+// # #757779
+
+jb-circuit-editor
+  & > svg
+    border 1px solid #d3d3d3
+
 .iconfont
   text-anchor middle
   dominant-baseline central
   font-family FontAwesome
   font-size 20px
-  
+
 .gadget
   font-size 12px
-  
-  .outline
-    stroke blue
-    fill-opacity .8
-    cursor move
-  .title
-    fill gray
-    text-anchor middle    
-  .type
-    fill blue
-    text-anchor middle
-  .pin
-    // stroke blue
-    // stroke-width 2px
-    // fill lightgray
-  .hit
-    // fill none
-    // stroke lightgray
-    // stroke-width 1px
-    fill-opacity .2
-    // fill red
+  cursor default
+  .gadget-container
+    fill-opacity 0.8
+  .delete
     cursor pointer
-  .in
-    text-anchor start
-  .out
+  .title
+    fill black
+    text-anchor middle
+  .type
+    fill #ccc
     text-anchor end
+  .hit
+    fill-opacity 0
+    cursor pointer
+    &:hover
+      stroke blue
+  .in, .out
+    text-anchor start
 
 .wire
-  stroke gray
+  stroke #808080
   stroke-width 1px
-  cursor crosshair
 
 #drag
-  // stroke-width 2px
-#drag.drawing
-  stroke red
+  &.drawing
+    stroke #f00
+
+.active
+  stroke black
+  stroke-width 2px
+  stroke-opacity 0.3
+
