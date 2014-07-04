@@ -7,11 +7,11 @@ ng.directive 'jbCircuitEditor', ->
     defs: '='
     data: '='
     
-  link: (scope, elem, attr) ->  
+  link: (scope, elem, attr) ->
     svg = d3.select(elem[0]).append 'svg'
       .attr width: '100%', height: '400px'
     diag = d3.svg.diagonal()
-      .projection (d) -> [d.x, d.y] # undo the x/y reversal from findPin
+      .projection (d) -> [d.x, d.y]
     
     glist = wlist = gadgets = wires = null
     
@@ -27,13 +27,13 @@ ng.directive 'jbCircuitEditor', ->
       .on 'drag', (d) ->
         d.x = d3.event.x | 0 # stay on int coordinates
         d.y = d3.event.y | 0 # stay on int coordinates
-        d3.select(@).attr transform: (d) -> "translate(#{d.x},#{d.y})"
+      d3.select(@).attr transform: (d) -> "translate(#{d.x},#{d.y})"
         # recalculate endpoints and move all wires attached to this gadget
-        wires.filter (w) -> w.source.id is d.id or w.target.id is d.id
-          .each (d) ->
-            d.source = findPin d.from
-            d.target = findPin d.to
-          .attr d: diag
+      wires.filter (w) -> w.source.id is d.id or w.target.id is d.id
+        .each (d) ->
+          d.source = findPin d.from
+          d.target = findPin d.to
+        .attr d: diag
       .on 'dragend', (d) ->
         g = scope.data.gadgets[d.id]
         unless g.x is d.x and g.y is d.y
@@ -53,8 +53,7 @@ ng.directive 'jbCircuitEditor', ->
       .on 'drag', (d) ->
         [mx,my] = d3.mouse(@)
         orig = dragInfo.source
-        #dragInfo.target = x: orig.x+my-d.y, y: orig.y+mx-d.x # flipped
-        dragInfo.target = x: orig.x+mx-d.x, y: orig.y+my-d.y # flipped
+        dragInfo.target = x: orig.x+mx-d.x, y: orig.y+my-d.y
         dragWire.attr class: 'drawing', fill: 'none', d: diag
       .on 'dragend', (d) ->
         dragWire.classed 'drawing', false
@@ -74,41 +73,43 @@ ng.directive 'jbCircuitEditor', ->
           d3.select(@).attr
             class: 'gadget-container'
             # 1px lines render sharply when on a 0.5px offset
-            x: 0.5 - d.hw, y: 0.5 - d.hh
-            width: 2 * d.hw, height: 2 * d.hh
+            x: 0, y: 0
+            width: 140, height: 40
             rx: 5
             ry: 5
-        .on 'mousedown', (d) -> 
+        .on 'mousedown', (d) ->
           d3.selectAll('.gadget-container').classed 'active', false
           d3.select(this).classed 'active', true
           emit 'selectGadget', d.id
         .style fill: (d) -> d.def.shade
       g.append('text').text (d) -> d.type
-        .attr class: 'title', y: (d) -> 24- d.hh
+        .attr class: 'title', x: 10, y: 24
       g.append('text').text (d) -> "#{d.id}"
-        .attr class: 'type', x: ((d) -> d.hw), y: (d) -> - d.hh - 8
+        .attr class: 'label', x: 140, y: - 8
       #g.append('text').text (d) -> d.def.icon #disable the icon for now
       #  .attr class: 'iconfont', x: 0, y: 0
       g.append('text').text (d) -> '\uf014' # fa-trash-o
-        .attr class: 'delete iconfont', x: ((d) -> d.hw-8), y: ((d) -> 8-d.hh)
+        .attr class: 'delete iconfont', x: 130, y: 10
         .style 'font-size': '12px'
         .on 'mouseup', (d) ->
           d3.event.stopPropagation()
           emit 'delGadget', d.id
       gadgets.exit().remove()
 
+
+      # Add input and output pins
       pins = gadgets.selectAll('.pin').data (d) -> d.pins
-      p = pins.enter()
+      p = pins.enter().append('g')
       p.append('circle')
-        .attr class: 'pin', cx: ((d) -> d.x+.5), cy: ((d) -> d.y+.5), r: 3
+        .attr class: 'pin', cx: ((d) -> d.x+0.5), cy: ((d) -> d.y+.5), r: 3
       p.append('circle').call(pinDrag)
-        .attr class: 'hit', cx: ((d) -> d.x+.5), cy: ((d) -> d.y+.5), r: 7
+        .attr class: 'hit', cx: ((d) -> d.x+0.5), cy: ((d) -> d.y+.5), r: 7
         .on 'mouseup', (d) -> dragInfo.to = d.pin
       p.append('text').text (d) -> d.name
         .attr
           class: (d) -> d.dir
           x: (d) -> d.x
-          y: (d) -> if d.dir is 'in' then d.y-8 else d.y+16
+          y: (d) -> if d.dir is 'in' then d.x-7 else d.y+18
       pins.exit().remove()
 
       wires.enter().insert('path', 'g') # uses insert to move to back right away
@@ -127,14 +128,14 @@ ng.directive 'jbCircuitEditor', ->
         emit 'delWire', wireUnderCursor.from, wireUnderCursor.to
         # wireUnderCursor = null
     svg.on 'dblclick', ->
-        [x,y] = d3.mouse(@)
-        emit 'addGadget', x|0, y|0 # convert to ints
+      [x,y] = d3.mouse(@)
+      emit 'addGadget', x|0, y|0 # convert to ints
 
     findPin = (pin) ->
       [gid,pname] = pin.split '.'
       for g in glist when gid is g.id
         for p in g.pins when pname is p.name
-          # reverses x and y and uses projection to get horizontal splines
+          # uses projection to get horizontal splines
           return y: g.y + p.y + .5, x: g.x + p.x + .5, id: gid
 
     prepareData = ->
@@ -150,18 +151,18 @@ ng.directive 'jbCircuitEditor', ->
 
         placePins = (pnames, dir, yi) ->
           nlist = if pnames then pnames.split ' ' else []
-          xi = -100 + xstep * (nlist.length - 1) >> 1
+          xi = xstep * (nlist.length-1) #>> 1 # why this bitshift?
           for name in nlist
-            pins.push { x: xi, y: yi, name, dir, pin: "#{id}.#{name}" }       
+            pins.push { x: xi, y: yi, name, dir, pin: "#{id}.#{name}" }
             xi += xstep
           nlist.length
 
         hw = width / 2
         hh = height / 2
-        ins = placePins def.inputs, 'in', -hh
-        outs = placePins def.outputs, 'out', hh
+        ins = placePins def.inputs, 'in', 0
+        outs = placePins def.outputs, 'out', height
 
-        { id, x, y, title, type, def, pins, hw, hh, height }
+        { id, x, y, title, type, def, pins, hw, width, hh, height }
 
       # convert object to list and lookup the wire endpoints in the gadgets
       wlist = for id, cap of scope.data.wires

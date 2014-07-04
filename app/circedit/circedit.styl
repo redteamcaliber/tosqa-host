@@ -23,8 +23,8 @@ jb-circuit-editor
     cursor pointer
   .title
     fill black
-    text-anchor middle
-  .type
+    text-anchor start
+  .label
     fill #ccc
     text-anchor end
   .hit
@@ -34,6 +34,9 @@ jb-circuit-editor
       stroke blue
   .in, .out
     text-anchor start
+    opacity 0.2
+    &:hover
+      opacity 1
 
 .wire
   stroke #808080
