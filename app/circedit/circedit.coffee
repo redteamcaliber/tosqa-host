@@ -71,7 +71,7 @@ ng.directive 'jbCircuitEditor', ->
       g.append('rect') #the gadget outline
         .each (d) ->
           d3.select(@).attr
-            class: 'outline'
+            class: 'gadget-container'
             # 1px lines render sharply when on a 0.5px offset
             x: 0.5 - d.hw, y: 0.5 - d.hh
             width: 2 * d.hw, height: 2 * d.hh
@@ -82,7 +82,7 @@ ng.directive 'jbCircuitEditor', ->
       g.append('text').text (d) -> d.type
         .attr class: 'title', y: (d) -> 12 - d.hh
       g.append('text').text (d) -> "#{d.id}"
-        .attr class: 'type', y: (d) -> -4 + d.hh
+        .attr class: 'type', y: (d) -> - d.hh - 8
       #g.append('text').text (d) -> d.def.icon #disable the icon for now
       #  .attr class: 'iconfont', x: 0, y: 0
       g.append('text').text (d) -> '\uf014' # fa-trash-o
@@ -122,7 +122,7 @@ ng.directive 'jbCircuitEditor', ->
       if wireUnderCursor
         emit 'delWire', wireUnderCursor.from, wireUnderCursor.to
         # wireUnderCursor = null
-      else
+    svg.on 'dblclick', ->
         [x,y] = d3.mouse(@)
         emit 'addGadget', x|0, y|0 # convert to ints
 

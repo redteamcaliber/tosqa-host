@@ -11,7 +11,7 @@ jb-circuit-editor>svg {
   font-size: 12px;
   cursor: default;
 }
-  .gadget .outline {
+  .gadget-container {
     /*stroke: #505050;*/
     fill-opacity: 0.8;
   }
