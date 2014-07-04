@@ -27,13 +27,13 @@ ng.directive 'jbCircuitEditor', ->
       .on 'drag', (d) ->
         d.x = d3.event.x | 0 # stay on int coordinates
         d.y = d3.event.y | 0 # stay on int coordinates
-      d3.select(@).attr transform: (d) -> "translate(#{d.x},#{d.y})"
-        # recalculate endpoints and move all wires attached to this gadget
-      wires.filter (w) -> w.source.id is d.id or w.target.id is d.id
-        .each (d) ->
-          d.source = findPin d.from
-          d.target = findPin d.to
-        .attr d: diag
+        d3.select(@).attr transform: (d) -> "translate(#{d.x},#{d.y})"
+          # recalculate endpoints and move all wires attached to this gadget
+        wires.filter (w) -> w.source.id is d.id or w.target.id is d.id
+          .each (d) ->
+            d.source = findPin d.from
+            d.target = findPin d.to
+          .attr d: diag
       .on 'dragend', (d) ->
         g = scope.data.gadgets[d.id]
         unless g.x is d.x and g.y is d.y
@@ -99,17 +99,19 @@ ng.directive 'jbCircuitEditor', ->
 
       # Add input and output pins
       pins = gadgets.selectAll('.pin').data (d) -> d.pins
-      p = pins.enter().append('g')
+      p = pins.enter().append('g').classed('pins', true)
       p.append('circle')
         .attr class: 'pin', cx: ((d) -> d.x+0.5), cy: ((d) -> d.y+.5), r: 3
       p.append('circle').call(pinDrag)
         .attr class: 'hit', cx: ((d) -> d.x+0.5), cy: ((d) -> d.y+.5), r: 7
-        .on 'mouseup', (d) -> dragInfo.to = d.pin
+        .on 'mouseup',  (d) -> dragInfo.to = d.pin
+        .on 'mouseover', (d) -> d3.select(this.parentNode).classed('active',true)
+        .on 'mouseout',  (d) -> d3.select(this.parentNode).classed('active',false)
       p.append('text').text (d) -> d.name
         .attr
           class: (d) -> d.dir
-          x: (d) -> d.x
-          y: (d) -> if d.dir is 'in' then d.x-7 else d.y+18
+          x: (d) -> if d.dir is 'in' then d.x-4 else d.x+16
+          y: (d) -> if d.dir is 'in' then d.y-10 else d.y+20
       pins.exit().remove()
 
       wires.enter().insert('path', 'g') # uses insert to move to back right away
@@ -151,7 +153,7 @@ ng.directive 'jbCircuitEditor', ->
 
         placePins = (pnames, dir, yi) ->
           nlist = if pnames then pnames.split ' ' else []
-          xi = xstep * (nlist.length-1) #>> 1 # why this bitshift?
+          xi = 10 # xstep * (nlist.length-1) #>> 1 # why this bitshift?
           for name in nlist
             pins.push { x: xi, y: yi, name, dir, pin: "#{id}.#{name}" }
             xi += xstep

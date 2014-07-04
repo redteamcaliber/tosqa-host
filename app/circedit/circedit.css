@@ -19,9 +19,9 @@ jb-circuit-editor > svg {
 }
 .gadget .title {
   fill: #000;
-  text-anchor: middle;
+  text-anchor: start;
 }
-.gadget .type {
+.gadget .label {
   fill: #ccc;
   text-anchor: end;
 }
@@ -35,6 +35,13 @@ jb-circuit-editor > svg {
 .gadget .in,
 .gadget .out {
   text-anchor: start;
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+.gadget .pins.active .in,
+.gadget .pins.active .out {
+  opacity: 1;
+  transition: opacity 0.2s;
 }
 .wire {
   stroke: #808080;
@@ -42,9 +49,4 @@ jb-circuit-editor > svg {
 }
 #drag.drawing {
   stroke: #f00;
-}
-.active {
-  stroke: #000;
-  stroke-width: 2px;
-  stroke-opacity: 0.3;
 }
