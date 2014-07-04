@@ -19,6 +19,9 @@ jb-circuit-editor
   cursor default
   .gadget-container
     fill-opacity 0.8
+    &.active
+      stroke #808080
+      stroke-width 2px
   .delete
     cursor pointer
   .title
@@ -36,7 +39,7 @@ jb-circuit-editor
     text-anchor start
     opacity 0
     transition opacity 0.2s
-  .pins.active .in, .pins.active .out
+  .pins.hover .in, .pins.hover .out
     opacity 1
     transition opacity 0.2s
 .wire

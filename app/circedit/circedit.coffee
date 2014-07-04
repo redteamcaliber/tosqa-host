@@ -78,6 +78,7 @@ ng.directive 'jbCircuitEditor', ->
             rx: 5
             ry: 5
         .on 'mousedown', (d) ->
+          # TODO: remove 'active' class if gadget is already selected
           d3.selectAll('.gadget-container').classed 'active', false
           d3.select(this).classed 'active', true
           emit 'selectGadget', d.id
@@ -86,8 +87,8 @@ ng.directive 'jbCircuitEditor', ->
         .attr class: 'title', x: 10, y: 24
       g.append('text').text (d) -> "#{d.id}"
         .attr class: 'label', x: 140, y: - 8
-      #g.append('text').text (d) -> d.def.icon #disable the icon for now
-      #  .attr class: 'iconfont', x: 0, y: 0
+      # g.append('text').text (d) -> d.def.icon #disable the icon for now
+      #   .attr class: 'iconfont', x: 16, y: 20
       g.append('text').text (d) -> '\uf014' # fa-trash-o
         .attr class: 'delete iconfont', x: 130, y: 10
         .style 'font-size': '12px'
@@ -105,8 +106,8 @@ ng.directive 'jbCircuitEditor', ->
       p.append('circle').call(pinDrag)
         .attr class: 'hit', cx: ((d) -> d.x+0.5), cy: ((d) -> d.y+.5), r: 7
         .on 'mouseup',  (d) -> dragInfo.to = d.pin
-        .on 'mouseover', (d) -> d3.select(this.parentNode).classed('active',true)
-        .on 'mouseout',  (d) -> d3.select(this.parentNode).classed('active',false)
+        .on 'mouseover', (d) -> d3.select(this.parentNode).classed('hover',true)
+        .on 'mouseout',  (d) -> d3.select(this.parentNode).classed('hover',false)
       p.append('text').text (d) -> d.name
         .attr
           class: (d) -> d.dir
@@ -129,6 +130,8 @@ ng.directive 'jbCircuitEditor', ->
       if wireUnderCursor
         emit 'delWire', wireUnderCursor.from, wireUnderCursor.to
         # wireUnderCursor = null
+      else # unselect all selected gadgets
+        d3.selectAll('.gadget-container').classed 'active', false
     svg.on 'dblclick', ->
       [x,y] = d3.mouse(@)
       emit 'addGadget', x|0, y|0 # convert to ints
