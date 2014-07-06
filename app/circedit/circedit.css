@@ -14,7 +14,7 @@ jb-circuit-editor > svg {
 .gadget .gadget-container {
   fill-opacity: 0.8;
 }
-.gadget .gadget-container.active {
+.gadget .gadget-container.selected {
   stroke: #808080;
   stroke-width: 2px;
 }

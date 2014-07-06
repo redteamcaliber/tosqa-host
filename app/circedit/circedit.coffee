@@ -78,9 +78,9 @@ ng.directive 'jbCircuitEditor', ->
             rx: 5
             ry: 5
         .on 'mousedown', (d) ->
-          # TODO: remove 'active' class if gadget is already selected
-          d3.selectAll('.gadget-container').classed 'active', false
-          d3.select(this).classed 'active', true
+          # TODO: remove 'selected' class if gadget is already selected
+          d3.selectAll('.gadget-container').classed 'selected', false
+          d3.select(this).classed 'selected', true
           emit 'selectGadget', d.id
         .style fill: (d) -> d.def.shade
       g.append('text').text (d) -> d.type
@@ -128,10 +128,11 @@ ng.directive 'jbCircuitEditor', ->
     svg.on 'mousedown', ->
       # return  if d3.event.defaultPrevented
       if wireUnderCursor
+        console.log wireUnderCursor.classList
         emit 'delWire', wireUnderCursor.from, wireUnderCursor.to
         # wireUnderCursor = null
       else # unselect all selected gadgets
-        d3.selectAll('.gadget-container').classed 'active', false
+        d3.selectAll('.gadget-container').classed('selected', false)
     svg.on 'dblclick', ->
       [x,y] = d3.mouse(@)
       emit 'addGadget', x|0, y|0 # convert to ints
