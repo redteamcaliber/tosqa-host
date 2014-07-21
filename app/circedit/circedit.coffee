@@ -42,6 +42,8 @@ ng.directive 'jbCircuitEditor', ->
     dragInfo = {}
     dragWire = svg.append('path').datum(dragInfo).attr id: 'drag'
     wireUnderCursor = null
+    pinUnderCursor = null
+    currentWire = null
 
     pinDrag = d3.behavior.drag()
       .origin Object
@@ -80,6 +82,8 @@ ng.directive 'jbCircuitEditor', ->
         .on 'mousedown', (d) ->
           # TODO: remove 'selected' class if gadget is already selected
           d3.selectAll('.gadget-container').classed 'selected', false
+          # deselect wire
+          d3.selectAll('.wire').classed 'selected', false 
           d3.select(this).classed 'selected', true
           emit 'selectGadget', d.id
         .style fill: (d) -> d.def.shade
@@ -119,23 +123,40 @@ ng.directive 'jbCircuitEditor', ->
         .attr class: 'wire', fill: 'none', d: diag
         # can't use mouseclick, see
         # https://groups.google.com/d/msg/d3-js/gHzOj91X2NA/65BEf2DuRV4J
-        .on 'mouseenter', (d) -> wireUnderCursor = d
-        .on 'mouseleave', (d) -> wireUnderCursor = null
+        .on 'mouseenter', (d) -> 
+          wireUnderCursor = d
+          currentWire = this
+          d3.select(this).classed('hover',true)
+          # added wire selection
+        .on 'mouseleave', (d) -> 
+          wireUnderCursor = null
+          d3.select(this).classed('hover',false)
+        .on 'mouseDown', ->
+          d3.selectAll('.gadget-container').classed 'selected', false
+          d3.select(this).classed 'selected',true
       wires.exit().remove()
 
       gadgets.attr transform: (d) -> "translate(#{d.x},#{d.y})"
     
     svg.on 'mousedown', ->
       # return  if d3.event.defaultPrevented
-      if wireUnderCursor
-        console.log wireUnderCursor.classList
-        emit 'delWire', wireUnderCursor.from, wireUnderCursor.to
+      if wireUnderCursor?
+        d3.selectAll('.gadget-container').classed 'selected', false
+        d3.selectAll('.wire').classed 'selected', false
+        d3.select(currentWire).classed 'selected',true
+        emit 'selWire', wireUnderCursor.from,  wireUnderCursor.to
+        # emit 'delWire', wireUnderCursor.from, wireUnderCursor.to
         # wireUnderCursor = null
       else # unselect all selected gadgets
         d3.selectAll('.gadget-container').classed('selected', false)
+        d3.selectAll('.wire').classed 'selected', false
     svg.on 'dblclick', ->
-      [x,y] = d3.mouse(@)
-      emit 'addGadget', x|0, y|0 # convert to ints
+      if wireUnderCursor?
+        emit 'delWire', wireUnderCursor.from, wireUnderCursor.to
+      else
+        [x,y] = d3.mouse(@)
+        emit 'addGadget', x|0, y|0 # convert to ints
+      
 
     findPin = (pin) ->
       [gid,pname] = pin.split '.'

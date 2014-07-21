@@ -50,25 +50,6 @@ circuitsCtrl = ($scope, jeebus) ->
       inputs: 'Cmds'
       
   $scope.circuit =
-    gadgets:
-      g1: { x: 120, y: 220, title: 'Gadget One', type: 'Pipe',    }
-      g2: { x: 300, y: 250, title: 'Gadget Two', type: 'Printer', }
-      g3: { x: 320, y:  60, title: 'StepGen-X',  type: 'StepGen', }
-      g4: { x: 540, y:  70, title: 'SSB-X',      type: 'SSB',     }
-      g5: { x: 340, y: 140, title: 'StepGen-Y',  type: 'StepGen', }
-      g6: { x: 520, y: 150, title: 'SSB-Y',      type: 'SSB',     }
-    wires:
-      'g1.Out/g2.In': 0
-      'g3.Out/g4.Cmds': 0
-      'g5.Out/g6.Cmds': 0
-    feeds:
-      'g2.In': [ 'some data', { Tag: 'blah', Msg: 'tagged data' } ]
-      'g3.Params': [ 1000, 500 ]
-      'g5.Params': [ 500, 1000 ]
-    labels:
-      In: 'g2.In'
-      
-  $scope.circuit =
     gadgets:{}
     wires:{}
     feeds:{}
@@ -119,7 +100,7 @@ circuitsCtrl = ($scope, jeebus) ->
     console.log 'fix id', x
     updatePinList() # for new and deleted gadgets
   $scope.$watch 'currSel.title', (x) ->
-    if $scope.currSel?
+    if $scope.currSel and x?
       id = $scope.currSel.id
       obj = $scope.circuit.gadgets[id]
       obj.title = x
@@ -152,10 +133,16 @@ circuitsCtrl = ($scope, jeebus) ->
       $scope.redraw()
     delWire: (from, to) ->    #jeebus.send { cmd: 'ced-dw', obj, from, to }
       id = (from.split '.')[0]
+      pin = (from.split '.')[1]
       obj = $scope.circuit.gadgets[id]
-      obj.wire = null
+      delete obj.wire[pin]
       jeebus.put "/circuit/demo1/#{id}", obj
       $scope.redraw()
+    selWire: (from, to) ->    #jeebus.send { cmd: 'ced-dw', obj, from, to }
+      $scope.currSel ={}
+      $scope.currSel.id = "#{from}/#{to}"
+      $scope.currSel.title = null
+      $scope.currSel.type = "wire" #$scope.circuit.gadgets[id].type
     selectGadget: (id) ->     #jeebus.send { cmd: 'ced-sg', obj, id       }
       $scope.currSel ={}
       $scope.currSel.id = id

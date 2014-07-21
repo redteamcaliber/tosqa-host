@@ -81,14 +81,39 @@
     </table>
   </div>
 </div>
-<!--.pure-g-->
-<!--  .pure-u-1-->
-<!--    table.pure-table.pure-table-horizontal-->
-<!--      thead -->
-<!--        tr -->
-<!--          th id-->
-<!--          th gadget-->
-<!--      tbody-->
-<!--        tr(ng-repeat='(k,v) in circuit.gadgets')-->
-<!--          td {{k}}-->
-<!--          td {{v}}-->
+<div class="pure-g">
+  <div class="pure-u-1">
+    <table class="pure-table pure-table-horizontal">
+      <thead>
+        <tr>
+          <th>id</th>
+          <th>gadget</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr ng-repeat="(k,v) in circuit.gadgets">
+          <td>{{k}}</td>
+          <td>{{v}}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+<div class="pure-g">
+  <div class="pure-u-1">
+    <table class="pure-table pure-table-horizontal">
+      <thead>
+        <tr>
+          <th>id</th>
+          <th>gadget</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr ng-repeat="(k,v) in circuit.wires">
+          <td>{{k}}</td>
+          <td>{{v}}          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>

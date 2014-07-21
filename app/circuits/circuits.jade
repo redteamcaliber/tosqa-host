@@ -40,14 +40,25 @@
           td Add:
           td: select(ng-model='addPin',ng-options='p for p in inputPins')
                 option(value='') Select an input pin...
-//.pure-g
-//  .pure-u-1
-//    table.pure-table.pure-table-horizontal
-//      thead 
-//        tr 
-//          th id
-//          th gadget
-//      tbody
-//        tr(ng-repeat='(k,v) in circuit.gadgets')
-//          td {{k}}
-//          td {{v}}
+.pure-g
+  .pure-u-1
+    table.pure-table.pure-table-horizontal
+      thead
+        tr
+          th id
+          th gadget
+      tbody
+        tr(ng-repeat='(k,v) in circuit.gadgets')
+          td {{k}}
+          td {{v}}
+.pure-g
+  .pure-u-1
+    table.pure-table.pure-table-horizontal
+      thead
+        tr
+          th id
+          th gadget
+      tbody
+        tr(ng-repeat='(k,v) in circuit.wires')
+          td {{k}}
+          td {{v}}          

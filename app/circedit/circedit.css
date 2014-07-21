@@ -16,7 +16,7 @@ jb-circuit-editor > svg {
 }
 .gadget .gadget-container.selected {
   stroke: #808080;
-  stroke-width: 2px;
+  stroke-width: px;
 }
 .gadget .delete {
   cursor: pointer;
@@ -52,6 +52,13 @@ jb-circuit-editor > svg {
   stroke: #808080;
   stroke-width: 1.5px;
   cursor: pointer;
+}
+.wire.hover {
+  stroke-width: 3px;
+}
+.wire.selected {
+  stroke: #f00;
+  stroke-width: 3px;
 }
 #drag.drawing {
   stroke: #1f8dd6;
